@@ -17,11 +17,11 @@ Thumbs.db
 
 # Ignore environment and config
 .env
-app/core/config.php
+# app/core/config.php
 
 # Ignore vendor and node_modules if used
 vendor/
 node_modules/
 
 # Ignore SQL dumps (optional)
-*.sql
+# *.sql
