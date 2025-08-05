@@ -1,0 +1,27 @@
+# Ignore VSCode config
+.vscode/
+
+# Ignore logs, sessions, and cache
+*.log
+*.sess
+cache/
+tmp/
+logs/
+
+# Ignore OS and IDE files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*.idea/
+
+# Ignore environment and config
+.env
+app/core/config.php
+
+# Ignore vendor and node_modules if used
+vendor/
+node_modules/
+
+# Ignore SQL dumps (optional)
+*.sql
