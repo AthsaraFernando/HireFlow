@@ -1,1 +1,1 @@
-<h1>System Admin Controller > View inside accesslogs()</h1>
+<h1>Accesslogs view</h1>
