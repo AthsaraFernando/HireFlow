@@ -1,1 +1,0 @@
-<h1>System Admin Controller > View inside index()</h1>
