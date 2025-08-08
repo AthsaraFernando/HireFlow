@@ -8,15 +8,15 @@ class Controller
             extract($data);
         }
 
-        if (!isset($data['param0'])) {
-            $data['param0'] = $name;
+        if (!isset($data['view'])) {
+            $data['view'] = $name;
         }
 
         $fileName = "../app/views/" . $name . ".view.php";
         if (file_exists($fileName)) {
             require $fileName;
         } else {
-            $fileName = "../app/views/" . $name . "/" . $data['param0'] . ".view.php";
+            $fileName = "../app/views/" . $name . "/" . $data['view'] . ".view.php";
             if (file_exists($fileName)) {
                 require $fileName;
             } else {

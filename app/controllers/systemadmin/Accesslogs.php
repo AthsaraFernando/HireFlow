@@ -1,7 +1,11 @@
 <?php
 
-class Accesslogs extends Controller // or SystemAdmin
+class Accesslogs extends Controller 
 {
-  
 
+    public function index()
+    {
+        $URL['view'] = 'accesslogs';
+        $this->view('systemadmin', $URL);
+    }
 }

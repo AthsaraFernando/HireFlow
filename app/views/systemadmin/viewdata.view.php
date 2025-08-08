@@ -1,1 +1,1 @@
-<h1>System Admin Controller > View inside viewdata()</h1>
+<h1>Viewdata view</h1>
