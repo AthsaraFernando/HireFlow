@@ -1,1 +1,0 @@
-export const ROOT = 'http://localhost/HireFlow_Local/public';
