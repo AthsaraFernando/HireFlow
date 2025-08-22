@@ -14,14 +14,32 @@ trait Database
         $con = $this->connect();
         $stmt = $con->prepare($query);
 
+        // $logData = [
+        //     'query' => $query,
+        //     'data' => $data,
+        //     'timestamp' => date('Y-m-d H:i:s')
+        // ];
+        // file_put_contents(
+        //     __DIR__ . '/test_log.txt',             // Adjust path if needed
+        //     print_r($logData, true) . "\n",         // Human-readable format
+        //     FILE_APPEND                             // Don’t overwrite old logs
+        // );
+
         $check = $stmt->execute($data);
         if ($check) {
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            if (is_array($result) && count($result)) {
-                return $result;
-            }
-        }
+            if (stripos(trim($query), 'select') === 0) {
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                return $result ?: [];
 
+            }
+            return true;
+
+            // Below code fails for updates because doesnt return true for updates
+            // $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            // if (is_array($result) && count($result)) {
+            //     return $result;
+            // }
+        }
         return false;
     }
 

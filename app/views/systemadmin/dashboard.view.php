@@ -24,17 +24,17 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/systemadmin/users" class="nav-link">
+                    <a href="<?= ROOT ?>/systemadmin/usermanage" class="nav-link">
                         <span class="nav-text">Manage Users</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/systemadmin/reports" class="nav-link">
+                    <a href="<?= ROOT ?>/systemadmin/viewdata" class="nav-link">
                         <span class="nav-text">Reports & Analytics</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/systemadmin/logs" class="nav-link">
+                    <a href="<?= ROOT ?>/systemadmin/accesslogs" class="nav-link">
                         <span class="nav-text">Access Logs</span>
                     </a>
                 </li>

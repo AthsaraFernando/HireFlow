@@ -8,7 +8,9 @@ class User
         'full_name',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'status'
+
     ];
 
     public function signUpValidate($data)
