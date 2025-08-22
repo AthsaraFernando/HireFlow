@@ -60,6 +60,9 @@ trait Model
         }
         return false;
     }
+
+
+
     public function insert($data)
     {
         // Removing non-allowed data before preparing the query
@@ -71,6 +74,8 @@ trait Model
             }
         }
 
+        // show($data);
+
         $keys = array_keys($data);
         $query = "insert into $this->table (" . implode(",", $keys) . ") values (:" . implode(",:", $keys) . ")";
         // echo $query;
@@ -80,6 +85,7 @@ trait Model
 
 
     }
+
     public function update($id, $data, $id_column = 'id')
     {
         // Removing non-allowed data before preparing the query
@@ -89,6 +95,10 @@ trait Model
                     unset($data[$key]);
                 }
             }
+        }
+
+        if (empty($data)) {
+            return false;
         }
 
         $keys = array_keys($data);
@@ -101,19 +111,34 @@ trait Model
         $query = trim($query, ", ");
         $query .= " where $id_column = :$id_column";
 
-        // echo $query;
+        // return $query;
 
         $data[$id_column] = $id;
-        $this->query($query, $data);
-        return false;
+        return $this->query($query, $data);
     }
+
+
+
     public function delete($id, $id_column = 'id')
     {
+        // $data[$id_column] = $id;
+        // $query = "update $this->table where $id_column = :$id_column";
+
+        // $data = [$id_column => $id];
         $data[$id_column] = $id;
-        $query = "update $this->table where $id_column = :$id_column";
+        $query = "DELETE FROM $this->table WHERE $id_column = :$id_column";
         // echo $query;
 
-        $this->query($query, $data);
-        return false;
+        // $logData = [
+        //     'data' => $data,
+        //     'timestamp' => date('Y-m-d H:i:s')
+        // ];
+        // file_put_contents(
+        //     __DIR__ . '/test_log.txt',             // Adjust path if needed
+        //     print_r($logData, true) . "\n",         // Human-readable format
+        //     FILE_APPEND                             // Don’t overwrite old logs
+        // );
+
+        return $this->query($query, $data);
     }
 }
