@@ -36,7 +36,7 @@ VALUES ('Hasindu Rodrigo', 'hasindu@hireflow.com', 'hradmin123', 2, 'active');
 
 -- Recruitment Manager
 INSERT INTO users (full_name, email, password, role_id, status)
-VALUES ('Tehan Fernando', 'tehan@hireflow.com', 'recruit123', 3, 'active');
+VALUES ('Tehan Isum', 'tehan@hireflow.com', 'recruit123', 3, 'active');
 
 -- Applicants
 INSERT INTO users (full_name, email, password, role_id, status)
