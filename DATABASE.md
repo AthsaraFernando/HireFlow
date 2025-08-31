@@ -1,52 +1,18 @@
 # HireFlow Database Documentation
 
-## Overview
-HireFlow uses MySQL database to store all application data including users, job posts, applications, interviews, and system logs.
-### Sample Data Included
+## 📊 Database Overview
 
-### Default Users (8 Complete Accounts)
-| Role | Name | Email | Password | Status |
-|------|------|-------|----------|--------|
-| **System Admin** | Sineth Mendis | sineth@hireflow.com | admin123 | Active |
-| **HR Admin** | Hasindu Rodrigo | hasindu@hireflow.com | hradmin123 | Active |
-| **Recruitment Manager** | Tehan Isum | tehan@hireflow.com | recruit123 | Active |
-| **Applicant** | Athsara Manitha | athsara1@gmail.com | applicant1 | Active |
-| **Applicant** | Chamali Perera | chamali.perera@gmail.com | applicant2 | Active |
-| **Applicant** | Nuwan Silva | nuwan.silva@gmail.com | applicant3 | Active |
-| **Applicant** | Priya Jayasinghe | priya.j@gmail.com | applicant4 | Active |
-| **Applicant** | Kamal Fernando | kamal.fernando@gmail.com | applicant5 | Active |
+HireFlow uses a MySQL database with a comprehensive schema designed to handle recruitment management efficiently. The database consists of 9 interconnected tables that manage users, roles, job postings, applications, interviews, and system settings.
 
-### Sample Job Posts (5 Complete Jobs)
-| Title | Department | Location | Status | Deadline |
-|-------|------------|----------|--------|----------|
-| **Senior Software Engineer** | IT | Colombo | Open | 2025-09-30 |
-| **Marketing Specialist** | Marketing | Kandy | Open | 2025-09-25 |
-| **Junior Data Analyst** | Analytics | Galle | Open | 2025-10-15 |
-| **HR Assistant** | Human Resources | Colombo | Open | 2025-09-20 |
-| **Project Manager** | Management | Colombo | Draft | 2025-10-05 |
+### 🗄️ Database Name: `hireflow_db`
 
-### Sample Applications (6 Complete Applications)
-- Multiple applications across different jobs with various statuses
-- Includes: Applied, Under Review, Shortlisted, Interview Scheduled statuses
-- Sample resume paths and cover letters included
+## 🚀 Complete Setup Guide
 
-### Sample Interviews & Feedback
-- Interview schedules with different types (Video, In-person)
-- Sample interview feedback and ratings
-- Complete workflow from application to interview completion
-
-### Sample Notifications (5 Complete)
-- Application confirmations and updates
-- Interview scheduling notifications  
-- New application alerts for HR staff
-- Interview reminders for recruitment managers
-
-### Sample System Data
-- **Access Logs**: 5 sample log entries for security monitoring
-- **System Settings**: 5 default configuration settings
-- **Foreign Key Relationships**: All tables properly linked Instructions
-
-## Database Setup Instructions
+### Prerequisites
+- XAMPP with MySQL installed and running
+- PHP 7.4 or higher
+- Web browser access
+- Git (for cloning the repository)
 
 ### For First-Time Users (Complete Setup Guide)
 
@@ -89,213 +55,132 @@ HireFlow uses MySQL database to store all application data including users, job 
    sudo chown -R daemon:daemon /opt/lampp/htdocs/HireFlow
    ```
 
-#### Step 3: Create Database
+#### Step 3: Database Setup Options
+
+##### Option A: One-Click Automated Setup (Recommended)
+
+1. **Create Database**
+   - Open phpMyAdmin (http://localhost/phpmyadmin)
+   - Create new database named `hireflow_db`
+   - Set collation to `utf8mb4_general_ci`
+
+2. **Configure Database Connection** (if not already done)
+   - Open `app/core/config.php`
+   - Verify database credentials:
+   ```php
+   define('DB_HOST', 'localhost');
+   define('DB_NAME', 'hireflow_db');
+   define('DB_USER', 'root');
+   define('DB_PASS', ''); // Usually empty for XAMPP
+   ```
+
+3. **Run Automated Setup Script**
+   - Open your browser and navigate to: `http://localhost/HireFlow/database-setup.php`
+   - The script will automatically:
+     - ✅ Test database connection
+     - ✅ Create all 9 tables with proper relationships
+     - ✅ Insert sample data for testing
+     - ✅ Set up user accounts and permissions
+     - ✅ Configure system settings
+
+##### Option B: Manual Setup (Alternative)
+
 1. **Access phpMyAdmin**
    - Open web browser
    - Go to `http://localhost/phpmyadmin`
    - Login with username: `root`, password: (leave empty for XAMPP default)
 
-2. **Import Database**
-   - Click "Import" tab in phpMyAdmin
-   - Click "Choose File" and select `my_db.session.sql` from HireFlow folder
-   - Click "Go" to execute the script
-   - Wait for "Import has been successfully finished" message
+2. **Create Database and Tables**
+   - Create new database named `hireflow_db`
+   - Click on the database to select it
+   - Click "SQL" tab and execute the table creation scripts (see SQL section below)
 
-3. **Verify Database Creation**
-   - You should see `hireflow_db` in the left sidebar
-   - Click on it to expand and see 9 tables
-   - Click on `users` table to see 8 sample user accounts
+#### Step 4: Verification & Testing
+1. **Verify Tables**
+   In phpMyAdmin, you should see 9 tables:
+   - access_logs
+   - applications  
+   - departments
+   - interviews
+   - job_posts
+   - notifications
+   - roles
+   - system_settings
+   - users
 
-#### Step 4: Configure Database Connection
-1. **Update Configuration File**
-   - Open `app/core/config.php` in your code editor
-   - Verify these settings match your XAMPP setup:
-   ```php
-   define('DB_HOST', 'localhost');
-   define('DB_NAME', 'hireflow_db');
-   define('DB_USER', 'root');
-   define('DB_PASS', ''); // Empty for default XAMPP
-   ```
+2. **Test Login**
+   Try logging in with sample accounts:
+   - **System Admin**: admin / password123
+   - **HR Admin**: hr_admin / password123
+   - **Recruitment Manager**: recruiter / password123
+   - **Applicant**: john_doe / password123
 
-#### Step 5: Test the Setup
-1. **Access Application**
-   - Open browser and go to `http://localhost/HireFlow`
-   - You should see the HireFlow home page
+### Default Login Credentials
+After setup, you can login with:
+- **Username:** admin
+- **Password:** password123
+- **Role:** System Administrator
 
-2. **Verify Database Connection**
-   - Go to `http://localhost/HireFlow/check-database.php`
-   - Should show all green checkmarks for tables and fields
+⚠️ **Important:** Change default passwords before deploying to production!
 
-3. **Test Navigation**
-   - Go to `http://localhost/HireFlow/quick-test.html`
-   - Test different user interfaces using the provided links
+### Troubleshooting
 
-#### Troubleshooting Common Issues
+#### Common Issues
+1. **"Access denied" error**
+   - Check if MySQL service is running in XAMPP
+   - Verify database credentials in config.php
+   - Ensure database 'hireflow_db' exists
 
-**Issue: "Access denied for user 'root'"**
-- Solution: Check if MySQL service is running in XAMPP Control Panel
-- Try accessing phpMyAdmin first to verify MySQL is working
+2. **"Table already exists" warnings**
+   - This is normal if running setup multiple times
+   - The script uses IF NOT EXISTS to prevent errors
 
-**Issue: "Database 'hireflow_db' doesn't exist"**
-- Solution: Re-run the `my_db.session.sql` script in phpMyAdmin
-- Make sure to select "Import" tab and choose the correct file
+3. **Foreign key constraint errors**
+   - Ensure all tables are created in correct order
+   - Check if referenced tables exist
+   - The script handles dependencies automatically
 
-**Issue: "Page not found" errors**
-- Solution: Ensure HireFlow folder is in `htdocs` directory
-- Check Apache service is running in XAMPP Control Panel
-- Verify URL is `http://localhost/HireFlow` (case-sensitive)
+4. **Permission denied errors**
+   - Run XAMPP as Administrator (Windows)
+   - Check file permissions on database files
 
-**Issue: File permissions (Mac/Linux)**
-- Solution: Run permission commands from Step 2.3 above
-- Ensure web server has read access to HireFlow directory
+### Sample Data Included
 
-### Alternative Setup Methods
+#### Default Users (7 Complete Accounts)
+| Role | Username | Email | Password | 
+|------|----------|-------|----------|
+| **System Admin** | admin | admin@hireflow.com | password123 |
+| **HR Admin** | hr_admin | hr@hireflow.com | password123 |
+| **Recruitment Manager** | recruiter | recruiter@hireflow.com | password123 |
+| **Applicant** | john_doe | john.doe@email.com | password123 |
+| **Applicant** | jane_smith | jane.smith@email.com | password123 |
+| **Applicant** | alex_wilson | alex.wilson@email.com | password123 |
+| **Applicant** | priya_j | priya.j@email.com | password123 |
 
-#### Method 1: Using phpMyAdmin (Recommended for beginners)
-1. Open phpMyAdmin (`http://localhost/phpmyadmin`)
-2. Click "New" to create database
-3. Name it `hireflow_db`
-4. Go to "Import" tab
-5. Select `my_db.session.sql` file
-6. Click "Go"
+#### Sample Departments (5 Complete Departments)
+| ID | Name | Description | Head |
+|----|------|-------------|------|
+| 1 | Human Resources | Manages recruitment, employee relations, and HR policies | HR Admin |
+| 2 | Information Technology | Handles software development, system administration, and technical support | HR Admin |
+| 3 | Marketing | Responsible for brand management, digital marketing, and customer outreach | HR Admin |
+| 4 | Finance | Manages company finances, budgeting, and financial reporting | HR Admin |
+| 5 | Operations | Oversees daily operations, process improvement, and logistics | HR Admin |
 
-#### Method 2: Using MySQL Command Line (Advanced users)
-```bash
-# Navigate to HireFlow directory
-cd /path/to/HireFlow
+#### Sample Job Posts (3 Complete Jobs)
+| Title | Department | Location | Status | Deadline |
+|-------|------------|----------|--------|----------|
+| **Senior Software Engineer** | IT | New York, NY | Active | 2025-09-30 |
+| **Junior Data Analyst** | IT | Remote | Active | 2025-09-15 |
+| **Marketing Specialist** | Marketing | Los Angeles, CA | Active | 2025-09-20 |
 
-# Import database
-mysql -u root -p < my_db.session.sql
+#### Sample Applications & Data
+- **Applications**: 3 sample applications with different statuses
+- **Interviews**: 2 scheduled interviews with feedback
+- **Notifications**: 4 sample notifications for different scenarios
+- **Access Logs**: Sample security monitoring entries
+- **System Settings**: 8 configuration options
 
-# Verify import
-mysql -u root -p -e "USE hireflow_db; SHOW TABLES;"
-```
-
-#### Method 3: Using Database Client (HeidiSQL, MySQL Workbench, etc.)
-1. Connect to localhost MySQL server
-2. Create new database `hireflow_db`
-3. Import/execute `my_db.session.sql` file
-4. Verify all 9 tables are created
-
-4. **Verify Setup**
-   - Check that `hireflow_db` database is created
-   - Verify all tables are present with sample data
-   - Use the verification script: `http://localhost/HireFlow/check-database.php`
-
-### Database Verification
-
-#### Automated Verification
-After setup, verify your database using our verification script:
-
-1. **Access Verification Page**
-   ```
-   http://localhost/HireFlow/check-database.php
-   ```
-
-2. **Expected Results**
-   ```
-   ✅ All 9 required tables present
-   ✅ Users table has all required fields  
-   ✅ Job posts table has all required fields
-   ✅ All foreign key relationships working
-   ✅ Sample data loaded correctly
-   ```
-
-#### Visual Setup Checklist
-
-```mermaid
-graph LR
-    A[Start] --> B{XAMPP Installed?}
-    B -->|No| C[Install XAMPP]
-    B -->|Yes| D{Services Running?}
-    C --> D
-    D -->|No| E[Start Apache & MySQL]
-    D -->|Yes| F{Repository Cloned?}
-    E --> F
-    F -->|No| G[Clone HireFlow Repo]
-    F -->|Yes| H{Files in htdocs?}
-    G --> H
-    H -->|No| I[Move to htdocs]
-    H -->|Yes| J{Database Created?}
-    I --> J
-    J -->|No| K[Import my_db.session.sql]
-    J -->|Yes| L{Config Updated?}
-    K --> L
-    L -->|No| M[Update config.php]
-    L -->|Yes| N[Test Application]
-    M --> N
-    N --> O{Working?}
-    O -->|No| P[Check Troubleshooting]
-    O -->|Yes| Q[Setup Complete! 🎉]
-    P --> B
-    
-    style A fill:#e3f2fd
-    style Q fill:#e8f5e8
-    style P fill:#ffebee
-```
-
-#### Manual Verification Commands
-
-3. **Manual Verification via phpMyAdmin**
-   ```sql
-   -- Check all tables exist
-   SHOW TABLES;
-   -- Expected: 9 tables
-   
-   -- Verify table structures
-   DESCRIBE users;
-   DESCRIBE job_posts;
-   DESCRIBE applications;
-   
-   -- Check sample data counts
-   SELECT COUNT(*) FROM users;        -- Should return 8
-   SELECT COUNT(*) FROM job_posts;    -- Should return 5  
-   SELECT COUNT(*) FROM applications; -- Should return 6
-   SELECT COUNT(*) FROM roles;        -- Should return 4
-   
-   -- Verify relationships work
-   SELECT u.full_name, r.role_name 
-   FROM users u 
-   JOIN roles r ON u.role_id = r.id;
-   
-   -- Check job posts with HR names
-   SELECT j.title, u.full_name as hr_name
-   FROM job_posts j
-   JOIN users u ON j.hr_id = u.id;
-   ```
-
-#### Quick Test URLs
-After successful setup, test these URLs:
-
-| URL | Expected Result | Description |
-|-----|----------------|-------------|
-| `http://localhost/HireFlow` | ✅ Home page loads | Main application |
-| `http://localhost/HireFlow/check-database.php` | ✅ All green checks | Database verification |
-| `http://localhost/HireFlow/quick-test.html` | ✅ Navigation page | UI testing dashboard |
-| `http://localhost/HireFlow/systemadmin/dashboard` | ✅ Dashboard loads | System admin interface |
-| `http://localhost/HireFlow/applicant/dashboard` | ✅ Dashboard loads | Applicant interface |
-
-#### Setup Success Indicators
-
-```mermaid
-pie title Database Setup Completion
-    "Tables Created" : 9
-    "Sample Users" : 8
-    "Sample Jobs" : 5
-    "Sample Applications" : 6
-    "Sample Notifications" : 5
-```
-
-### Database Configuration
-Update the database configuration in `app/core/config.php`:
-```php
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'hireflow_db');
-define('DB_USER', 'root');
-define('DB_PASS', ''); // Default XAMPP password is empty
-```
-
-## Database Schema
+## 📊 Database Schema
 
 ### Entity Relationship Diagram (EER)
 
@@ -304,147 +189,125 @@ define('DB_PASS', ''); // Default XAMPP password is empty
                     │     roles       │
                     │─────────────────│
                     │ PK │ id         │
-                    │    │ role_name  │
+                    │    │ name       │
                     │    │ description│
                     │    │ created_at │
                     └─────────────────┘
                              │
                              │ 1:N
                              ▼
-                    ┌─────────────────┐
-                    │     users       │
-                    │─────────────────│
-                    │ PK │ id         │
-                    │    │ full_name  │
-                    │ UK │ email      │
-                    │    │ password   │
-                    │    │ phone      │
-                    │    │ address    │
-                    │ FK │ role_id    │
-                    │    │ status     │
-                    │    │ profile_pic│
-                    │    │ last_login │
-                    │    │ created_at │
-                    │    │ updated_at │
-                    └─────────────────┘
-                        │           │
-                   1:N  │           │ 1:N
-                        ▼           ▼
-            ┌─────────────────┐   ┌─────────────────┐
-            │   job_posts     │   │ notifications   │
-            │─────────────────│   │─────────────────│
-            │ PK │ id         │   │ PK │ id         │
-            │ FK │ hr_id      │   │ FK │ user_id    │
-            │    │ title      │   │    │ title      │
-            │    │ description│   │    │ message    │
-            │    │ requirements│   │    │ type       │
-            │    │ responsiblts│   │    │ is_read    │
-            │    │ department │   │    │ created_at │
-            │    │ location   │   │    │ read_at    │
-            │    │ salary_rng │   └─────────────────┘
-            │    │ employ_type│
-            │    │ exp_level  │            ┌─────────────────┐
-            │    │ deadline   │            │  access_logs    │
-            │    │ status     │            │─────────────────│
-            │    │ apps_count │            │ PK │ id         │
-            │    │ created_at │            │ FK │ user_id    │
-            │    │ updated_at │            │    │ ip_address │
-            └─────────────────┘            │    │ user_agent │
-                    │                      │    │ action     │
-               1:N  │                      │    │ resource   │
-                    ▼                      │    │ method     │
-            ┌─────────────────┐            │    │ status_code│
-            │  applications   │            │    │ resp_time  │
-            │─────────────────│            │    │ created_at │
-            │ PK │ id         │            └─────────────────┘
-            │ FK │ applicant_id│                    ▲
-            │ FK │ job_id     │                     │ 1:N
-            │    │ resume_path│                     │
-            │    │ cover_ltr  │            ┌─────────────────┐
-            │    │ add_docs   │            │ system_settings │
-            │    │ status     │            │─────────────────│
-            │    │ notes      │            │ PK │ id         │
-            │    │ applied_at │            │ UK │ setting_key│
-            │    │ updated_at │            │    │ setting_val│
-            │ UK │ (app_id,   │            │    │ description│
-            │    │  job_id)   │            │ FK │ updated_by │
-            └─────────────────┘            │    │ updated_at │
-                    │                      └─────────────────┘
-               1:N  │
-                    ▼
-            ┌─────────────────┐
-            │   interviews    │
-            │─────────────────│
-            │ PK │ id         │
-            │ FK │ application_id│
-            │ FK │ interviewer_id│
-            │    │ interview_type│
-            │    │ scheduled_date│
-            │    │ scheduled_time│
-            │    │ duration_mins │
-            │    │ location   │
-            │    │ meeting_link│
-            │    │ status     │
-            │    │ notes      │
-            │    │ created_at │
-            │    │ updated_at │
-            └─────────────────┘
-                    │
-               1:1  │
-                    ▼
-            ┌─────────────────┐
-            │    feedback     │
-            │─────────────────│
-            │ PK │ id         │
-            │ FK │ interview_id│
-            │    │ tech_rating│
-            │    │ comm_rating│
-            │    │ overall_rtg│
-            │    │ strengths  │
-            │    │ weaknesses │
-            │    │ comments   │
-            │    │ recommendation│
-            │    │ submitted_at│
-            └─────────────────┘
-
-Legend:
-PK = Primary Key
-FK = Foreign Key  
-UK = Unique Key
+    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+    │  departments    │    │     users       │    │ system_settings │
+    │─────────────────│    │─────────────────│    │─────────────────│
+    │ PK │ id         │◄──┐│ PK │ id         │┌──►│ PK │ id         │
+    │    │ name       │   ││    │ username   ││   │    │ setting_key│
+    │    │ description│   ││    │ email      ││   │    │ setting_val│
+    │ FK │ head_of_   │───┘│    │ password   ││   │    │ description│
+    │    │ department │    │    │ first_name ││   │ FK │ updated_by │───┘
+    │    │ created_at │    │    │ last_name  ││   │    │ updated_at │
+    │    │ updated_at │    │ FK │ role_id    │┘   └─────────────────┘
+    └─────────────────┘    │    │ phone      │
+             │             │    │ is_active  │
+             │ 1:N         │    │ last_login │
+             ▼             │    │ created_at │
+    ┌─────────────────┐    │    │ updated_at │
+    │   job_posts     │    └─────────────────┘
+    │─────────────────│             │
+    │ PK │ id         │             │ 1:N
+    │    │ title      │             ▼
+    │ FK │ department │◄────────────┼─── access_logs
+    │    │ description│             │    notifications
+    │    │ requirements│            │    applications (applicant_id)
+    │    │ salary_range│            │    applications (reviewed_by)
+    │    │ location   │             │    interviews (interviewer_id)
+    │    │ employ_type│             │
+    │    │ status     │             │
+    │ FK │ posted_by  │─────────────┘
+    │    │ posted_at  │
+    │    │ deadline   │
+    │    │ created_at │
+    │    │ updated_at │
+    └─────────────────┘
+             │
+             │ 1:N
+             ▼
+    ┌─────────────────┐
+    │  applications   │
+    │─────────────────│
+    │ PK │ id         │
+    │ FK │ job_post_id│
+    │ FK │ applicant  │
+    │    │ cover_letter│
+    │    │ resume_path│
+    │    │ status     │
+    │    │ applied_at │
+    │ FK │ reviewed_by│
+    │    │ reviewed_at│
+    │    │ notes      │
+    └─────────────────┘
+             │
+             │ 1:N
+             ▼
+    ┌─────────────────┐
+    │   interviews    │
+    │─────────────────│
+    │ PK │ id         │
+    │ FK │ application│
+    │ FK │ interviewer│
+    │    │ scheduled  │
+    │    │ location   │
+    │    │ type       │
+    │    │ status     │
+    │    │ feedback   │
+    │    │ rating     │
+    │    │ created_at │
+    │    │ updated_at │
+    └─────────────────┘
 ```
 
-### Mermaid Entity Relationship Diagram
+### Mermaid ERD (Complete Relationships)
 
 ```mermaid
 erDiagram
     roles ||--o{ users : "has"
-    users ||--o{ job_posts : "creates"
-    users ||--o{ applications : "submits"
-    users ||--o{ interviews : "conducts"
-    users ||--o{ notifications : "receives"
-    users ||--o{ access_logs : "generates"
-    users ||--o{ system_settings : "updates"
+    users ||--o{ departments : "heads"
+    departments ||--o{ job_posts : "contains"
+    users ||--o{ job_posts : "posts"
+    users ||--o{ applications : "applies"
+    users ||--o{ applications : "reviews"
     job_posts ||--o{ applications : "receives"
     applications ||--o{ interviews : "schedules"
-    interviews ||--|| feedback : "generates"
+    users ||--o{ interviews : "conducts"
+    users ||--o{ access_logs : "generates"
+    users ||--o{ notifications : "receives"
+    users ||--o{ system_settings : "updates"
 
     roles {
         int id PK
-        varchar role_name UK
+        varchar name
         text description
         timestamp created_at
     }
 
+    departments {
+        int id PK
+        varchar name
+        text description
+        int head_of_department FK
+        timestamp created_at
+        timestamp updated_at
+    }
+
     users {
         int id PK
-        varchar full_name
-        varchar email UK
+        varchar username
+        varchar email
         varchar password
-        varchar phone
-        text address
+        varchar first_name
+        varchar last_name
         int role_id FK
-        enum status
-        varchar profile_picture
+        varchar phone
+        boolean is_active
         timestamp last_login
         timestamp created_at
         timestamp updated_at
@@ -452,63 +315,55 @@ erDiagram
 
     job_posts {
         int id PK
-        int hr_id FK
         varchar title
+        int department_id FK
         text description
         text requirements
-        text responsibilities
-        varchar department
-        varchar location
         varchar salary_range
+        varchar location
         enum employment_type
-        enum experience_level
-        date deadline
         enum status
-        int applications_count
+        int posted_by FK
+        timestamp posted_at
+        date deadline
         timestamp created_at
         timestamp updated_at
     }
 
     applications {
         int id PK
+        int job_post_id FK
         int applicant_id FK
-        int job_id FK
-        varchar resume_path
         text cover_letter
-        text additional_documents
+        varchar resume_path
         enum status
-        text notes
         timestamp applied_at
-        timestamp updated_at
+        int reviewed_by FK
+        timestamp reviewed_at
+        text notes
     }
 
     interviews {
         int id PK
         int application_id FK
         int interviewer_id FK
-        enum interview_type
-        date scheduled_date
-        time scheduled_time
-        int duration_minutes
+        datetime scheduled_at
         varchar location
-        varchar meeting_link
+        enum interview_type
         enum status
-        text notes
+        text feedback
+        int rating
         timestamp created_at
         timestamp updated_at
     }
 
-    feedback {
+    access_logs {
         int id PK
-        int interview_id FK
-        int technical_rating
-        int communication_rating
-        int overall_rating
-        text strengths
-        text weaknesses
-        text comments
-        enum recommendation
-        timestamp submitted_at
+        int user_id FK
+        varchar action
+        varchar ip_address
+        text user_agent
+        timestamp created_at
     }
 
     notifications {
@@ -522,22 +377,9 @@ erDiagram
         timestamp read_at
     }
 
-    access_logs {
-        int id PK
-        int user_id FK
-        varchar ip_address
-        text user_agent
-        varchar action
-        varchar resource
-        varchar method
-        int status_code
-        int response_time_ms
-        timestamp created_at
-    }
-
     system_settings {
         int id PK
-        varchar setting_key UK
+        varchar setting_key
         text setting_value
         text description
         int updated_by FK
@@ -545,582 +387,577 @@ erDiagram
     }
 ```
 
-### Database Workflow Diagram
+### Database Setup Completion Chart
 
 ```mermaid
-flowchart TD
-    A[User Registration] --> B{Role Assignment}
-    B -->|System Admin| C[Full System Access]
-    B -->|HR Admin| D[Job & Application Management]
-    B -->|Recruitment Manager| E[Interview & Evaluation]
-    B -->|Applicant| F[Job Search & Apply]
-    
-    D --> G[Create Job Posts]
-    G --> H[Job Goes Live]
-    H --> I[Applications Received]
-    
-    F --> J[Browse Jobs]
-    J --> K[Submit Application]
-    K --> I
-    
-    I --> L[Application Review]
-    L --> M{HR Decision}
-    M -->|Reject| N[Update Status]
-    M -->|Shortlist| O[Schedule Interview]
-    
-    O --> P[Interview Conducted]
-    P --> Q[Feedback Submitted]
-    Q --> R{Final Decision}
-    R -->|Hire| S[Job Offer]
-    R -->|Reject| T[Send Rejection]
-    
-    S --> U[Update All Systems]
-    T --> U
-    N --> U
-    
-    U --> V[Send Notifications]
-    V --> W[Log All Actions]
+pie title Database Setup Status
+    "Tables Created" : 9
+    "Sample Users" : 7
+    "Sample Jobs" : 3
+    "Sample Applications" : 3
+    "System Settings" : 8
 ```
 
-### Database Workflow Diagram
+## 📋 Complete Table Details
 
-```mermaid
-flowchart TD
-    A[User Registration] --> B{Role Assignment}
-    B -->|System Admin| C[Full System Access]
-    B -->|HR Admin| D[Job & Application Management]
-    B -->|Recruitment Manager| E[Interview & Evaluation]
-    B -->|Applicant| F[Job Search & Apply]
-    
-    D --> G[Create Job Posts]
-    G --> H[Job Goes Live]
-    H --> I[Applications Received]
-    
-    F --> J[Browse Jobs]
-    J --> K[Submit Application]
-    K --> I
-    
-    I --> L[Application Review]
-    L --> M{HR Decision}
-    M -->|Reject| N[Update Status]
-    M -->|Shortlist| O[Schedule Interview]
-    
-    O --> P[Interview Conducted]
-    P --> Q[Feedback Submitted]
-    Q --> R{Final Decision}
-    R -->|Hire| S[Job Offer]
-    R -->|Reject| T[Send Rejection]
-    
-    S --> U[Update All Systems]
-    T --> U
-    N --> U
-    
-    U --> V[Send Notifications]
-    V --> W[Log All Actions]
-```
+### 1. roles
+**Purpose:** Defines user access levels and permissions throughout the system
 
-### System Architecture Overview
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique role identifier |
+| name | VARCHAR(50) | UNIQUE, NOT NULL | Role name (System Administrator, HR Administrator, etc.) |
+| description | TEXT | NULL | Role description and permissions overview |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Role creation date |
 
-```mermaid
-graph TB
-    subgraph "Frontend Layer (Complete ✅)"
-        UI1[System Admin UI - 8 pages]
-        UI2[HR Admin UI - 10 pages]
-        UI3[Recruitment Manager UI - 10 pages]
-        UI4[Applicant UI - 8 pages]
-    end
-    
-    subgraph "Backend Layer (Pending ⏳)"
-        API[REST API Endpoints]
-        AUTH[Authentication System]
-        FILE[File Upload System]
-        EMAIL[Email Notifications]
-    end
-    
-    subgraph "Database Layer (Complete ✅)"
-        DB[(MySQL Database)]
-        T1[roles - 4 records]
-        T2[users - 8 records]
-        T3[job_posts - 5 records]
-        T4[applications - 6 records]
-        T5[interviews - 2 records]
-        T6[feedback - ready]
-        T7[notifications - 5 records]
-        T8[access_logs - 5 records]
-        T9[system_settings - 5 records]
-    end
-    
-    UI1 -.-> API
-    UI2 -.-> API
-    UI3 -.-> API
-    UI4 -.-> API
-    
-    API --> AUTH
-    API --> FILE
-    API --> EMAIL
-    API --> DB
-    
-    DB --> T1
-    DB --> T2
-    DB --> T3
-    DB --> T4
-    DB --> T5
-    DB --> T6
-    DB --> T7
-    DB --> T8
-    DB --> T9
-    
-    style UI1 fill:#e1f5fe
-    style UI2 fill:#e1f5fe
-    style UI3 fill:#e1f5fe
-    style UI4 fill:#e1f5fe
-    style DB fill:#e8f5e8
-    style T1 fill:#e8f5e8
-    style T2 fill:#e8f5e8
-    style T3 fill:#e8f5e8
-    style T4 fill:#e8f5e8
-    style T5 fill:#e8f5e8
-    style T6 fill:#e8f5e8
-    style T7 fill:#e8f5e8
-    style T8 fill:#e8f5e8
-    style T9 fill:#e8f5e8
-    style API fill:#fff3e0
-    style AUTH fill:#fff3e0
-    style FILE fill:#fff3e0
-    style EMAIL fill:#fff3e0
-```
+**Sample Data:**
+- System Administrator (Full system access)
+- HR Administrator (Recruitment management) 
+- Recruitment Manager (Candidate evaluation)
+- Applicant (Job application access)
 
-### Database Security Model
+### 2. departments
+**Purpose:** Organizational structure and job categorization system
 
-```mermaid
-graph TD
-    A[Database Access] --> B{Authentication Check}
-    B -->|Valid| C{Role Validation}
-    B -->|Invalid| D[Access Denied]
-    
-    C -->|System Admin| E[Full Database Access]
-    C -->|HR Admin| F[Job & Application Tables]
-    C -->|Recruitment Manager| G[Interview & Feedback Tables]
-    C -->|Applicant| H[Limited Personal Data]
-    
-    E --> I[All CRUD Operations]
-    F --> J[Job Management CRUD]
-    G --> K[Interview CRUD + Feedback]
-    H --> L[Read Own Data + Apply]
-    
-    I --> M[Access Logged]
-    J --> M
-    K --> M
-    L --> M
-    
-    M --> N[Security Audit Trail]
-    
-    style D fill:#ffebee
-    style E fill:#e8f5e8
-    style F fill:#fff3e0
-    style G fill:#e3f2fd
-    style H fill:#fce4ec
-```
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique department identifier |
+| name | VARCHAR(100) | UNIQUE, NOT NULL | Department name |
+| description | TEXT | NULL | Department description and responsibilities |
+| head_of_department | INT | FK → users(id) | Department head/manager reference |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Creation date |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Last update date |
 
-### Complete Table Overview
-The HireFlow database consists of 9 core tables that support the complete recruitment workflow:
+**Sample Data:**
+- Human Resources, IT, Marketing, Finance, Operations
 
-| Table | Records | Purpose | Status |
-|-------|---------|---------|--------|
-| `roles` | 4 roles | User role definitions | ✅ Complete |
-| `users` | 8 users | All user accounts | ✅ Complete |
-| `job_posts` | 5 jobs | Job postings | ✅ Complete |
-| `applications` | 6 applications | Job applications | ✅ Complete |
-| `interviews` | 2 interviews | Interview scheduling | ✅ Complete |
-| `feedback` | Sample ready | Interview feedback | ✅ Complete |
-| `notifications` | 5 notifications | User notifications | ✅ Complete |
-| `access_logs` | 5 log entries | Security & audit | ✅ Complete |
-| `system_settings` | 5 settings | App configuration | ✅ Complete |
+### 3. users
+**Purpose:** Central user management for all system users across all roles
 
-### Core Tables
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique user identifier |
+| username | VARCHAR(50) | UNIQUE, NOT NULL | Login username |
+| email | VARCHAR(100) | UNIQUE, NOT NULL | User email address |
+| password | VARCHAR(255) | NOT NULL | Hashed password (using password_hash()) |
+| first_name | VARCHAR(50) | NOT NULL | User's first name |
+| last_name | VARCHAR(50) | NOT NULL | User's last name |
+| role_id | INT | FK → roles(id), NOT NULL | User role assignment |
+| phone | VARCHAR(20) | NULL | Contact phone number |
+| is_active | BOOLEAN | DEFAULT TRUE | Account active status |
+| last_login | TIMESTAMP | NULL | Last login time tracking |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Account creation date |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Last profile update |
 
-#### 1. `roles`
-Stores user role definitions
-```sql
-- id (Primary Key)
-- role_name (System Admin, HR Admin, Recruitment Manager, Applicant)
-- description
-- created_at
-```
-
-#### 2. `users`
-Stores all user accounts across different roles
-```sql
-- id (Primary Key)
-- full_name
-- email (Unique)
-- password (Hashed)
-- phone
-- address
-- role_id (Foreign Key → roles.id)
-- status (active, inactive, suspended)
-- profile_picture
-- last_login
-- created_at, updated_at
-```
-
-#### 3. `job_posts`
-Stores job postings created by HR Admins
-```sql
-- id (Primary Key)
-- hr_id (Foreign Key → users.id)
-- title
-- description
-- requirements
-- responsibilities
-- department
-- location
-- salary_range
-- employment_type (Full-time, Part-time, Contract, Internship)
-- experience_level (Entry, Mid, Senior, Executive)
-- deadline
-- status (Open, Closed, Draft)
-- applications_count
-- created_at, updated_at
-```
-
-#### 4. `applications`
-Stores job applications submitted by applicants
-```sql
-- id (Primary Key)
-- applicant_id (Foreign Key → users.id)
-- job_id (Foreign Key → job_posts.id)
-- resume_path
-- cover_letter
-- additional_documents
-- status (Applied, Under Review, Shortlisted, Interview Scheduled, etc.)
-- notes
-- applied_at, updated_at
-- UNIQUE constraint (applicant_id, job_id) - one application per job
-```
-
-#### 5. `interviews`
-Stores interview scheduling and details
-```sql
-- id (Primary Key)
-- application_id (Foreign Key → applications.id)
-- interviewer_id (Foreign Key → users.id)
-- interview_type (Phone, Video, In-person, Panel)
-- scheduled_date, scheduled_time
-- duration_minutes
-- location
-- meeting_link
-- status (Scheduled, Completed, Canceled, Rescheduled)
-- notes
-- created_at, updated_at
-```
-
-#### 6. `feedback`
-Stores interview feedback from recruitment managers
-```sql
-- id (Primary Key)
-- interview_id (Foreign Key → interviews.id)
-- technical_rating (1-10)
-- communication_rating (1-10)
-- overall_rating (1-10)
-- strengths, weaknesses
-- comments
-- recommendation (Strongly Recommend, Recommend, etc.)
-- submitted_at
-```
-
-### Supporting Tables
-
-#### 7. `notifications`
-System-wide notifications for users
-```sql
-- id (Primary Key)
-- user_id (Foreign Key → users.id)
-- title, message
-- type (info, success, warning, error)
-- is_read, read_at
-- created_at
-```
-
-#### 8. `access_logs`
-Security and audit logging
-```sql
-- id (Primary Key)
-- user_id (Foreign Key → users.id)
-- ip_address, user_agent
-- action, resource, method
-- status_code, response_time_ms
-- created_at
-```
-
-#### 9. `system_settings`
-Configuration settings for the application
-```sql
-- id (Primary Key)
-- setting_key (Unique)
-- setting_value, description
-- updated_by (Foreign Key → users.id)
-- updated_at
-```
-
-## Sample Data Included
-
-### Default Users
-- **System Admin**: sineth@hireflow.com (password: admin123)
-- **HR Admin**: hasindu@hireflow.com (password: hradmin123)
-- **Recruitment Manager**: tehan@hireflow.com (password: recruit123)
-- **Sample Applicants**: Various test applicants with applications
-
-### Sample Job Posts
-- Senior Software Engineer (Open)
-- Marketing Specialist (Open)
-- Junior Data Analyst (Open)
-- HR Assistant (Open)
-- Project Manager (Draft)
-
-### Sample Applications
-- Multiple applications across different jobs with various statuses
-- Sample interview schedules and feedback
-
-## Future Backend Development Considerations
-
-### Database Features Already Implemented
-✅ **Complete User Management**
-- Role-based access control (4 roles)
-- User profiles with contact information
-- Profile picture support
-- Last login tracking
+**Key Features:**
+- Secure password hashing
+- Role-based access control
+- Activity tracking
 - Account status management
 
-✅ **Job Management System**
-- Complete job posting workflow
-- Multi-status support (Draft → Open → Closed)
-- Application count tracking
-- Department and location management
-- Employment type and experience level classification
+### 4. job_posts
+**Purpose:** Job posting management and tracking throughout recruitment lifecycle
 
-✅ **Application Processing**
-- One application per user per job (enforced by unique constraint)
-- Resume and document path storage
-- Multi-stage application status tracking
-- Cover letter and additional documents support
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique job posting identifier |
+| title | VARCHAR(200) | NOT NULL | Job title |
+| department_id | INT | FK → departments(id) | Associated department |
+| description | TEXT | NOT NULL | Detailed job description |
+| requirements | TEXT | NULL | Job requirements and qualifications |
+| salary_range | VARCHAR(100) | NULL | Salary information |
+| location | VARCHAR(100) | NULL | Work location |
+| employment_type | ENUM | 'full-time', 'part-time', 'contract', 'internship' | Employment type |
+| status | ENUM | 'active', 'closed', 'draft' | Current posting status |
+| posted_by | INT | FK → users(id), NOT NULL | User who created the posting |
+| posted_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Publication date |
+| deadline | DATE | NULL | Application deadline |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Creation date |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Last modification date |
 
-✅ **Interview Workflow**
-- Multiple interview types (Phone, Video, In-person, Panel)
-- Complete scheduling with date/time/duration
-- Meeting link and location support
-- Interview status management
-- Interviewer assignment
+**Workflow States:**
+- Draft → Active → Closed
+- Supports deadline management
+- Department categorization
 
-✅ **Feedback System**
-- Detailed rating system (Technical, Communication, Overall)
-- Strengths and weaknesses documentation
-- Recommendation levels
-- Comments and notes
+### 5. applications
+**Purpose:** Tracks job applications and their progression through the recruitment process
 
-✅ **Notification System**
-- Multi-type notifications (info, success, warning, error)
-- Read/unread status tracking
-- User-specific notifications
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique application identifier |
+| job_post_id | INT | FK → job_posts(id), NOT NULL | Applied job posting |
+| applicant_id | INT | FK → users(id), NOT NULL | Applicant user |
+| cover_letter | TEXT | NULL | Application cover letter |
+| resume_path | VARCHAR(255) | NULL | Resume file path |
+| status | ENUM | 'pending', 'shortlisted', 'rejected', 'hired' | Application status |
+| applied_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Application submission time |
+| reviewed_by | INT | FK → users(id) | HR/Recruiter who reviewed |
+| reviewed_at | TIMESTAMP | NULL | Review date |
+| notes | TEXT | NULL | Reviewer notes and comments |
 
-✅ **Security & Audit**
-- Complete access logging
-- IP address and user agent tracking
-- Action and resource monitoring
-- Performance metrics (response time)
+**Application Workflow:**
+- Pending → Shortlisted/Rejected
+- Shortlisted → Hired/Rejected
+- Full audit trail maintained
 
-✅ **System Configuration**
-- Flexible settings management
-- Key-value configuration storage
-- Change tracking with user attribution
+### 6. interviews
+**Purpose:** Interview scheduling and feedback management system
 
-### Tables to Add/Enhance
-1. **Documents Management**
-   ```sql
-   CREATE TABLE documents (
-       id INT PRIMARY KEY AUTO_INCREMENT,
-       user_id INT,
-       application_id INT,
-       file_name VARCHAR(255),
-       file_path VARCHAR(500),
-       file_type VARCHAR(50),
-       file_size INT,
-       uploaded_at TIMESTAMP
-   );
-   ```
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique interview identifier |
+| application_id | INT | FK → applications(id), NOT NULL | Related application |
+| interviewer_id | INT | FK → users(id), NOT NULL | Conducting interviewer |
+| scheduled_at | DATETIME | NOT NULL | Interview date and time |
+| location | VARCHAR(200) | NULL | Interview location/platform |
+| interview_type | ENUM | 'phone', 'video', 'in-person' | Interview method |
+| status | ENUM | 'scheduled', 'completed', 'cancelled', 'no-show' | Interview status |
+| feedback | TEXT | NULL | Interview feedback and notes |
+| rating | INT | CHECK (rating >= 1 AND rating <= 5) | Interview rating score |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Schedule creation date |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Last update date |
 
-2. **Email Templates**
-   ```sql
-   CREATE TABLE email_templates (
-       id INT PRIMARY KEY AUTO_INCREMENT,
-       template_name VARCHAR(100),
-       subject VARCHAR(255),
-       body TEXT,
-       variables TEXT, -- JSON format
-       created_by INT,
-       is_active BOOLEAN
-   );
-   ```
+**Interview Features:**
+- Multi-format support (phone, video, in-person)
+- Rating system (1-5)
+- Status tracking
+- Feedback collection
 
-3. **Audit Trail**
-   ```sql
-   CREATE TABLE audit_trail (
-       id INT PRIMARY KEY AUTO_INCREMENT,
-       table_name VARCHAR(100),
-       record_id INT,
-       action ENUM('INSERT', 'UPDATE', 'DELETE'),
-       old_values JSON,
-       new_values JSON,
-       user_id INT,
-       timestamp TIMESTAMP
-   );
-   ```
+### 7. access_logs
+**Purpose:** Security monitoring and user activity tracking for audit purposes
 
-### Security Enhancements
-- Password hashing using `password_hash()` and `password_verify()`
-- Session management and CSRF protection
-- File upload validation and security
-- SQL injection prevention using prepared statements
-- Role-based access control implementation
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique log entry identifier |
+| user_id | INT | FK → users(id) | User who performed action |
+| action | VARCHAR(100) | NOT NULL | Action performed |
+| ip_address | VARCHAR(45) | NULL | User's IP address (IPv4/IPv6) |
+| user_agent | TEXT | NULL | Browser/device information |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Action timestamp |
 
-### Performance Optimizations
-✅ **Database Indexes Already Implemented**
-- Primary keys on all tables
-- Foreign key indexes for relationships
-- Unique constraints on critical fields (email, role combinations)
+**Security Features:**
+- Complete activity tracking
+- IP address logging
+- User agent tracking
+- Audit trail maintenance
 
-📋 **Additional Optimizations for Production**
-- Add composite indexes on frequently queried columns:
-  ```sql
-  CREATE INDEX idx_applications_status_date ON applications(status, applied_at);
-  CREATE INDEX idx_jobs_status_deadline ON job_posts(status, deadline);
-  CREATE INDEX idx_interviews_date_status ON interviews(scheduled_date, status);
-  CREATE INDEX idx_notifications_user_read ON notifications(user_id, is_read);
-  ```
-- Implement database connection pooling
-- Add caching layer for frequently accessed data
-- Optimize queries with proper joins and indexes
+### 8. notifications
+**Purpose:** In-app notification system for user communication
 
-### Data Integrity
-✅ **Already Implemented**
-- Foreign key constraints on all relationships
-- Check constraints on rating fields (1-10 range)
-- Enum constraints for status fields
-- Unique constraints preventing duplicate applications
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique notification identifier |
+| user_id | INT | FK → users(id), NOT NULL | Notification recipient |
+| title | VARCHAR(200) | NOT NULL | Notification title |
+| message | TEXT | NOT NULL | Notification content |
+| type | ENUM | 'info', 'success', 'warning', 'error' | Notification type |
+| is_read | BOOLEAN | DEFAULT FALSE | Read status |
+| created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Creation date |
+| read_at | TIMESTAMP | NULL | When marked as read |
 
-📋 **Additional Integrity Features**
-- Add triggers for automatic data validation
-- Implement soft deletes for important records
-- Add check constraints for data ranges
-- Set up database backups and recovery procedures
+**Notification Types:**
+- Info: General information
+- Success: Positive actions
+- Warning: Important alerts
+- Error: Problem notifications
 
-## UI Integration Status
+### 9. system_settings
+**Purpose:** Application configuration management and system parameters
 
-### Frontend Components Ready for Database Integration
+| Column | Type | Constraints | Description |
+|--------|------|-------------|-------------|
+| id | INT | PK, AUTO_INCREMENT | Unique setting identifier |
+| setting_key | VARCHAR(100) | UNIQUE, NOT NULL | Configuration key |
+| setting_value | TEXT | NULL | Configuration value |
+| description | TEXT | NULL | Setting description |
+| updated_by | INT | FK → users(id) | User who made changes |
+| updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Last update time |
 
-#### **System Admin Interface (8 pages) ✅**
-- **Dashboard**: Connects to users, applications, interviews, access_logs tables
-- **User Management**: Full CRUD operations on users and roles tables
-- **Access Logs**: Real-time display from access_logs table
-- **Data Analytics**: Aggregated data from all tables
-- **System Settings**: Direct integration with system_settings table
-- **Backup & Restore**: Database backup/restore functionality
-- **Security Settings**: Advanced system_settings configurations
-- **Reports**: Cross-table analytics and reporting
+**Default Settings:**
+- site_name: Application name
+- max_file_size: Upload limits
+- allowed_file_types: File restrictions
+- session_timeout: Security settings
+- email_notifications: Communication preferences
 
-#### **HR Admin Interface (10 pages) ✅**
-- **Dashboard**: Job posts, applications, interview metrics
-- **Job Management**: Complete CRUD on job_posts table
-- **Application Review**: Applications and applicant data integration
-- **Candidate Database**: Users (applicants) with search/filter
-- **Interview Coordination**: Interviews table management
-- **Reporting**: Analytics across job_posts, applications, interviews
-- **Team Management**: Users management for HR staff
-- **Calendar**: Interview scheduling integration
-- **Templates**: Email templates for notifications
-- **Settings**: HR-specific system_settings
+## 🔗 Database Relationships Summary
 
-#### **Recruitment Manager Interface (10 pages) ✅**
-- **Dashboard**: Interview-focused metrics and pending tasks
-- **Assigned Jobs**: job_posts assigned to specific recruiters
-- **Candidate Evaluation**: Applications review and scoring
-- **Interview Management**: Complete interviews table integration
-- **Feedback System**: feedback table with rating/comments
-- **Hiring Pipeline**: Application status progression tracking
-- **Calendar**: Interview scheduling and management
-- **Reports**: Interview and feedback analytics
-- **Candidate Notes**: Extended feedback and evaluation notes
-- **Team Coordination**: Multi-recruiter collaboration features
+### Primary Relationships
+- **roles** → **users** (1:N) - Each user has one role, roles can have multiple users
+- **users** → **departments** (1:N) - Department heads are users
+- **departments** → **job_posts** (1:N) - Jobs belong to departments
+- **users** → **job_posts** (1:N) - Users create job postings
+- **job_posts** → **applications** (1:N) - Jobs receive multiple applications
+- **users** → **applications** (1:N) - Users apply for jobs
+- **applications** → **interviews** (1:N) - Applications can have multiple interviews
+- **users** → **interviews** (1:N) - Users conduct interviews
 
-#### **Applicant Interface (8 pages) ✅**
-- **Dashboard**: Personal metrics from applications, interviews
-- **Job Browse**: job_posts with search, filter, and pagination
-- **Job Details**: Individual job_post display with apply functionality
-- **Applications**: Personal applications with status tracking
-- **Apply**: New application creation with file uploads
-- **Interview Schedule**: Personal interviews from interviews table
-- **Interview Feedback**: Personal feedback from feedback table
-- **Profile Management**: users table profile editing
+### Secondary Relationships
+- **users** → **access_logs** (1:N) - Users generate activity logs
+- **users** → **notifications** (1:N) - Users receive notifications
+- **users** → **system_settings** (1:N) - Users update system settings
 
-### Database-UI Mapping
+### Referential Integrity
+- All foreign keys have proper constraints
+- Cascading rules defined for data consistency
+- Orphan record prevention implemented
 
-| Database Table | Primary UI Components | Ready for Integration |
-|----------------|----------------------|----------------------|
-| **users** | User Management, Profile, Authentication | ✅ Ready |
-| **roles** | User Management, Access Control | ✅ Ready |
-| **job_posts** | Job Management, Job Browse, Applications | ✅ Ready |
-| **applications** | Application Management, Tracking | ✅ Ready |
-| **interviews** | Interview Scheduling, Management | ✅ Ready |
-| **feedback** | Interview Feedback, Evaluation | ✅ Ready |
-| **notifications** | Real-time Notifications, Alerts | ✅ Ready |
-| **access_logs** | Security Monitoring, Audit Trail | ✅ Ready |
-| **system_settings** | System Configuration, Settings | ✅ Ready |
+## 📝 Complete SQL Schema
 
-### Authentication System Requirements
+### Table Creation Script
 
-The current database structure fully supports authentication implementation:
+```sql
+-- Create database
+CREATE DATABASE IF NOT EXISTS hireflow_db CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
+USE hireflow_db;
 
-```php
-// User Authentication Fields Available:
-- email (unique identifier)
-- password (for hashing with password_hash())
-- role_id (for role-based access control)  
-- status (active/inactive/suspended)
-- last_login (session tracking)
+-- 1. Create roles table
+CREATE TABLE IF NOT EXISTS roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 
-// Session Management Fields:
-- user_id, role_id for session data
-- access_logs for security monitoring
-- system_settings for session configuration
+-- 2. Create departments table  
+CREATE TABLE IF NOT EXISTS departments (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    head_of_department INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
 
-// Profile Management Fields:
-- full_name, email, phone, address
-- profile_picture (file path storage)
-- created_at, updated_at (account tracking)
+-- 3. Create users table
+CREATE TABLE IF NOT EXISTS users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    role_id INT NOT NULL,
+    phone VARCHAR(20),
+    is_active BOOLEAN DEFAULT TRUE,
+    last_login TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(id)
+);
+
+-- 4. Create job_posts table
+CREATE TABLE IF NOT EXISTS job_posts (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(200) NOT NULL,
+    department_id INT,
+    description TEXT NOT NULL,
+    requirements TEXT,
+    salary_range VARCHAR(100),
+    location VARCHAR(100),
+    employment_type ENUM('full-time', 'part-time', 'contract', 'internship') DEFAULT 'full-time',
+    status ENUM('active', 'closed', 'draft') DEFAULT 'active',
+    posted_by INT NOT NULL,
+    posted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deadline DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (department_id) REFERENCES departments(id),
+    FOREIGN KEY (posted_by) REFERENCES users(id)
+);
+
+-- 5. Create applications table
+CREATE TABLE IF NOT EXISTS applications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    job_post_id INT NOT NULL,
+    applicant_id INT NOT NULL,
+    cover_letter TEXT,
+    resume_path VARCHAR(255),
+    status ENUM('pending', 'shortlisted', 'rejected', 'hired') DEFAULT 'pending',
+    applied_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    reviewed_by INT,
+    reviewed_at TIMESTAMP NULL,
+    notes TEXT,
+    FOREIGN KEY (job_post_id) REFERENCES job_posts(id),
+    FOREIGN KEY (applicant_id) REFERENCES users(id),
+    FOREIGN KEY (reviewed_by) REFERENCES users(id)
+);
+
+-- 6. Create interviews table
+CREATE TABLE IF NOT EXISTS interviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    application_id INT NOT NULL,
+    interviewer_id INT NOT NULL,
+    scheduled_at DATETIME NOT NULL,
+    location VARCHAR(200),
+    interview_type ENUM('phone', 'video', 'in-person') DEFAULT 'in-person',
+    status ENUM('scheduled', 'completed', 'cancelled', 'no-show') DEFAULT 'scheduled',
+    feedback TEXT,
+    rating INT CHECK (rating >= 1 AND rating <= 5),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (application_id) REFERENCES applications(id),
+    FOREIGN KEY (interviewer_id) REFERENCES users(id)
+);
+
+-- 7. Create access_logs table
+CREATE TABLE IF NOT EXISTS access_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT,
+    action VARCHAR(100) NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- 8. Create notifications table
+CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    type ENUM('info', 'success', 'warning', 'error') DEFAULT 'info',
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    read_at TIMESTAMP NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- 9. Create system_settings table
+CREATE TABLE IF NOT EXISTS system_settings (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(100) NOT NULL UNIQUE,
+    setting_value TEXT,
+    description TEXT,
+    updated_by INT,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (updated_by) REFERENCES users(id)
+);
+
+-- Add foreign key constraint for departments
+ALTER TABLE departments ADD FOREIGN KEY (head_of_department) REFERENCES users(id);
 ```
 
-## Maintenance
+### Sample Data Insertion
 
-### Regular Tasks
-1. **Backup Database** - Weekly automated backups
-2. **Clean Old Logs** - Remove access logs older than 6 months
-3. **Archive Applications** - Move old applications to archive tables
-4. **Update Statistics** - Refresh application counts and analytics data
+```sql
+-- Insert sample roles
+INSERT IGNORE INTO roles (name, description) VALUES
+('System Administrator', 'Full system access and user management'),
+('HR Administrator', 'Manages recruitment process and employee data'),
+('Recruitment Manager', 'Oversees job postings and candidate screening'),
+('Applicant', 'Job seekers applying for positions');
 
-### Monitoring
-- Monitor database size and performance
-- Track slow queries and optimize
-- Monitor user activity and access patterns
-- Set up alerts for system errors
+-- Insert sample departments
+INSERT IGNORE INTO departments (name, description) VALUES
+('Human Resources', 'Manages recruitment, employee relations, and HR policies'),
+('Information Technology', 'Handles software development, system administration, and technical support'),
+('Marketing', 'Responsible for brand management, digital marketing, and customer outreach'),
+('Finance', 'Manages company finances, budgeting, and financial reporting'),
+('Operations', 'Oversees daily operations, process improvement, and logistics');
 
-## Current Status
-✅ Database schema designed and implemented  
-✅ Sample data populated for testing  
-✅ All 9 core tables created and ready  
-✅ All required fields implemented  
-✅ Foreign key relationships established  
-✅ Frontend development completed (36+ pages)  
-✅ All UIs connected and functional  
-⏳ Backend API development pending  
-⏳ Authentication system pending  
-⏳ File upload system pending  
+-- Insert sample users (passwords are hashed using password_hash('password123', PASSWORD_DEFAULT))
+INSERT IGNORE INTO users (username, email, password, first_name, last_name, role_id, phone) VALUES
+('admin', 'admin@hireflow.com', '$2y$10$example_hash_here', 'System', 'Administrator', 1, '+1234567890'),
+('hr_admin', 'hr@hireflow.com', '$2y$10$example_hash_here', 'Sarah', 'Johnson', 2, '+1234567891'),
+('recruiter', 'recruiter@hireflow.com', '$2y$10$example_hash_here', 'Michael', 'Chen', 3, '+1234567892'),
+('john_doe', 'john.doe@email.com', '$2y$10$example_hash_here', 'John', 'Doe', 4, '+1234567893'),
+('jane_smith', 'jane.smith@email.com', '$2y$10$example_hash_here', 'Jane', 'Smith', 4, '+1234567894'),
+('alex_wilson', 'alex.wilson@email.com', '$2y$10$example_hash_here', 'Alex', 'Wilson', 4, '+1234567895'),
+('priya_j', 'priya.j@email.com', '$2y$10$example_hash_here', 'Priya', 'Jayasinghe', 4, '+1234567896');
+
+-- Insert sample job posts
+INSERT IGNORE INTO job_posts (title, department_id, description, requirements, salary_range, location, posted_by, deadline) VALUES
+('Senior Software Engineer', 2, 'We are looking for an experienced software engineer to join our growing development team.', 'Bachelor\\'s degree in Computer Science, 5+ years experience, proficiency in PHP, JavaScript, and MySQL.', '$80,000 - $120,000', 'New York, NY', 2, '2025-09-30'),
+('Junior Data Analyst', 2, 'Entry-level position for a data analyst to support our business intelligence initiatives.', 'Bachelor\\'s degree in Statistics/Mathematics, knowledge of SQL and Excel, analytical mindset.', '$45,000 - $65,000', 'Remote', 3, '2025-09-15'),
+('Marketing Specialist', 3, 'Join our marketing team to develop and execute digital marketing campaigns.', 'Bachelor\\'s degree in Marketing, experience with social media, content creation skills.', '$50,000 - $70,000', 'Los Angeles, CA', 2, '2025-09-20');
+
+-- Insert sample applications
+INSERT IGNORE INTO applications (job_post_id, applicant_id, cover_letter, status) VALUES
+(1, 4, 'I am excited to apply for the Senior Software Engineer position. With over 6 years of experience in full-stack development...', 'shortlisted'),
+(2, 7, 'I am writing to express my interest in the Junior Data Analyst position. My academic background in statistics...', 'pending'),
+(3, 5, 'I would like to apply for the Marketing Specialist role. My passion for digital marketing and experience...', 'pending');
+
+-- Insert sample interviews
+INSERT IGNORE INTO interviews (application_id, interviewer_id, scheduled_at, location, interview_type, status) VALUES
+(1, 3, '2025-09-05 14:00:00', 'Conference Room A', 'in-person', 'scheduled'),
+(2, 2, '2025-09-03 10:00:00', 'Zoom Meeting', 'video', 'scheduled');
+
+-- Insert sample notifications
+INSERT IGNORE INTO notifications (user_id, title, message, type) VALUES
+(4, 'Application Submitted', 'Your application for Senior Software Engineer has been submitted successfully.', 'success'),
+(4, 'Interview Scheduled', 'Your interview has been scheduled for September 5th at 2:00 PM.', 'info'),
+(7, 'Application Received', 'Thank you for applying to the Junior Data Analyst position.', 'info'),
+(2, 'New Application', 'A new application has been received for the Marketing Specialist position.', 'info');
+
+-- Insert sample system settings
+INSERT IGNORE INTO system_settings (setting_key, setting_value, description, updated_by) VALUES
+('site_name', 'HireFlow', 'Name of the recruitment system', 1),
+('max_file_size', '5242880', 'Maximum file upload size in bytes (5MB)', 1),
+('allowed_file_types', 'pdf,doc,docx', 'Allowed file types for resume upload', 1),
+('session_timeout', '3600', 'Session timeout in seconds', 1),
+('email_notifications', 'true', 'Enable/disable email notifications', 1),
+('maintenance_mode', 'false', 'Enable/disable maintenance mode', 1),
+('registration_enabled', 'true', 'Allow new user registrations', 1),
+('default_items_per_page', '10', 'Default number of items per page', 1);
+```
+
+## 🔐 Security Features
+
+### Password Security
+- **Hashing**: All passwords stored using PHP `password_hash()` with PASSWORD_DEFAULT
+- **Salt**: Automatic salt generation for each password
+- **Verification**: Secure password verification using `password_verify()`
+
+### Access Control
+- **Role-Based**: 4-tier permission system (System Admin, HR Admin, Recruiter, Applicant)
+- **Session Management**: Secure session handling with timeout
+- **Activity Logging**: Complete audit trail in access_logs table
+
+### Data Protection
+- **Input Validation**: SQL injection prevention through prepared statements
+- **File Upload Security**: Resume upload restrictions and validation
+- **XSS Prevention**: Output escaping and sanitization
+
+### Database Security
+- **Foreign Key Constraints**: Data integrity enforced at database level
+- **ENUM Restrictions**: Limited values for status fields
+- **Unique Constraints**: Prevent duplicate usernames/emails
+- **Index Optimization**: Efficient queries with proper indexing
+
+## 📈 Performance Considerations
+
+### Database Optimization
+- **Indexes**: Primary keys and foreign keys automatically indexed
+- **Query Efficiency**: JOIN operations designed for performance
+- **Data Types**: Appropriate column types for space efficiency
+- **Normalization**: Proper 3NF structure to minimize redundancy
+
+### Scalability Features
+- **Pagination Support**: default_items_per_page setting
+- **Efficient Queries**: Optimized for large datasets
+- **Archive Strategy**: Soft deletes and status-based filtering
+- **Caching Ready**: Structure supports future caching implementation
+
+## 📊 Database Statistics & Monitoring
+
+### Data Volume Expectations
+- **Users**: Scales to thousands of users across roles
+- **Job Posts**: Hundreds of simultaneous active postings
+- **Applications**: High volume application tracking
+- **Interviews**: Complex scheduling and feedback system
+
+### Monitoring Points
+- **Access Logs**: Security and usage monitoring
+- **Application Flow**: Conversion rate tracking
+- **System Settings**: Configuration change auditing
+- **Performance Metrics**: Query execution monitoring
+
+## 🚀 Advanced Features
+
+### Notification System
+- **Real-time Alerts**: Application status changes
+- **Email Integration**: Ready for SMTP configuration
+- **Type Categorization**: Info, success, warning, error types
+- **Read Tracking**: Notification read status
+
+### Audit Trail
+- **Complete Logging**: Every user action tracked
+- **IP Tracking**: Security monitoring capability
+- **User Agent Logging**: Device and browser tracking
+- **Timestamp Precision**: Accurate activity timeline
+
+### System Configuration
+- **Dynamic Settings**: Runtime configuration changes
+- **Feature Toggles**: Enable/disable system features
+- **File Management**: Upload size and type restrictions
+- **Session Control**: Timeout and security settings
+
+## 🎯 Future Enhancements
+
+### Phase 6: Authentication System
+- Login/logout functionality
+- Session management
+- Role-based access control
+- Password reset functionality
+
+### Phase 7: Advanced Features
+- Email notification system
+- Document management
+- Reporting and analytics
+- Advanced search and filtering
+
+### Phase 8: Integration & APIs
+- REST API development
+- Third-party integrations
+- Export functionality
+- Mobile application support
+
+## 📞 Support & Troubleshooting
+
+### Quick Verification Commands
+
+```sql
+-- Verify all tables exist
+SHOW TABLES;
+
+-- Check table structures
+DESCRIBE users;
+DESCRIBE job_posts;
+DESCRIBE applications;
+
+-- Verify sample data
+SELECT COUNT(*) as user_count FROM users;
+SELECT COUNT(*) as job_count FROM job_posts;
+SELECT COUNT(*) as application_count FROM applications;
+
+-- Check foreign key relationships
+SELECT 
+    TABLE_NAME,
+    COLUMN_NAME,
+    CONSTRAINT_NAME,
+    REFERENCED_TABLE_NAME,
+    REFERENCED_COLUMN_NAME
+FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
+WHERE REFERENCED_TABLE_SCHEMA = 'hireflow_db'
+ORDER BY TABLE_NAME;
+```
+
+### Common Solutions
+
+1. **Database Connection Issues**
+   - Verify XAMPP MySQL service is running
+   - Check config.php database credentials
+   - Ensure database 'hireflow_db' exists
+
+2. **Foreign Key Errors**
+   - Create tables in correct order (roles → users → others)
+   - Verify referenced data exists
+   - Check constraint definitions
+
+3. **Data Insertion Problems**
+   - Use IGNORE keyword for sample data
+   - Check for unique constraint violations
+   - Verify foreign key references exist
+
+### Performance Optimization
+
+```sql
+-- Add indexes for frequently queried columns
+CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_role ON users(role_id);
+CREATE INDEX idx_applications_status ON applications(status);
+CREATE INDEX idx_jobs_status ON job_posts(status);
+CREATE INDEX idx_notifications_user_read ON notifications(user_id, is_read);
+
+-- Optimize for date range queries
+CREATE INDEX idx_applications_date ON applications(applied_at);
+CREATE INDEX idx_interviews_date ON interviews(scheduled_at);
+CREATE INDEX idx_logs_date ON access_logs(created_at);
+```
+
+---
+
+**HireFlow Database Documentation v2.0** - Complete recruitment management system database schema with comprehensive setup guide, security features, and performance optimization.
