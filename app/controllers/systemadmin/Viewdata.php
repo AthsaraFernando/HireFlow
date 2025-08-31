@@ -4,7 +4,11 @@ class Viewdata extends Controller
 {
     public function index()
     {
-        $URL['view'] = 'viewdata';
-        $this->view('systemadmin', $URL);
+        // Sample data - in real implementation this would come from database
+        $data = [];
+        $data['errors'] = [];
+        $data['success'] = '';
+        
+        $this->view('systemadmin/viewdata', $data);
     }
 }

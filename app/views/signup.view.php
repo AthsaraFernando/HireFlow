@@ -25,11 +25,14 @@ if (!function_exists('old_value')) {
             <div class="signup-container">
                 <div class="brand-section text-center mb-4">
                     <h1 class="brand-title">Hire<span class="dark">Flow</span></h1>
-                    <p class="brand-subtitle">Join Our Recruitment Platform</p>
+                    <p class="brand-subtitle">Create Your Job Seeker Account</p>
                 </div>
 
                 <div class="form-container">
-                    <h2 class="form-title text-center mb-3">Create Your Account</h2>
+                    <h2 class="form-title text-center mb-3">Join as an Applicant</h2>
+                    <p class="text-center text-muted mb-4">
+                        Register to browse and apply for job opportunities
+                    </p>
 
                     <?php if (!empty($errors)): ?>
                         <div class="alert alert-error mb-3">
@@ -75,6 +78,8 @@ if (!function_exists('old_value')) {
                             </div>
                         </div>
 
+                        <!-- Hidden field to set role as applicant -->
+                        <input type="hidden" name="role_id" value="4">
 
                         <div class="form-group mb-4">
                             <label class="checkbox-label">
@@ -90,10 +95,16 @@ if (!function_exists('old_value')) {
                             </label>
                         </div>
 
+                        <div class="info-box mb-4">
+                            <p class="text-muted small">
+                                <strong>Note:</strong> This registration is for job seekers only. 
+                                Staff accounts (HR Admin, Recruitment Manager) are created by System Administrator.
+                            </p>
+                        </div>
 
                         <div class="form-group mb-4">
                             <button type="submit" class="btn btn-primary w-full">
-                                Create Account
+                                Create Applicant Account
                             </button>
                         </div>
 

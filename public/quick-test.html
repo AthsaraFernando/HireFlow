@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HireFlow - Quick Test Links</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 2rem; 
+            background: #f5f5f5; 
+        }
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); 
+        }
+        .header { 
+            text-align: center; 
+            margin-bottom: 2rem; 
+            padding-bottom: 1rem; 
+            border-bottom: 2px solid #4e31aa; 
+        }
+        .section { 
+            margin: 2rem 0; 
+        }
+        .section h3 { 
+            color: #4e31aa; 
+            border-left: 4px solid #4e31aa; 
+            padding-left: 1rem; 
+        }
+        .links { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 1rem; 
+        }
+        .link { 
+            display: block; 
+            padding: 1rem; 
+            background: #f8f9fa; 
+            border: 1px solid #ddd; 
+            border-radius: 5px; 
+            text-decoration: none; 
+            color: #333; 
+            transition: all 0.3s; 
+        }
+        .link:hover { 
+            background: #e9ecef; 
+            transform: translateY(-2px); 
+        }
+        .working { border-left: 4px solid #28a745; }
+        .pending { border-left: 4px solid #ffc107; }
+        .business-logic { 
+            background: #e7f3ff; 
+            border: 2px solid #007bff; 
+            border-radius: 8px; 
+            padding: 1.5rem; 
+            margin: 2rem 0; 
+        }
+        .note { font-size: 0.9em; color: #666; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 HireFlow Quick Test Links</h1>
+            <p>Development testing and navigation dashboard</p>
+        </div>
+
+        <div class="business-logic">
+            <h3>🏢 Account Creation Policy</h3>
+            <ul>
+                <li><strong>✅ Applicants:</strong> Can self-register via signup page</li>
+                <li><strong>🔒 HR Admins:</strong> Created by System Admin only</li>
+                <li><strong>🔒 Recruitment Managers:</strong> Created by System Admin only</li>
+                <li><strong>🔒 System Admins:</strong> Created by other System Admins only</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h3>🔗 Authentication & Common Pages</h3>
+            <div class="links">
+                <a href="/HireFlow/public" class="link working">
+                    🏠 Home Page (Sign In)
+                </a>
+                <a href="/HireFlow/public/signup" class="link working">
+                    📝 Sign Up (Applicants Only)
+                    <div class="note">Job seekers can self-register</div>
+                </a>
+                <a href="/HireFlow/public/forgot-password" class="link pending">
+                    🔒 Forgot Password
+                </a>
+                <a href="/HireFlow/public/reset-password" class="link pending">
+                    🔄 Reset Password
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>⚙️ System Admin (Complete)</h3>
+            <div class="links">
+                <a href="/HireFlow/public/systemadmin/dashboard" class="link working">
+                    📊 Dashboard
+                </a>
+                <a href="/HireFlow/public/systemadmin/usermanage" class="link working">
+                    👥 User Management
+                    <div class="note">Create HR Admin & Recruitment Manager accounts</div>
+                </a>
+                <a href="/HireFlow/public/systemadmin/accesslogs" class="link working">
+                    📋 Access Logs
+                </a>
+                <a href="/HireFlow/public/systemadmin/viewdata" class="link working">
+                    📈 Data Analytics
+                </a>
+                <a href="/HireFlow/public/systemadmin/systemsettings" class="link working">
+                    ⚙️ System Settings
+                </a>
+                <a href="/HireFlow/public/systemadmin/backuprestore" class="link working">
+                    💾 Backup & Restore
+                </a>
+                <a href="/HireFlow/public/systemadmin/securitysettings" class="link working">
+                    🔐 Security Settings
+                </a>
+                <a href="/HireFlow/public/systemadmin/reports" class="link working">
+                    📊 System Reports
+                </a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>👥 HR Admin (Coming Next)</h3>
+            <div class="links">
+                <a href="/HireFlow/public/hradmin/dashboard" class="link pending">
+                    📊 HR Dashboard
+                </a>
+                <a href="/HireFlow/public/hradmin/job-posts" class="link pending">
+                    💼 Job Posts Management
+                </a>
+                <a href="/HireFlow/public/hradmin/applications" class="link pending">
+                    📄 Applications Review
+                </a>
+                <a href="/HireFlow/public/hradmin/applicant-database" class="link pending">
+                    👤 Applicant Database
+                </a>
+                <a href="/HireFlow/public/hradmin/interview-schedule" class="link pending">
+                    📅 Interview Schedule
+                </a>
+                <a href="/HireFlow/public/hradmin/reports" class="link pending">
+                    📈 HR Reports
+                </a>
+            </div>
+            <p class="note">Account created by System Admin only</p>
+        </div>
+
+        <div class="section">
+            <h3>🎯 Recruitment Manager (Phase 4)</h3>
+            <div class="links">
+                <a href="/HireFlow/public/recruitment/dashboard" class="link pending">
+                    📊 Recruitment Dashboard
+                </a>
+                <a href="/HireFlow/public/recruitment/assigned-jobs" class="link pending">
+                    📋 Assigned Jobs
+                </a>
+                <a href="/HireFlow/public/recruitment/candidate-evaluation" class="link pending">
+                    ⭐ Candidate Evaluation
+                </a>
+                <a href="/HireFlow/public/recruitment/interview-schedule" class="link pending">
+                    📅 Interview Management
+                </a>
+                <a href="/HireFlow/public/recruitment/hiring-pipeline" class="link pending">
+                    🔄 Hiring Pipeline
+                </a>
+                <a href="/HireFlow/public/recruitment/reports" class="link pending">
+                    📈 Recruitment Reports
+                </a>
+            </div>
+            <p class="note">Account created by System Admin only</p>
+        </div>
+
+        <div class="section">
+            <h3>👤 Applicant (Phase 5 - Complete)</h3>
+            <div class="links">
+                <a href="/HireFlow/public/applicant/dashboard" class="link working">
+                    📊 Applicant Dashboard
+                </a>
+                <a href="/HireFlow/public/applicant/jobs" class="link working">
+                    🔍 Browse Jobs
+                </a>
+                <a href="/HireFlow/public/applicant/job-details" class="link working">
+                    📋 Job Details
+                </a>
+                <a href="/HireFlow/public/applicant/applications" class="link working">
+                    📄 My Applications
+                </a>
+                <a href="/HireFlow/public/applicant/apply" class="link working">
+                    ✏️ Apply for Job
+                </a>
+                <a href="/HireFlow/public/applicant/interviews" class="link working">
+                    📅 Interview Schedule
+                </a>
+                <a href="/HireFlow/public/applicant/feedback" class="link working">
+                    📝 Interview Feedback
+                </a>
+                <a href="/HireFlow/public/applicant/profile" class="link working">
+                    � My Profile
+                </a>
+            </div>
+            <p class="note">Self-registration allowed via signup page</p>
+        </div>
+
+        <div style="text-align: center; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #ddd;">
+            <p><strong>Phase 2 Complete:</strong> System Admin (8/8 pages) ✅</p>
+            <p><strong>Phase 5 Complete:</strong> Applicant (8/8 pages) ✅</p>
+            <p><strong>Next:</strong> Phase 3 - HR Admin (11 pages)</p>
+        </div>
+    </div>
+</body>
+</html>

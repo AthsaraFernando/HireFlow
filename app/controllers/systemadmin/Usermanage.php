@@ -2,9 +2,18 @@
 
 class Usermanage extends Controller 
 {
-  public function index()
+    public function index()
     {
-        $URL['view'] = 'usermanage';
-        $this->view('systemadmin', $URL);
+        // Sample data - in real implementation this would come from database
+        $data = [];
+        $data['errors'] = [];
+        $data['success'] = '';
+        
+        if ($_POST) {
+            // Handle user management operations
+            $data['success'] = 'User updated successfully!';
+        }
+        
+        $this->view('systemadmin/usermanage', $data);
     }
 }

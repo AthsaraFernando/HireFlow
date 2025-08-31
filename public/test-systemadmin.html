@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Admin URL Tester</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .url-link { display: block; padding: 1rem; margin: 0.5rem 0; background: #f8f9fa; border: 1px solid #ddd; text-decoration: none; color: #333; border-radius: 5px; }
+        .url-link:hover { background: #e9ecef; }
+        .status { padding: 0.25rem 0.5rem; border-radius: 3px; font-size: 0.8rem; margin-left: 1rem; }
+        .status.working { background: #d4edda; color: #155724; }
+        .status.error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>System Admin Pages Tester</h1>
+        <p>Click each link to test the System Admin pages:</p>
+        
+        <h2>✅ Working Pages</h2>
+        <a href="/HireFlow/public/systemadmin/dashboard" class="url-link">
+            Dashboard <span class="status working">✓ Working</span>
+        </a>
+        <a href="/HireFlow/public/systemadmin/usermanage" class="url-link">
+            User Management <span class="status working">✓ Working</span>
+        </a>
+        <a href="/HireFlow/public/systemadmin/accesslogs" class="url-link">
+            Access Logs <span class="status working">✓ Working</span>
+        </a>
+        <a href="/HireFlow/public/systemadmin/viewdata" class="url-link">
+            View Data <span class="status working">✓ Working</span>
+        </a>
+        
+        <h2>🧪 Test These URLs</h2>
+        <a href="/HireFlow/public/systemadmin/systemsettings" class="url-link">
+            System Settings <span class="status">Test This</span>
+        </a>
+        <a href="/HireFlow/public/systemadmin/backuprestore" class="url-link">
+            Backup & Restore <span class="status">Test This</span>
+        </a>
+        <a href="/HireFlow/public/systemadmin/securitysettings" class="url-link">
+            Security Settings <span class="status">Test This</span>
+        </a>
+        <a href="/HireFlow/public/systemadmin/reports" class="url-link">
+            Reports <span class="status">Test This</span>
+        </a>
+        
+        <h2>📋 Expected URLs Based on File Names</h2>
+        <p>Controller files found:</p>
+        <ul>
+            <li><code>SystemSettings.php</code> → /systemadmin/systemsettings</li>
+            <li><code>BackupRestore.php</code> → /systemadmin/backuprestore</li>
+            <li><code>SecuritySettings.php</code> → /systemadmin/securitysettings</li>
+            <li><code>Reports.php</code> → /systemadmin/reports</li>
+        </ul>
+        
+        <p><a href="/HireFlow/public/" style="color: #007bff;">← Back to Home</a></p>
+    </div>
+</body>
+</html>

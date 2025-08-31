@@ -53,15 +53,14 @@ if (!function_exists('old_value')) {
                             <label for="role_id" class="form-label">User Type</label>
                             <select id="role_id" name="role_id" class="form-select w-full" required>
                                 <option value="">Select your role</option>
-                                <option value="1" <?= old_value('role_id') == '1' ? 'selected' : '' ?>>System Admin
-                                </option>
-                                <option value="2" <?= old_value('role_id') == '2' ? 'selected' : '' ?>>HR
-                                    Admin</option>
-                                <option value="3" <?= old_value('role_id') == '3' ? 'selected' : '' ?>>Recruitment Manager
-                                </option>
-                                <option value="4" <?= old_value('role_id') == '4' ? 'selected' : '' ?>>
-                                    Applicant</option>
+                                <option value="1" <?= old_value('role_id') == '1' ? 'selected' : '' ?>>System Admin</option>
+                                <option value="2" <?= old_value('role_id') == '2' ? 'selected' : '' ?>>HR Admin</option>
+                                <option value="3" <?= old_value('role_id') == '3' ? 'selected' : '' ?>>Recruitment Manager</option>
+                                <option value="4" <?= old_value('role_id') == '4' ? 'selected' : '' ?>>Applicant</option>
                             </select>
+                            <small class="form-text">
+                                <strong>Note:</strong> HR Admin & Recruitment Manager accounts are created by System Admin only.
+                            </small>
                         </div>
 
                         <div class="form-group mb-4">
@@ -84,10 +83,13 @@ if (!function_exists('old_value')) {
                                 </a>
                             </p>
                             <p class="text-muted">
-                                New applicant?
+                                Job seeker looking for opportunities?
                                 <a href="<?= ROOT ?>/signup" class="link link-primary">
-                                    Create an account
+                                    Create Applicant Account
                                 </a>
+                            </p>
+                            <p class="text-muted small mt-2">
+                                <strong>Staff Access:</strong> HR Admin & Recruitment Manager accounts are created by System Admin.
                             </p>
                         </div>
                     </form>

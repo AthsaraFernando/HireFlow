@@ -1,0 +1,273 @@
+@import url('../../css/main.css');
+@import url('./dashboard.style.css');
+
+.feedback-content {
+    padding: 32px;
+    background-color: #f8fafc;
+    min-height: calc(100vh - 96px);
+}
+
+.feedback-header {
+    margin-bottom: 32px;
+}
+
+.feedback-header h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 8px 0;
+}
+
+.feedback-header p {
+    color: #6b7280;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.feedback-tabs {
+    display: flex;
+    gap: 2px;
+    background-color: #f3f4f6;
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 32px;
+}
+
+.tab-button {
+    flex: 1;
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-button.active {
+    background: white;
+    color: #3b82f6;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tab-button:hover:not(.active) {
+    color: #374151;
+}
+
+.feedback-grid {
+    display: grid;
+    gap: 24px;
+}
+
+.feedback-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.feedback-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.feedback-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+}
+
+.feedback-info {
+    flex: 1;
+}
+
+.feedback-info h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin: 0 0 8px 0;
+}
+
+.feedback-info p {
+    color: #6b7280;
+    margin: 0 0 4px 0;
+    font-size: 0.9rem;
+}
+
+.feedback-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.rating-label {
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 2px;
+}
+
+.star {
+    color: #d1d5db;
+    font-size: 1.1rem;
+}
+
+.star.filled {
+    color: #f59e0b;
+}
+
+.rating-score {
+    font-weight: 600;
+    color: #374151;
+    margin-left: 8px;
+}
+
+.feedback-sections {
+    display: grid;
+    gap: 20px;
+}
+
+.feedback-section {
+    border-left: 3px solid #e5e7eb;
+    padding-left: 16px;
+}
+
+.feedback-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 8px 0;
+}
+
+.feedback-section p {
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.feedback-section.positive {
+    border-left-color: #10b981;
+}
+
+.feedback-section.negative {
+    border-left-color: #ef4444;
+}
+
+.feedback-section.neutral {
+    border-left-color: #f59e0b;
+}
+
+.feedback-meta {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    padding-top: 16px;
+    border-top: 1px solid #f3f4f6;
+    margin-top: 20px;
+}
+
+.feedback-date {
+    color: #9ca3af;
+    font-size: 0.85rem;
+}
+
+.feedback-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.improvement-suggestions {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.improvement-suggestions h5 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e40af;
+    margin: 0 0 8px 0;
+}
+
+.improvement-suggestions ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #1e40af;
+}
+
+.improvement-suggestions li {
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+}
+
+.no-feedback {
+    text-align: center;
+    padding: 64px 32px;
+    color: #6b7280;
+}
+
+.no-feedback-icon {
+    font-size: 4rem;
+    color: #d1d5db;
+    margin-bottom: 16px;
+}
+
+.no-feedback h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 8px 0;
+}
+
+.no-feedback p {
+    font-size: 1rem;
+    margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .feedback-content {
+        padding: 20px;
+    }
+    
+    .feedback-tabs {
+        flex-direction: column;
+    }
+    
+    .feedback-header-content {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+    
+    .feedback-rating {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .feedback-actions {
+        flex-direction: column;
+    }
+    
+    .feedback-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .feedback-meta {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+}
