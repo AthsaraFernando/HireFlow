@@ -37,13 +37,17 @@ class App
         $controller = new $this->controller;
         
         // Selecting the controller's method based on the URL
-        if (!empty($URL[1])) {
-            if (method_exists($controller, $URL[1])) {
-                $this->method = $URL[1];
-                unset($URL[1]);
+        // After unset operations, the method is now at index 0 (reindexed)
+        $URL = array_values($URL); // Reindex the array after unset operations
+        if (!empty($URL[0])) {
+            if (method_exists($controller, $URL[0])) {
+                $this->method = $URL[0];
+                unset($URL[0]);
             }
         }
         
+        // Reindex again for parameters
+        $URL = array_values($URL);
         call_user_func_array([$controller, $this->method], $URL);
     }
 }
