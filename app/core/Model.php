@@ -76,9 +76,7 @@ trait Model
         // echo $query;
         $result = $this->query($query, $data);
 
-        return false;
-
-
+        return $result;
     }
     public function update($id, $data, $id_column = 'id')
     {
@@ -104,16 +102,16 @@ trait Model
         // echo $query;
 
         $data[$id_column] = $id;
-        $this->query($query, $data);
-        return false;
+        $result = $this->query($query, $data);
+        return $result;
     }
     public function delete($id, $id_column = 'id')
     {
         $data[$id_column] = $id;
-        $query = "update $this->table where $id_column = :$id_column";
+        $query = "delete from $this->table where $id_column = :$id_column";
         // echo $query;
 
-        $this->query($query, $data);
-        return false;
+        $result = $this->query($query, $data);
+        return $result;
     }
 }
