@@ -43,16 +43,33 @@ class App
                     $this->controller = '_404';
                 }
             } else {
-                // For other folder-based controllers, convert URL to class name
-                $controllerName = $this->convertUrlToClassName($URL[1]);
-                $fileName = "../app/controllers/" . $URL[0] . "/" . $controllerName . ".php";
-                if (file_exists($fileName)) {
-                    require $fileName;
-                    $this->controller = $controllerName;
+                // For systemadmin and other folder-based controllers
+                if (isset($URL[1])) {
+                    $controllerName = $this->convertUrlToClassName($URL[1]);
+                    $fileName = "../app/controllers/" . $URL[0] . "/" . $controllerName . ".php";
+                    if (file_exists($fileName)) {
+                        require $fileName;
+                        $this->controller = $controllerName;
+                        unset($URL[0]); // Remove folder name from URL
+                        unset($URL[1]); // Remove controller name from URL
+                    } else {
+                        $fileName = "../app/controllers/_404.php";
+                        require $fileName;
+                        $this->controller = '_404';
+                    }
                 } else {
-                    $fileName = "../app/controllers/_404.php";
-                    require $fileName;
-                    $this->controller = '_404';
+                    // If no second segment, try the main controller for that folder
+                    $folderControllerName = ucfirst($URL[0]);
+                    $fileName = "../app/controllers/" . $URL[0] . "/" . $folderControllerName . ".php";
+                    if (file_exists($fileName)) {
+                        require $fileName;
+                        $this->controller = $folderControllerName;
+                        unset($URL[0]);
+                    } else {
+                        $fileName = "../app/controllers/_404.php";
+                        require $fileName;
+                        $this->controller = '_404';
+                    }
                 }
             }
         }
@@ -60,14 +77,16 @@ class App
         $controller = new $this->controller;
         
         // Selecting the controller's method based on the URL
-        if (!empty($URL[1])) {
-            if (method_exists($controller, $URL[1])) {
-                $this->method = $URL[1];
-                unset($URL[1]);
+        // After removing folder and controller segments, check for method
+        $remainingURL = array_values($URL); // Re-index array
+        if (!empty($remainingURL[0])) {
+            if (method_exists($controller, $remainingURL[0])) {
+                $this->method = $remainingURL[0];
+                unset($remainingURL[0]);
             }
         }
         
-        call_user_func_array([$controller, $this->method], $URL);
+        call_user_func_array([$controller, $this->method], array_values($remainingURL));
 
     }
 }

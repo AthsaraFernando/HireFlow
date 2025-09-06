@@ -158,15 +158,17 @@ set_time_limit(300); // 5 minutes max
                     'users' => "
                         CREATE TABLE IF NOT EXISTS users (
                             id INT AUTO_INCREMENT PRIMARY KEY,
-                            username VARCHAR(50) NOT NULL UNIQUE,
+                            full_name VARCHAR(150) NOT NULL,
                             email VARCHAR(100) NOT NULL UNIQUE,
                             password VARCHAR(255) NOT NULL,
-                            first_name VARCHAR(50) NOT NULL,
-                            last_name VARCHAR(50) NOT NULL,
                             role_id INT NOT NULL,
                             phone VARCHAR(20),
-                            is_active BOOLEAN DEFAULT TRUE,
+                            address TEXT,
+                            profile_image VARCHAR(255),
+                            status ENUM('active', 'inactive') DEFAULT 'active',
                             last_login TIMESTAMP NULL,
+                            password_reset_token VARCHAR(255),
+                            password_reset_expires DATETIME,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                             FOREIGN KEY (role_id) REFERENCES roles(id)
@@ -231,10 +233,11 @@ set_time_limit(300); // 5 minutes max
                             id INT AUTO_INCREMENT PRIMARY KEY,
                             user_id INT,
                             action VARCHAR(100) NOT NULL,
+                            details TEXT,
                             ip_address VARCHAR(45),
                             user_agent TEXT,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                            FOREIGN KEY (user_id) REFERENCES users(id)
+                            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
                         )",
                     
                     'notifications' => "
@@ -322,17 +325,9 @@ set_time_limit(300); // 5 minutes max
                     ('Operations', 'Oversees daily operations, process improvement, and logistics')");
                 echo "<p>✅ Sample departments inserted</p>";
                 
-                // Sample users (with hashed passwords)
-                $hashedPassword = password_hash('password123', PASSWORD_DEFAULT);
-                $pdo->exec("INSERT IGNORE INTO users (username, email, password, first_name, last_name, role_id, phone) VALUES
-                    ('admin', 'admin@hireflow.com', '$hashedPassword', 'System', 'Administrator', 1, '+1234567890'),
-                    ('hr_admin', 'hr@hireflow.com', '$hashedPassword', 'Sarah', 'Johnson', 2, '+1234567891'),
-                    ('recruiter', 'recruiter@hireflow.com', '$hashedPassword', 'Michael', 'Chen', 3, '+1234567892'),
-                    ('john_doe', 'john.doe@email.com', '$hashedPassword', 'John', 'Doe', 4, '+1234567893'),
-                    ('jane_smith', 'jane.smith@email.com', '$hashedPassword', 'Jane', 'Smith', 4, '+1234567894'),
-                    ('alex_wilson', 'alex.wilson@email.com', '$hashedPassword', 'Alex', 'Wilson', 4, '+1234567895'),
-                    ('priya_j', 'priya.j@email.com', '$hashedPassword', 'Priya', 'Jayasinghe', 4, '+1234567896')");
-                echo "<p>✅ Sample users inserted (default password: password123)</p>";
+                // No sample users - use admin-setup.php to create initial admin
+                echo "<p>✅ Tables ready for user creation</p>";
+                echo "<p>🔗 <a href='admin-setup.php'>Create Initial System Administrator</a></p>";
                 
                 // Sample job posts
                 $pdo->exec("INSERT IGNORE INTO job_posts (title, department_id, description, requirements, salary_range, location, posted_by, deadline) VALUES

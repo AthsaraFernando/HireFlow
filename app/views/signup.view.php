@@ -36,11 +36,14 @@ if (!function_exists('old_value')) {
 
                     <?php if (!empty($errors)): ?>
                         <div class="alert alert-error mb-3">
-                            <?= implode('<br>', $errors) ?>
+                            <?php foreach ($errors as $error): ?>
+                                <?= esc($error) ?><br>
+                            <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
 
                     <form method="POST" action="<?= ROOT ?>/signup" class="signup-form">
+                        <?= csrf_token_input() ?>
 
                     
                         <div class="form-row">

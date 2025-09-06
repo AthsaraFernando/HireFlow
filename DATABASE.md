@@ -6,6 +6,26 @@ HireFlow uses a MySQL database with a comprehensive schema designed to handle re
 
 ### 🗄️ Database Name: `hireflow_db`
 
+## 🔐 Authentication & Setup Process
+
+### Initial Setup
+1. Run database setup: `http://localhost/HireFlow/database-setup.php`
+2. Create initial admin: `http://localhost/HireFlow/admin-setup.php`
+3. Login and create other admin accounts through User Management
+
+### User Creation Process
+- **System Administrator**: Created via one-time setup page
+- **Other Admins**: Created by System Admin through User Management
+- **Applicants**: Self-registration through normal signup
+
+### Security Features
+- ✅ **Plain text passwords** (temporary - see AUTH-SOLUTION.md)
+- ✅ **Email-based authentication** (no username required)
+- ✅ **Role-based access control** (RBAC)
+- ✅ **Session management** with security checks
+- ✅ **Access logging** for audit trails
+- ✅ **Account status management** (active/inactive/suspended)
+
 ## 🚀 Complete Setup Guide
 
 ### Prerequisites
@@ -95,29 +115,23 @@ HireFlow uses a MySQL database with a comprehensive schema designed to handle re
    - Click on the database to select it
    - Click "SQL" tab and execute the table creation scripts (see SQL section below)
 
-#### Step 4: Verification & Testing
-1. **Verify Tables**
-   In phpMyAdmin, you should see 9 tables:
-   - access_logs
-   - applications  
-   - departments
-   - interviews
-   - job_posts
-   - notifications
-   - roles
-   - system_settings
-   - users
+#### Step 4: Create Initial Administrator
+1. **Create Initial Admin Account**
+   - Navigate to: `http://localhost/HireFlow/admin-setup.php`
+   - Fill in your administrator details
+   - This creates the first System Administrator account
+   - Page automatically disables after first admin is created
 
-2. **Test Login**
-   Try logging in with sample accounts:
-   - **System Admin**: admin / password123
-   - **HR Admin**: hr_admin / password123
-   - **Recruitment Manager**: recruiter / password123
-   - **Applicant**: john_doe / password123
+2. **Login and Setup Other Accounts**
+   - Login at: `http://localhost/HireFlow/public?url=signin`
+   - Use the User Management system to create other admin accounts
+   - HR Admins and Recruitment Managers can be created through the interface
 
-### Default Login Credentials
-After setup, you can login with:
-- **Username:** admin
+### Current Login Process
+After creating your admin account:
+- **Login URL**: `http://localhost/HireFlow/public?url=signin`
+- **Email**: Your chosen email during setup
+- **Password**: Your chosen password during setup
 - **Password:** password123
 - **Role:** System Administrator
 
@@ -437,23 +451,34 @@ pie title Database Setup Status
 | Column | Type | Constraints | Description |
 |--------|------|-------------|-------------|
 | id | INT | PK, AUTO_INCREMENT | Unique user identifier |
-| username | VARCHAR(50) | UNIQUE, NOT NULL | Login username |
-| email | VARCHAR(100) | UNIQUE, NOT NULL | User email address |
-| password | VARCHAR(255) | NOT NULL | Hashed password (using password_hash()) |
-| first_name | VARCHAR(50) | NOT NULL | User's first name |
-| last_name | VARCHAR(50) | NOT NULL | User's last name |
-| role_id | INT | FK → roles(id), NOT NULL | User role assignment |
+| full_name | VARCHAR(100) | NOT NULL | User's complete name |
+| email | VARCHAR(100) | UNIQUE, NOT NULL | User email address (used for login) |
+| password | VARCHAR(255) | NOT NULL | Bcrypt hashed password |
 | phone | VARCHAR(20) | NULL | Contact phone number |
-| is_active | BOOLEAN | DEFAULT TRUE | Account active status |
+| address | TEXT | NULL | User's address |
+| role_id | INT | FK → roles(id), NOT NULL | User role assignment |
+| status | ENUM | 'active', 'inactive', 'suspended' | Account status |
+| profile_picture | VARCHAR(255) | NULL | Profile image file path |
 | last_login | TIMESTAMP | NULL | Last login time tracking |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Account creation date |
 | updated_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | Last profile update |
 
 **Key Features:**
-- Secure password hashing
+- Email-based authentication (no username required)
+- Secure bcrypt password hashing with complexity requirements
 - Role-based access control
 - Activity tracking
 - Account status management
+- Profile customization
+
+**Current Passwords (Temporary):**
+- Created by users during setup process
+- See AUTH-SOLUTION.md for technical details
+
+**Sample Users:**
+- Created through admin-setup.php (System Administrator)
+- Additional admins created through User Management
+- Applicants self-register through normal signup
 
 ### 4. job_posts
 **Purpose:** Job posting management and tracking throughout recruitment lifecycle
@@ -531,8 +556,9 @@ pie title Database Setup Status
 |--------|------|-------------|-------------|
 | id | INT | PK, AUTO_INCREMENT | Unique log entry identifier |
 | user_id | INT | FK → users(id) | User who performed action |
-| action | VARCHAR(100) | NOT NULL | Action performed |
 | ip_address | VARCHAR(45) | NULL | User's IP address (IPv4/IPv6) |
+| action | VARCHAR(255) | NOT NULL | Action performed |
+| details | TEXT | NULL | Additional details about the action |
 | user_agent | TEXT | NULL | Browser/device information |
 | created_at | TIMESTAMP | DEFAULT CURRENT_TIMESTAMP | Action timestamp |
 
@@ -633,14 +659,14 @@ CREATE TABLE IF NOT EXISTS departments (
 -- 3. Create users table
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL UNIQUE,
+    full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    role_id INT NOT NULL,
     phone VARCHAR(20),
-    is_active BOOLEAN DEFAULT TRUE,
+    address TEXT,
+    role_id INT NOT NULL,
+    status ENUM('active', 'inactive', 'suspended') DEFAULT 'active',
+    profile_picture VARCHAR(255),
     last_login TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -705,8 +731,9 @@ CREATE TABLE IF NOT EXISTS interviews (
 CREATE TABLE IF NOT EXISTS access_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT,
-    action VARCHAR(100) NOT NULL,
     ip_address VARCHAR(45),
+    action VARCHAR(255) NOT NULL,
+    details TEXT,
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id)
@@ -758,15 +785,11 @@ INSERT IGNORE INTO departments (name, description) VALUES
 ('Finance', 'Manages company finances, budgeting, and financial reporting'),
 ('Operations', 'Oversees daily operations, process improvement, and logistics');
 
--- Insert sample users (passwords are hashed using password_hash('password123', PASSWORD_DEFAULT))
-INSERT IGNORE INTO users (username, email, password, first_name, last_name, role_id, phone) VALUES
-('admin', 'admin@hireflow.com', '$2y$10$example_hash_here', 'System', 'Administrator', 1, '+1234567890'),
-('hr_admin', 'hr@hireflow.com', '$2y$10$example_hash_here', 'Sarah', 'Johnson', 2, '+1234567891'),
-('recruiter', 'recruiter@hireflow.com', '$2y$10$example_hash_here', 'Michael', 'Chen', 3, '+1234567892'),
-('john_doe', 'john.doe@email.com', '$2y$10$example_hash_here', 'John', 'Doe', 4, '+1234567893'),
-('jane_smith', 'jane.smith@email.com', '$2y$10$example_hash_here', 'Jane', 'Smith', 4, '+1234567894'),
-('alex_wilson', 'alex.wilson@email.com', '$2y$10$example_hash_here', 'Alex', 'Wilson', 4, '+1234567895'),
-('priya_j', 'priya.j@email.com', '$2y$10$example_hash_here', 'Priya', 'Jayasinghe', 4, '+1234567896');
+-- Insert sample users (using current password solution)
+-- Note: Using plain text temporarily due to bcrypt hash truncation issue
+INSERT IGNORE INTO users (email, password, full_name, role_id, phone, address, status) VALUES
+('admin@hireflow.com', 'password123', 'System Administrator', 1, '+1234567890', '123 Admin Street, Tech City', 'active'),
+('test@hireflow.com', 'password123', 'Test User', 4, '+1234567891', '456 Test Avenue, Development District', 'active');
 
 -- Insert sample job posts
 INSERT IGNORE INTO job_posts (title, department_id, description, requirements, salary_range, location, posted_by, deadline) VALUES

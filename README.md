@@ -6,11 +6,20 @@ A comprehensive recruitment management system built with PHP MVC architecture, d
 
 **For first-time setup:**
 1. Make sure XAMPP is running (Apache + MySQL)
-2. Open: `http://localhost/HireFlow/database-setup.php`
-3. The script will create all tables and sample data automatically
-4. Default login: **admin** / **password123**
+2. Create database `hireflow_db` in phpMyAdmin
+3. Open: `http://localhost/HireFlow/database-setup.php`
+4. The script will create all tables and sample data automatically
+5. Create initial admin: `http://localhost/HireFlow/admin-setup.php`
 
-**Full documentation:** See [DATABASE.md](DATABASE.md) for complete setup guide.
+**Setup Process:**
+1. Run database setup script
+2. Create your System Administrator account
+3. Login and create other admin accounts through User Management
+
+**Login**: `http://localhost/HireFlow/public?url=signin`
+
+**Test login**: `http://localhost/HireFlow/public?url=signin`  
+**Full setup guide**: See [DATABASE-SETUP-GUIDE.md](DATABASE-SETUP-GUIDE.md)
 
 ## 🧪 Quick Start & Testing
 **Test all views here:** [http://localhost/HireFlow/public/url-test.php](http://localhost/HireFlow/public/url-test.php)
@@ -631,10 +640,18 @@ public/assets/
 ## 📈 Future Roadmap
 
 ### Phase 6: Authentication System
-- [ ] Complete login/logout functionality
-- [ ] Session management implementation
-- [ ] Password reset functionality
-- [ ] Remember me feature
+- [x] Complete login/logout functionality
+- [x] Session management implementation  
+- [x] Password reset functionality
+- [x] Remember me feature
+- [x] Secure password hashing (bcrypt)
+- [x] CSRF protection on all forms
+- [x] Rate limiting for login attempts
+- [x] Activity logging and monitoring
+- [x] Role-based access control
+- [x] User profile management
+- [x] Profile image upload
+- [x] Password change functionality
 
 ### Phase 7: Job Management
 - [ ] Job posting CRUD operations
@@ -713,6 +730,20 @@ public/assets/
 - [x] Interview feedback and performance review
 - [x] Professional profile with portfolio support
 
+### ✅ Phase 6A: Authentication & User Management (COMPLETE ✨)
+- [x] **Secure Authentication System**: Bcrypt password hashing with salt
+- [x] **Session Management**: 30-minute timeout with security controls
+- [x] **CSRF Protection**: Token-based protection on all forms
+- [x] **Rate Limiting**: IP-based blocking after 5 failed login attempts
+- [x] **Password Reset**: Secure token-based system with 1-hour expiration
+- [x] **Activity Logging**: Complete audit trail of all user actions
+- [x] **Profile Management**: User profile updates with image upload
+- [x] **Role-Based Access Control**: 4-tier permission system
+- [x] **Security Monitoring**: Failed login tracking and IP blocking
+- [x] **Input Validation**: XSS prevention and SQL injection protection
+- [x] **Enhanced User Management**: System Admin can create staff accounts
+- [x] **Password Migration**: Secure update of existing plain text passwords
+
 ## 🔐 Security & Business Logic
 
 ### Account Creation Policy
@@ -721,11 +752,16 @@ public/assets/
 - **Recruitment Managers**: Created by System Admin only (no public signup) ✅
 - **System Admins**: Created by existing System Admins only ✅
 
-### Authentication & Authorization
-- Role-based access control (RBAC)
-- Secure password hashing
-- Session management
-- Route protection based on user roles
+### Enhanced Authentication & Authorization ✨
+- **Role-Based Access Control (RBAC)**: 4-tier permission system
+- **Secure Password Hashing**: Bcrypt with automatic salt generation
+- **Session Management**: 30-minute timeout with secure configuration
+- **CSRF Protection**: Token validation on all POST requests
+- **Rate Limiting**: IP-based blocking after failed login attempts
+- **Activity Logging**: Complete audit trail with IP and user agent tracking
+- **Password Reset**: Secure token-based system with expiration
+- **Input Validation**: XSS prevention and SQL injection protection
+- **Route Protection**: Authentication required based on user roles
 
 ## 🎨 UI/UX Features
 
@@ -750,21 +786,60 @@ public/assets/
 HireFlow/
 ├── app/
 │   ├── controllers/          # Application logic
+│   │   ├── Signin.php       # Login controller (Enhanced)
+│   │   ├── Signup.php       # Registration controller (Enhanced)
+│   │   ├── Signout.php      # Logout controller (Enhanced)
+│   │   ├── PasswordReset.php # Password reset functionality (NEW)
+│   │   ├── Profile.php      # Profile management (NEW)
 │   │   ├── systemadmin/     # System Admin controllers
-│   │   └── hradmin/         # HR Admin controllers
+│   │   │   ├── Dashboard.php    # Enhanced with auth
+│   │   │   ├── Usermanage.php   # Enhanced user management
+│   │   │   └── Accesslogs.php   # Security monitoring (Enhanced)
+│   │   ├── hradmin/         # HR Admin controllers
+│   │   ├── manager/         # Recruitment Manager controllers
+│   │   └── applicant/       # Applicant controllers
 │   ├── models/              # Database models
+│   │   ├── User.php         # Enhanced user model with security
+│   │   ├── Role.php         # User roles management
+│   │   ├── AccessLog.php    # Security logging model (NEW)
+│   │   ├── JobPost.php      # Job posting operations
+│   │   ├── Application.php  # Application management
+│   │   ├── Department.php   # Department operations
+│   │   └── Notification.php # Notification system
 │   ├── views/               # UI templates
-│   │   ├── components/      # Reusable components
+│   │   ├── home.view.php    # Login form (Enhanced with CSRF)
+│   │   ├── signup.view.php  # Registration form (Enhanced)
+│   │   ├── password-reset.view.php # Password reset request (NEW)
+│   │   ├── password-reset-form.view.php # New password form (NEW)
+│   │   ├── profile.view.php # Profile management (NEW)
 │   │   ├── systemadmin/     # System Admin views
-│   │   └── hradmin/         # HR Admin views
+│   │   ├── hradmin/         # HR Admin views
+│   │   ├── manager/         # Manager views
+│   │   └── applicant/       # Applicant views
 │   └── core/                # Framework core files
+│       ├── App.php          # Main application router
+│       ├── Controller.php   # Base controller class
+│       ├── Model.php        # Base model class
+│       ├── Database.php     # Database connection handler
+│       ├── Auth.php         # Authentication system (NEW)
+│       ├── functions.php    # Enhanced utility functions
+│       ├── config.php       # Application configuration
+│       └── init.php         # Enhanced framework initialization
 ├── public/                  # Web-accessible files
 │   ├── assets/             # CSS, JS, images
+│   │   ├── css/            # Stylesheets
+│   │   ├── js/             # JavaScript files
+│   │   └── images/         # Images and logos
+│   │       └── profiles/   # Profile image uploads (NEW)
 │   ├── index.php           # Application entry point
 │   └── url-test.php        # Testing dashboard
-├── DATABASE.md             # Database documentation
-├── README.md              # Project documentation
-└── my_db.session.sql      # Database setup file
+├── database-setup.php      # Complete database setup script
+├── migrate-passwords.php   # Password migration script (NEW)
+├── auth-test.php          # Authentication testing dashboard (NEW)
+├── DATABASE.md            # Database documentation
+├── AUTHENTICATION.md      # Phase 6A documentation (NEW)
+├── README.md             # Project documentation
+└── my_db.session.sql     # Database setup file
 ```
 
 ## 🧪 Testing & Quality Assurance
@@ -829,18 +904,40 @@ HireFlow/
 
 ## 📞 Support & Documentation
 
-### Additional Resources
-- **Database Schema**: See [DATABASE.md](DATABASE.md)
-- **API Documentation**: Coming in future phases
-- **User Guides**: Integrated help system planned
+### 📚 Documentation Files
+- **[DATABASE.md](DATABASE.md)**: Complete database schema and setup guide
+- **[AUTHENTICATION.md](AUTHENTICATION.md)**: Phase 6A authentication system documentation
+- **[README.md](README.md)**: Main project documentation (this file)
+
+### 🧪 Testing Resources
+- **Authentication Testing**: `http://localhost/HireFlow/auth-test.php`
+- **Password Migration**: `http://localhost/HireFlow/migrate-passwords.php`
+- **URL Testing Dashboard**: `http://localhost/HireFlow/public/url-test.php`
+- **Database Setup**: `http://localhost/HireFlow/database-setup.php`
+
+### 📖 Developer Resources
+- **Phase Documentation**: Each major phase has dedicated documentation
+- **Code Examples**: Comprehensive examples in all controller/model files
+- **Security Guide**: Authentication best practices in AUTHENTICATION.md
+- **Database Guide**: Complete schema documentation in DATABASE.md
 
 ### Development Status
-- **Current Phase**: Phase 5 Complete (All Core Modules)
-- **System Status**: Fully Functional Frontend Complete
-- **Overall Progress**: 100% complete (All 42 views implemented)
-- **Ready for**: Production deployment and backend integration
+- **Current Phase**: Phase 6A Complete (Authentication & User Management)
+- **System Status**: Fully Functional with Secure Authentication
+- **Overall Progress**: Authentication system complete, ready for Phase 7
+- **Ready for**: Job Management System implementation
+
+### 🚀 Quick Start Guide
+1. **Setup Database**: Run `http://localhost/HireFlow/database-setup.php`
+2. **Migrate Passwords**: Run `http://localhost/HireFlow/migrate-passwords.php`
+3. **Test Authentication**: Use `http://localhost/HireFlow/auth-test.php`
+4. **Access Application**: Go to `http://localhost/HireFlow/public`
 
 ---
 
-**Note**: This is an active development project. Features marked as "pending" are planned for future implementation phases. Use the URL testing dashboard to explore currently available functionality.
+**🎉 HireFlow Development Status - Phase 6A Complete!**
+
+This recruitment management system now features a complete authentication system with enterprise-grade security. The system includes 42+ responsive UI components, secure user authentication, role-based access control, and comprehensive security monitoring.
+
+**Next Phase**: Job Management System (Phase 7) - Ready for implementation!
 

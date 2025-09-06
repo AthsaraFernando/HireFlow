@@ -30,13 +30,22 @@ if (!function_exists('old_value')) {
                 <div class="form-container">
                     <h2 class="form-title text-center mb-3">Sign In</h2>
 
+                    <?php if (!empty($success)): ?>
+                        <div class="alert alert-success mb-3">
+                            <?= esc($success) ?>
+                        </div>
+                    <?php endif; ?>
+
                     <?php if (!empty($errors)): ?>
                         <div class="alert alert-error mb-3">
-                            <?= implode('<br>', $errors) ?>
+                            <?php foreach ($errors as $error): ?>
+                                <?= esc($error) ?><br>
+                            <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
 
                     <form method="POST" action="<?= ROOT ?>/signin" class="signin-form">
+                        <?= csrf_token_input() ?>
                         <div class="form-group mb-3">
                             <label for="email" class="form-label">Email Address</label>
                             <input type="email" id="email" name="email" class="form-input w-full"
@@ -78,7 +87,7 @@ if (!function_exists('old_value')) {
 
                         <div class="form-links text-center">
                             <p class="mb-2">
-                                <a href="<?= ROOT ?>/forgot-password" class="link link-secondary">
+                                <a href="<?= ROOT ?>/password-reset" class="link link-secondary">
                                     Forgot your password?
                                 </a>
                             </p>

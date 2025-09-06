@@ -4,11 +4,10 @@ class Signout extends Controller
 {
     public function index()
     {
-        if (!empty($_SESSION['USER'])) {
-            unset($_SESSION['USER']);
-        }
-        redirect('home');
+        // Logout user using Auth class
+        Auth::logout();
+        
+        // Redirect to signin with logout message
+        redirect('signin?logout=1');
     }
-
-
 }

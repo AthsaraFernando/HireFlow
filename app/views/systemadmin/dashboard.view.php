@@ -24,7 +24,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/systemadmin/users" class="nav-link">
+                    <a href="<?= ROOT ?>/systemadmin/usermanage" class="nav-link">
                         <span class="nav-text">Manage Users</span>
                     </a>
                 </li>
@@ -34,12 +34,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/systemadmin/logs" class="nav-link">
+                    <a href="<?= ROOT ?>/systemadmin/accesslogs" class="nav-link">
                         <span class="nav-text">Access Logs</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
+                    <a href="<?= ROOT ?>/systemadmin/viewdata" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
                 </li>
