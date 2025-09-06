@@ -4,7 +4,7 @@ class Accesslogs extends Controller
 {
     public function index()
     {
-        // Require System Admin access
+        // Require System Admin role (role_id = 1)
         Auth::requireRole(1);
         
         $data = [];
@@ -53,9 +53,7 @@ class Accesslogs extends Controller
                   LEFT JOIN roles r ON u.role_id = r.id 
                   $whereClause
                   ORDER BY al.created_at DESC 
-                  LIMIT ?";
-        
-        $params[] = $limit;
+                  LIMIT " . (int)$limit;
         
         // Get filtered logs
         $data['logs'] = $accessLog->query($query, $params) ?: [];

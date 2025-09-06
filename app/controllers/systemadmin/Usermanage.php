@@ -4,16 +4,22 @@ class Usermanage extends Controller
 {
     public function index()
     {
-        // Require System Admin access
+        // Require System Admin role (role_id = 1)
         Auth::requireRole(1);
         
         $data = [];
         $user = new User();
         $role = new Role();
         
+        // Check if user has admin privileges for actions
+        $canManageUsers = Auth::hasRole(1); // Only System Admin can manage users
+        $data['can_manage_users'] = $canManageUsers;
+        
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Check for CSRF token
-            if (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
+            // Only System Admins can perform user management actions
+            if (!$canManageUsers) {
+                $data['errors']['general'] = "Insufficient privileges to perform this action.";
+            } elseif (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
                 $data['errors']['general'] = "Invalid request. Please try again.";
             } else {
                 $action = $_POST['action'] ?? '';
@@ -196,5 +202,99 @@ class Usermanage extends Controller
                   ORDER BY u.created_at DESC";
         
         return $user->query($query) ?: [];
+    }
+
+    public function create()
+    {
+        // Require System Admin role (role_id = 1)
+        Auth::requireRole(1);
+        
+        // Set JSON response header
+        header('Content-Type: application/json');
+        
+        // Check if user has System Admin privileges
+        if (!Auth::hasRole(1)) {
+            echo json_encode(['success' => false, 'message' => 'Insufficient privileges to create users']);
+            return;
+        }
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
+            return;
+        }
+        
+        $user = new User();
+        $response = ['success' => false, 'message' => '', 'errors' => []];
+        
+        // Validate input
+        $firstName = trim($_POST['firstName'] ?? '');
+        $lastName = trim($_POST['lastName'] ?? '');
+        $email = strtolower(trim($_POST['email'] ?? ''));
+        $phone = trim($_POST['phone'] ?? '');
+        $role = $_POST['role'] ?? '';
+        $status = $_POST['status'] ?? 'active';
+        $password = $_POST['password'] ?? '';
+        $confirmPassword = $_POST['confirmPassword'] ?? '';
+        
+        // Validation
+        if (empty($firstName)) {
+            $response['errors']['firstName'] = 'First name is required';
+        }
+        if (empty($lastName)) {
+            $response['errors']['lastName'] = 'Last name is required';
+        }
+        if (empty($email)) {
+            $response['errors']['email'] = 'Email is required';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $response['errors']['email'] = 'Invalid email format';
+        } elseif ($user->emailExists($email)) {
+            $response['errors']['email'] = 'Email already exists';
+        }
+        
+        if (empty($role)) {
+            $response['errors']['role'] = 'Role is required';
+        } elseif (!in_array($role, ['system_admin', 'hr_admin', 'recruitment_manager'])) {
+            $response['errors']['role'] = 'Invalid role';
+        }
+        
+        if (empty($password)) {
+            $response['errors']['password'] = 'Password is required';
+        } elseif (strlen($password) < 8) {
+            $response['errors']['password'] = 'Password must be at least 8 characters';
+        } elseif ($password !== $confirmPassword) {
+            $response['errors']['password'] = 'Passwords do not match';
+        }
+        
+        if (!empty($response['errors'])) {
+            $response['message'] = 'Please fix the errors and try again';
+            echo json_encode($response);
+            return;
+        }
+        
+        // Map role names to IDs
+        $roleMap = [
+            'system_admin' => 1,
+            'hr_admin' => 2, 
+            'recruitment_manager' => 3
+        ];
+        
+        $userData = [
+            'full_name' => $firstName . ' ' . $lastName,
+            'email' => $email,
+            'password' => $password, // Will be hashed by the User model
+            'role_id' => $roleMap[$role],
+            'phone' => $phone,
+            'status' => $status
+        ];
+        
+        if ($user->createUser($userData)) {
+            AccessLog::log('user_created', 'Created user: ' . $email);
+            $response['success'] = true;
+            $response['message'] = 'Staff account created successfully!';
+        } else {
+            $response['message'] = 'Failed to create user account';
+        }
+        
+        echo json_encode($response);
     }
 }

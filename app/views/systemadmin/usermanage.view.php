@@ -23,46 +23,60 @@
     <!-- User Statistics Cards -->
     <div class="card-grid">
         <div class="metric-card">
-            <div class="metric-value">156</div>
+            <div class="metric-value"><?= count($users ?? []) ?></div>
             <div class="metric-label">Total Users</div>
-            <div class="metric-change positive">+12 this month</div>
+            <div class="metric-change neutral">All registered users</div>
         </div>
         <div class="metric-card">
-            <div class="metric-value">89</div>
+            <?php 
+                $activeUsers = array_filter($users ?? [], function($user) { return $user['status'] === 'active'; });
+            ?>
+            <div class="metric-value"><?= count($activeUsers) ?></div>
             <div class="metric-label">Active Users</div>
-            <div class="metric-change positive">+5 this week</div>
+            <div class="metric-change positive">Currently active</div>
         </div>
         <div class="metric-card">
-            <div class="metric-value">67</div>
+            <?php 
+                $inactiveUsers = array_filter($users ?? [], function($user) { return $user['status'] === 'inactive'; });
+            ?>
+            <div class="metric-value"><?= count($inactiveUsers) ?></div>
             <div class="metric-label">Inactive Users</div>
-            <div class="metric-change neutral">No change</div>
+            <div class="metric-change neutral">Currently inactive</div>
         </div>
         <div class="metric-card">
-            <div class="metric-value">4</div>
+            <div class="metric-value"><?= count($roles ?? []) ?></div>
             <div class="metric-label">User Roles</div>
-            <div class="metric-change neutral">Stable</div>
+            <div class="metric-change neutral">Available roles</div>
         </div>
     </div>
 
     <!-- User Management Actions -->
     <div class="action-section">
         <div class="action-buttons">
-            <button class="btn btn-primary" onclick="openUserModal('add')">
-                <i class="icon-plus"></i>Add Staff User
-            </button>
-            <button class="btn btn-secondary" onclick="exportUsers()">
-                <i class="icon-download"></i>Export Users
-            </button>
-            <button class="btn btn-secondary" onclick="openBulkActionsModal()">
-                <i class="icon-edit"></i>Bulk Actions
-            </button>
+            <?php if ($can_manage_users ?? false): ?>
+                <button class="btn btn-primary" onclick="openUserModal('add')">
+                    <i class="icon-plus"></i>Add Staff User
+                </button>
+                <button class="btn btn-secondary" onclick="exportUsers()">
+                    <i class="icon-download"></i>Export Users
+                </button>
+                <button class="btn btn-secondary" onclick="openBulkActionsModal()">
+                    <i class="icon-edit"></i>Bulk Actions
+                </button>
+            <?php else: ?>
+                <div class="alert alert-info">
+                    <p><strong>View Only Mode:</strong> You can view user information but cannot manage users. Contact a System Administrator for user management tasks.</p>
+                </div>
+            <?php endif; ?>
         </div>
         
-        <div class="info-note">
-            <p class="text-muted small">
-                <strong>Note:</strong> Applicants self-register. Only create HR Admin and Recruitment Manager accounts here.
-            </p>
-        </div>
+        <?php if ($can_manage_users ?? false): ?>
+            <div class="info-note">
+                <p class="text-muted small">
+                    <strong>Note:</strong> Applicants self-register. Only create HR Admin and Recruitment Manager accounts here.
+                </p>
+            </div>
+        <?php endif; ?>
         
         <div class="search-filter">
             <input type="text" placeholder="Search users..." class="search-input" id="userSearch">
@@ -99,157 +113,91 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td><input type="checkbox" class="user-checkbox" value="1"></td>
-                    <td>USR-001</td>
-                    <td>
-                        <div class="user-info">
-                            <div class="user-avatar">JD</div>
-                            <div>
-                                <div class="user-name">John Doe</div>
-                                <div class="user-meta">Administrator</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>john.doe@company.com</td>
-                    <td><span class="role-badge system-admin">System Admin</span></td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td>2024-01-15 10:30 AM</td>
-                    <td>2024-01-01</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon" onclick="viewUser(1)" title="View">
-                                <i class="icon-eye"></i>
-                            </button>
-                            <button class="btn-icon" onclick="editUser(1)" title="Edit">
-                                <i class="icon-edit"></i>
-                            </button>
-                            <button class="btn-icon danger" onclick="toggleUserStatus(1)" title="Suspend">
-                                <i class="icon-pause"></i>
-                            </button>
-                            <button class="btn-icon danger" onclick="deleteUser(1)" title="Delete">
-                                <i class="icon-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" class="user-checkbox" value="2"></td>
-                    <td>USR-002</td>
-                    <td>
-                        <div class="user-info">
-                            <div class="user-avatar">MS</div>
-                            <div>
-                                <div class="user-name">Mary Smith</div>
-                                <div class="user-meta">HR Manager</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>mary.smith@company.com</td>
-                    <td><span class="role-badge hr-admin">HR Admin</span></td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td>2024-01-15 09:15 AM</td>
-                    <td>2024-01-02</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon" onclick="viewUser(2)" title="View">
-                                <i class="icon-eye"></i>
-                            </button>
-                            <button class="btn-icon" onclick="editUser(2)" title="Edit">
-                                <i class="icon-edit"></i>
-                            </button>
-                            <button class="btn-icon danger" onclick="toggleUserStatus(2)" title="Suspend">
-                                <i class="icon-pause"></i>
-                            </button>
-                            <button class="btn-icon danger" onclick="deleteUser(2)" title="Delete">
-                                <i class="icon-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" class="user-checkbox" value="3"></td>
-                    <td>USR-003</td>
-                    <td>
-                        <div class="user-info">
-                            <div class="user-avatar">RJ</div>
-                            <div>
-                                <div class="user-name">Robert Johnson</div>
-                                <div class="user-meta">Recruiter</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>robert.johnson@company.com</td>
-                    <td><span class="role-badge recruitment-manager">Recruitment Manager</span></td>
-                    <td><span class="status-badge inactive">Inactive</span></td>
-                    <td>2024-01-10 04:20 PM</td>
-                    <td>2024-01-03</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon" onclick="viewUser(3)" title="View">
-                                <i class="icon-eye"></i>
-                            </button>
-                            <button class="btn-icon" onclick="editUser(3)" title="Edit">
-                                <i class="icon-edit"></i>
-                            </button>
-                            <button class="btn-icon success" onclick="toggleUserStatus(3)" title="Activate">
-                                <i class="icon-play"></i>
-                            </button>
-                            <button class="btn-icon danger" onclick="deleteUser(3)" title="Delete">
-                                <i class="icon-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" class="user-checkbox" value="4"></td>
-                    <td>USR-004</td>
-                    <td>
-                        <div class="user-info">
-                            <div class="user-avatar">LD</div>
-                            <div>
-                                <div class="user-name">Lisa Davis</div>
-                                <div class="user-meta">Job Seeker</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>lisa.davis@email.com</td>
-                    <td><span class="role-badge applicant">Applicant</span></td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td>2024-01-14 02:45 PM</td>
-                    <td>2024-01-05</td>
-                    <td>
-                        <div class="action-buttons">
-                            <button class="btn-icon" onclick="viewUser(4)" title="View">
-                                <i class="icon-eye"></i>
-                            </button>
-                            <button class="btn-icon" onclick="editUser(4)" title="Edit">
-                                <i class="icon-edit"></i>
-                            </button>
-                            <button class="btn-icon danger" onclick="toggleUserStatus(4)" title="Suspend">
-                                <i class="icon-pause"></i>
-                            </button>
-                            <button class="btn-icon danger" onclick="deleteUser(4)" title="Delete">
-                                <i class="icon-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                <?php if (!empty($users)): ?>
+                    <?php foreach ($users as $user): ?>
+                        <?php 
+                            // Generate initials for avatar
+                            $nameParts = explode(' ', trim($user['full_name']));
+                            $initials = '';
+                            foreach ($nameParts as $part) {
+                                $initials .= strtoupper(substr($part, 0, 1));
+                            }
+                            $initials = substr($initials, 0, 2);
+                            
+                            // Format role badge class
+                            $roleClass = str_replace(' ', '-', strtolower($user['role_name'] ?? 'unknown'));
+                            
+                            // Format dates
+                            $lastLogin = $user['last_login'] ? date('M j, Y g:i A', strtotime($user['last_login'])) : 'Never';
+                            $createdDate = date('M j, Y', strtotime($user['created_at']));
+                        ?>
+                        <tr data-user-id="<?= $user['id'] ?>">
+                            <td><input type="checkbox" class="user-checkbox" value="<?= $user['id'] ?>"></td>
+                            <td>USR-<?= str_pad($user['id'], 3, '0', STR_PAD_LEFT) ?></td>
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar"><?= $initials ?></div>
+                                    <div>
+                                        <div class="user-name"><?= htmlspecialchars($user['full_name']) ?></div>
+                                        <div class="user-meta"><?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td><?= htmlspecialchars($user['email']) ?></td>
+                            <td><span class="role-badge <?= $roleClass ?>"><?= htmlspecialchars($user['role_name'] ?? 'Unknown') ?></span></td>
+                            <td><span class="status-badge <?= $user['status'] ?>"><?= ucfirst($user['status']) ?></span></td>
+                            <td><?= $lastLogin ?></td>
+                            <td><?= $createdDate ?></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-icon" onclick="viewUser(<?= $user['id'] ?>)" title="View">
+                                        <i class="icon-eye"></i>
+                                    </button>
+                                    <?php if (($can_manage_users ?? false) && $user['id'] != Auth::user_id()): ?>
+                                        <button class="btn-icon" onclick="editUser(<?= $user['id'] ?>)" title="Edit">
+                                            <i class="icon-edit"></i>
+                                        </button>
+                                        <button class="btn-icon danger" onclick="toggleUserStatus(<?= $user['id'] ?>)" title="<?= $user['status'] === 'active' ? 'Suspend' : 'Activate' ?>">
+                                            <i class="icon-<?= $user['status'] === 'active' ? 'pause' : 'play' ?>"></i>
+                                        </button>
+                                        <button class="btn-icon danger" onclick="deleteUser(<?= $user['id'] ?>)" title="Delete">
+                                            <i class="icon-trash"></i>
+                                        </button>
+                                    <?php elseif ($user['id'] == Auth::user_id()): ?>
+                                        <span class="text-muted small">Current User</span>
+                                    <?php elseif (!($can_manage_users ?? false)): ?>
+                                        <span class="text-muted small">View Only</span>
+                                    <?php endif; ?>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="9" class="text-center text-muted">
+                            <p>No users found. <a href="#" onclick="openUserModal('add')">Create the first user</a></p>
+                        </td>
+                    </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
 
     <!-- Pagination -->
     <div class="pagination-container">
-        <div class="pagination-info">Showing 1-4 of 156 users</div>
+        <div class="pagination-info">
+            <?php 
+            $totalUsers = count($users);
+            echo "Showing 1-{$totalUsers} of {$totalUsers} users";
+            ?>
+        </div>
         <div class="pagination">
             <button class="pagination-btn" disabled>Previous</button>
             <button class="pagination-btn active">1</button>
-            <button class="pagination-btn">2</button>
-            <button class="pagination-btn">3</button>
-            <button class="pagination-btn">...</button>
-            <button class="pagination-btn">39</button>
-            <button class="pagination-btn">Next</button>
+            <?php if ($totalUsers > 10): ?>
+                <button class="pagination-btn">2</button>
+                <button class="pagination-btn">Next</button>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -373,10 +321,34 @@ function saveUser() {
         return;
     }
     
-    // Here you would make an AJAX call to save the user
-    showToast('Staff account created successfully!', 'success');
-    closeUserModal();
-    // Refresh the user table
+    // Password strength validation
+    if (password.length < 8) {
+        showToast('Password must be at least 8 characters long', 'error');
+        return;
+    }
+    
+    // Create user via AJAX
+    fetch('/HireFlow/public/systemadmin/usermanage/create', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showToast('Staff account created successfully!', 'success');
+            closeUserModal();
+            // Refresh the page to show new user
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        } else {
+            showToast(data.message || 'Failed to create user', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('An error occurred while creating the user', 'error');
+    });
 }
 
 function editUser(userId) {
@@ -390,16 +362,56 @@ function viewUser(userId) {
 
 function deleteUser(userId) {
     if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
-        // Make AJAX call to delete user
-        showToast('User deleted successfully!', 'success');
-        // Refresh the user table
+        const formData = new FormData();
+        formData.append('action', 'delete');
+        formData.append('user_id', userId);
+        formData.append('csrf_token', '<?= $csrf_token ?>');
+        
+        fetch('/HireFlow/public/systemadmin/usermanage', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            showToast('User deleted successfully!', 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1000);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to delete user', 'error');
+        });
     }
 }
 
 function toggleUserStatus(userId) {
-    // Toggle user active/inactive status
-    showToast('User status updated successfully!', 'success');
-    // Refresh the user table
+    // Get current status from the row
+    const statusBadge = document.querySelector(`tr[data-user-id="${userId}"] .status-badge`);
+    const currentStatus = statusBadge.classList.contains('active') ? 'active' : 'inactive';
+    const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+    
+    const formData = new FormData();
+    formData.append('action', 'toggle_status');
+    formData.append('user_id', userId);
+    formData.append('status', newStatus);
+    formData.append('csrf_token', '<?= $csrf_token ?>');
+    
+    fetch('/HireFlow/public/systemadmin/usermanage', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.text())
+    .then(data => {
+        showToast('User status updated successfully!', 'success');
+        setTimeout(() => {
+            location.reload();
+        }, 1000);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showToast('Failed to update user status', 'error');
+    });
 }
 
 function exportUsers() {

@@ -4,11 +4,8 @@ class Reports extends Controller
 {
     public function index()
     {
-        // TODO: Add authentication check when role-based login is implemented
-        // if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Recruitment Manager') {
-        //     redirect('signin');
-        //     return;
-        // }
+        // Require Recruitment Manager role (role_id = 3)
+        Auth::requireRole(3);
 
         $data = [];
         $data['page_title'] = 'Recruitment Reports';

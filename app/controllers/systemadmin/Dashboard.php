@@ -4,10 +4,15 @@ class Dashboard extends Controller
 {
     public function index()
     {
-        // Require System Admin access
+        // Require System Admin role (role_id = 1)
         Auth::requireRole(1);
         
         $data = [];
+        
+        // Pass user role information to view
+        $data['current_user_role'] = Auth::user_role();
+        $data['is_system_admin'] = Auth::hasRole(1);
+        $data['user_role_name'] = getRoleName(Auth::user_role());
         
         // Get system statistics
         $user = new User();

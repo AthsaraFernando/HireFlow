@@ -78,6 +78,12 @@
         </header>
 
         <div class="dashboard-content">
+            <?php if (!($is_system_admin ?? false)): ?>
+                <div class="alert alert-info mb-4">
+                    <h4>👁️ Viewing as <?= htmlspecialchars($user_role_name ?? 'Unknown Role') ?></h4>
+                    <p>You are viewing the System Admin dashboard with limited permissions. Some features may be restricted or hidden based on your role.</p>
+                </div>
+            <?php endif; ?>
             <div class="stats-grid">
                 <div class="stat-card stat-primary">
                     <div class="stat-icon">

@@ -4,6 +4,9 @@ class ApplicantDatabase extends Controller
 {
     public function index()
     {
+        // Require HR Admin role (role_id = 2)
+        Auth::requireRole(2);
+        
         // Sample data - in real implementation this would come from database
         $data = [];
         $data['errors'] = [];

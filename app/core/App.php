@@ -19,6 +19,10 @@ class App
     public function loadController()
     {
         $URL = $this->splitURL();
+        
+        // Global authentication check
+        $this->checkGlobalAuth($URL);
+        
         // show($URL);
         
         // First check for direct controller files (e.g., Home.php, Signin.php)
@@ -88,6 +92,39 @@ class App
         
         call_user_func_array([$controller, $this->method], array_values($remainingURL));
 
+    }
+    
+    /**
+     * Global authentication check for protected areas
+     */
+    private function checkGlobalAuth($URL)
+    {
+        // Define public pages that don't require authentication
+        $publicPages = [
+            'home', 'signin', 'signup', 'signout', '_404',
+            'password-reset', 'admin-setup'
+        ];
+        
+        // Check if accessing a public page
+        if (empty($URL[0]) || in_array(strtolower($URL[0]), $publicPages)) {
+            return; // Allow access to public pages
+        }
+        
+        // Check for special public files (robots.txt, favicon.ico, etc.)
+        if (isset($URL[0]) && preg_match('/\.(txt|ico|png|jpg|jpeg|gif|css|js)$/i', $URL[0])) {
+            return; // Allow access to static files
+        }
+        
+        // All other pages require authentication
+        if (!Auth::logged_in()) {
+            // Store the requested URL for redirect after login
+            $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'] ?? '';
+            redirect('signin?required=1');
+            exit();
+        }
+        
+        // Additional role-based checks can be added here
+        // For now, basic login is sufficient as controllers handle specific role checks
     }
 }
 

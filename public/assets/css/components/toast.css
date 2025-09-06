@@ -11,19 +11,20 @@
 
 /* Base toast styles */
 .toast {
-  background-color: var(--card);
-  color: var(--card-foreground);
-  border: 1px solid var(--border);
+  background-color: #ffffff;
+  color: #1f2937;
+  border: 1px solid #e5e7eb;
   border-left: 4px solid var(--primary);
   border-radius: var(--radius);
   padding: 0.75rem 1.25rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
   opacity: 0;
   transform: translateX(20px);
   animation: toast-in 0.4s ease forwards;
   max-width: 320px;
   font-size: 0.875rem;
   line-height: 1.25rem;
+  font-weight: 500;
 }
 
 
@@ -35,12 +36,16 @@
 
 /* Success variant */
 .toast.success {
-  border-left-color: var(--primary);
+  border-left-color: #10b981;
+  background-color: #f0fdf4;
+  color: #166534;
 }
 
 /* Error variant */
 .toast.error {
-  border-left-color: var(--destructive);
+  border-left-color: #ef4444;
+  background-color: #fef2f2;
+  color: #dc2626;
 }
 
 @keyframes toast-in {

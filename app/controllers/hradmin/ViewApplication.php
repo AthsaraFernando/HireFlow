@@ -4,6 +4,9 @@ class ViewApplication extends Controller
 {
     public function index($id = null)
     {
+        // Require HR Admin role (role_id = 2)
+        Auth::requireRole(2);
+        
         if (!$id) {
             // Redirect to applications if no ID provided
             header('Location: /HireFlow/public/hradmin/applications');

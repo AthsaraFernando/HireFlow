@@ -4,9 +4,21 @@ class Signin extends Controller
 {
     public function index()
     {
-        // Redirect if already logged in
+        // Handle logout request from signin page
+        if (isset($_GET['logout']) && Auth::logged_in()) {
+            Auth::logout();
+            redirect('signin?logout=1');
+            return;
+        }
+        
+        // Show logout prompt if user is logged in but trying to access signin
         if (Auth::logged_in()) {
-            $this->redirectToUserDashboard();
+            // Show a page asking if they want to logout first
+            $data = [];
+            $data['current_user'] = Auth::user();
+            $data['current_role'] = getRoleName(Auth::user_role());
+            $data['show_logout_prompt'] = true;
+            $this->view('home', $data);
             return;
         }
 
@@ -59,6 +71,11 @@ class Signin extends Controller
         if (isset($_GET['registered'])) {
             $data['success'] = "Registration successful! Please login with your credentials.";
         }
+        
+        // Check if authentication was required
+        if (isset($_GET['required'])) {
+            $data['errors']['general'] = "Please login to access that page.";
+        }
 
         $data['errors'] = $user->errors;
         $data['csrf_token'] = Auth::generateCSRFToken();
@@ -67,6 +84,23 @@ class Signin extends Controller
 
     private function redirectToUserDashboard()
     {
+        // Check if there's a redirect URL stored
+        if (isset($_SESSION['redirect_after_login'])) {
+            $redirectUrl = $_SESSION['redirect_after_login'];
+            unset($_SESSION['redirect_after_login']);
+            
+            // Clean the URL to remove the /HireFlow/public prefix
+            $redirectUrl = str_replace('/HireFlow/public/', '', $redirectUrl);
+            $redirectUrl = ltrim($redirectUrl, '/');
+            
+            // Validate that the redirect URL is safe (within our application)
+            if (!empty($redirectUrl) && !preg_match('/^https?:\/\//', $redirectUrl)) {
+                redirect($redirectUrl);
+                return;
+            }
+        }
+        
+        // Default role-based redirect
         $user_role = Auth::user_role();
         
         switch ($user_role) {
@@ -77,10 +111,10 @@ class Signin extends Controller
                 redirect('hradmin/dashboard');
                 break;
             case 3: // Recruitment Manager
-                redirect('manager/dashboard');
+                redirect('recruitment/dashboard');
                 break;
             case 4: // Applicant
-                redirect('applicant/dashboard');
+                redirect('applicant');
                 break;
             default:
                 Auth::logout();

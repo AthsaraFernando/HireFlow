@@ -4,6 +4,10 @@ class CreateJob extends Controller
 {
     public function index()
     {
+        // Require HR Admin role (role_id = 2)
+        Auth::requireRole(2);
+        
+
         $data = [];
         $data['errors'] = [];
         $data['success'] = '';

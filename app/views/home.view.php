@@ -30,6 +30,18 @@ if (!function_exists('old_value')) {
                 <div class="form-container">
                     <h2 class="form-title text-center mb-3">Sign In</h2>
 
+                    <?php if (!empty($show_logout_prompt)): ?>
+                        <div class="alert alert-info mb-3">
+                            <h4>Already Logged In</h4>
+                            <p>You are currently logged in as <strong><?= esc($current_user['full_name'] ?? 'Unknown') ?></strong> (<?= esc($current_role) ?>).</p>
+                            <p>To login as a different user, please logout first:</p>
+                            <div class="button-group">
+                                <a href="<?= ROOT ?>/signin?logout=1" class="btn btn-secondary">Logout & Login Again</a>
+                                <a href="<?= ROOT ?>/<?= Auth::user_role() == 1 ? 'systemadmin/dashboard' : (Auth::user_role() == 2 ? 'hradmin/dashboard' : (Auth::user_role() == 3 ? 'recruitment/dashboard' : 'applicant')) ?>" class="btn btn-primary">Go to Dashboard</a>
+                            </div>
+                        </div>
+                    <?php else: ?>
+
                     <?php if (!empty($success)): ?>
                         <div class="alert alert-success mb-3">
                             <?= esc($success) ?>
@@ -102,6 +114,8 @@ if (!function_exists('old_value')) {
                             </p>
                         </div>
                     </form>
+                    
+                    <?php endif; ?>
                 </div>
 
                 <div class="signin-footer text-center mt-4">

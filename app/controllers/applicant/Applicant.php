@@ -9,12 +9,18 @@ class Applicant extends Controller
 
     public function index()
     {
+        // Require Applicant role (role_id = 4)
+        Auth::requireRole(4);
+        
         // Default route redirects to dashboard
         redirect('applicant/dashboard');
     }
 
     public function dashboard()
     {
+        // Require Applicant role (role_id = 4)
+        Auth::requireRole(4);
+        
         $data = [];
         
         // Sample dashboard data for frontend testing
