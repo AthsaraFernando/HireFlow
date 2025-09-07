@@ -6,23 +6,23 @@ A comprehensive recruitment management system built with PHP MVC architecture, d
 
 ### Database Setup
 1. Ensure XAMPP is running (Apache + MySQL)
-2. Import the complete database schema:
+2. **Recommended**: Import the complete database backup:
+   ```bash
+   # See Database-Backup/SETUP_GUIDE.md for detailed instructions
+   # Import Database-Backup/hireflow_db.sql using phpMyAdmin
+   ```
+3. **Alternative**: Build from schema files:
    ```bash
    # Using phpMyAdmin: Import database_schema.sql
    # Or using MySQL command line:
    mysql -u root -p < database_schema.sql
    ```
-3. (Optional) Import comprehensive dummy data for testing:
+4. (Optional) Import additional dummy data for testing:
    ```bash
    # Using phpMyAdmin: Import dummy_data.sql after schema
    # Or using MySQL command line:
    mysql -u root -p hireflow_db < dummy_data.sql
    ```
-4. The schema includes basic sample data, while dummy_data.sql adds:
-   - 11 realistic job postings across 8 departments
-   - 10 job applications with detailed cover letters
-   - Interview schedules and notifications
-   - System activity logs and configuration settings
 
 ### First Login
 - **System Admin**: `admin@hireflow.com` / `Password@1`

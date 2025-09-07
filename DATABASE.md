@@ -13,17 +13,24 @@ HireFlow uses a MySQL database with a normalized schema designed for efficient r
 
 ## Quick Setup
 ```bash
-# 1. Import the complete schema with basic data
+# Option 1: Import complete database backup (RECOMMENDED)
+# See Database-Backup/SETUP_GUIDE.md for detailed instructions
+# Import Database-Backup/hireflow_db.sql using phpMyAdmin or command line
+
+# Option 2: Build from schema
 mysql -u root -p < database_schema.sql
 
-# 2. (Optional) Import comprehensive dummy data for testing
+# Option 3: Add additional test data (optional)
 mysql -u root -p hireflow_db < dummy_data.sql
 
-# Or use phpMyAdmin to import both files in order
+# Or use phpMyAdmin to import these files in order
 ```
 
 **Files:**
-- `database_schema.sql` - Complete database structure + default users
+- `Database-Backup/hireflow_db.sql` - **Complete database backup with all data** (recommended)
+- `Database-Backup/SETUP_GUIDE.md` - **Detailed import instructions**
+- `Database-Backup/DATABASE_SCHEMA.md` - **Complete schema documentation**
+- `database_schema.sql` - Database structure + default users
 - `dummy_data.sql` - Additional test data (70+ records) including:
   - 11 realistic job postings across 8 departments  
   - 10 job applications with detailed cover letters

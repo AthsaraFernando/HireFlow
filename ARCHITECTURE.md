@@ -12,8 +12,11 @@ Applicant:         athsara@hireflow.com / Password@1
 ```
 
 ## Database Files
-- `database_schema.sql` - Complete database structure with default users
-- `dummy_data.sql` - Comprehensive test data (70+ records) for development
+- `Database-Backup/hireflow_db.sql` - **Complete database backup** (recommended for setup)
+- `Database-Backup/SETUP_GUIDE.md` - **Step-by-step import instructions**
+- `Database-Backup/DATABASE_SCHEMA.md` - **Complete schema documentation**
+- `database_schema.sql` - Database structure with default users
+- `dummy_data.sql` - Additional test data (70+ records) for development
 
 ## System Architecture Diagram
 
