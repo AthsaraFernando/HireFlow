@@ -84,7 +84,7 @@
                 <div class="stat-card">
                     <div class="stat-icon shortlisted">✅</div>
                     <div class="stat-info">
-                        <h3>3</h3>
+                        <h3><?= $user['shortlisted_count'] ?></h3>
                         <p>Shortlisted</p>
                     </div>
                 </div>
@@ -198,23 +198,7 @@
                     </div>
                 </div>
 
-                <!-- Profile Completion -->
-                <div class="dashboard-card">
-                    <div class="card-header">
-                        <h2>Profile Completion</h2>
-                    </div>
-                    <div class="card-content">
-                        <div class="profile-progress">
-                            <div class="progress-circle">
-                                <div class="progress-value"><?= $user['profile_completion'] ?>%</div>
-                            </div>
-                            <div class="progress-text">
-                                <p>Complete your profile to increase your chances of getting hired!</p>
-                                <a href="<?= ROOT ?>/applicant/profile" class="btn btn-outline">Update Profile</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+
             </div>
         </div>
     </div>

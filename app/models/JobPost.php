@@ -55,14 +55,95 @@ class JobPost
         return $this->query($query);
     }
 
-    public function getActiveJobs()
+    public function getActiveJobs($limit = 20, $offset = 0)
     {
-        $query = "SELECT jp.*, d.name as department_name 
-                  FROM job_posts jp 
-                  LEFT JOIN departments d ON jp.department_id = d.id 
-                  WHERE jp.status = 'active' 
-                  ORDER BY jp.posted_at DESC";
+        $query = "SELECT * FROM job_posts 
+                  WHERE status = 'Open' 
+                  AND (deadline IS NULL OR deadline >= CURDATE())
+                  ORDER BY created_at DESC 
+                  LIMIT $limit OFFSET $offset";
         
         return $this->query($query);
+    }
+    
+    public function getJobById($id)
+    {
+        $query = "SELECT * FROM job_posts WHERE id = ? AND status = 'Open'";
+        return $this->get_row($query, [$id]);
+    }
+    
+    public function searchJobs($filters = [], $limit = 20, $offset = 0)
+    {
+        $conditions = ["status = 'Open'"];
+        $params = [];
+        
+        if (!empty($filters['title'])) {
+            $conditions[] = "title LIKE ?";
+            $params[] = '%' . $filters['title'] . '%';
+        }
+        
+        if (!empty($filters['department'])) {
+            $conditions[] = "department LIKE ?";
+            $params[] = '%' . $filters['department'] . '%';
+        }
+        
+        if (!empty($filters['location'])) {
+            $conditions[] = "location LIKE ?";
+            $params[] = '%' . $filters['location'] . '%';
+        }
+        
+        if (!empty($filters['employment_type'])) {
+            $conditions[] = "employment_type = ?";
+            $params[] = $filters['employment_type'];
+        }
+        
+        $whereClause = implode(' AND ', $conditions);
+        
+        // Execute the query with parameters first to get filtered results
+        if (!empty($params)) {
+            $baseQuery = "SELECT * FROM job_posts WHERE {$whereClause} ORDER BY created_at DESC";
+            $results = $this->query($baseQuery, $params);
+            
+            // Apply pagination manually to avoid PDO parameter binding issues with LIMIT/OFFSET
+            if ($results && is_array($results)) {
+                return array_slice($results, $offset, $limit);
+            }
+            return [];
+        } else {
+            $query = "SELECT * FROM job_posts WHERE {$whereClause} ORDER BY created_at DESC LIMIT $limit OFFSET $offset";
+            return $this->query($query);
+        }
+    }
+    
+    public function getJobCount($filters = [])
+    {
+        $conditions = ["status = 'Open'"];
+        $params = [];
+        
+        if (!empty($filters['title'])) {
+            $conditions[] = "title LIKE ?";
+            $params[] = '%' . $filters['title'] . '%';
+        }
+        
+        if (!empty($filters['department'])) {
+            $conditions[] = "department LIKE ?";
+            $params[] = '%' . $filters['department'] . '%';
+        }
+        
+        if (!empty($filters['location'])) {
+            $conditions[] = "location LIKE ?";
+            $params[] = '%' . $filters['location'] . '%';
+        }
+        
+        if (!empty($filters['employment_type'])) {
+            $conditions[] = "employment_type = ?";
+            $params[] = $filters['employment_type'];
+        }
+        
+        $whereClause = implode(' AND ', $conditions);
+        $query = "SELECT COUNT(*) as total FROM job_posts WHERE {$whereClause}";
+        
+        $result = $this->get_row($query, $params);
+        return $result ? $result['total'] : 0;
     }
 }
