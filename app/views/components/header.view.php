@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/toast.css">
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/systemadmin/dashboard.style.css">
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/systemadmin/system-admin.css">
-    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/hradmin/hradmin.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/hradmin/hradmin.css?v=<?= time() ?>">
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/recruitment/recruitment.css?v=<?= time() ?>">
     
     <!-- Fonts -->

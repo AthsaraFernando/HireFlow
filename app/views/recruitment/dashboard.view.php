@@ -1,6 +1,96 @@
 <?php $this->view('components/header') ?>
 
-<div class="main-container">
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
+            <p class="brand-subtitle">Recruitment Manager</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/dashboard" class="nav-link active">
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/assigned-jobs" class="nav-link">
+                        <span class="nav-text">Assigned Jobs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/applications" class="nav-link">
+                        <span class="nav-text">Applications</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/shortlist-candidates" class="nav-link">
+                        <span class="nav-text">Shortlist</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/interview-schedule" class="nav-link">
+                        <span class="nav-text">Interviews</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/candidate-evaluation" class="nav-link">
+                        <span class="nav-text">Evaluations</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/reports" class="nav-link">
+                        <span class="nav-text">Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/notifications" class="nav-link">
+                        <span class="nav-text">Notifications</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/profile" class="nav-link">
+                        <span class="nav-text">My Profile</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="<?= ROOT ?>/signout" class="logout-btn">
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <
+                </button>
+                <h1 class="page-title">Recruitment Dashboard</h1>
+            </div>
+
+            <div class="header-right">
+                <div class="header-notifications">
+                    <button class="notification-btn"></button>
+                </div>
+
+                <div class="header-user">
+                    <div class="user-info">
+                        <span class="user-name">
+                            <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
+                        <span class="user-role">Recruitment Manager</span>
+                    </div>
+                    <div class="user-avatar">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="main-container">
     <!-- Header Section -->
     <div class="header-section">
         <h1 class="page-title">Recruitment Dashboard</h1>
@@ -207,6 +297,36 @@
             </div>
         </div>
     </div>
-</div>
+
+<script>
+// Sidebar toggle functionality
+document.getElementById('sidebarToggle').addEventListener('click', function () {
+    document.querySelector('.sidebar').classList.toggle('collapsed');
+    document.querySelector('.main-content').classList.toggle('expanded');
+});
+
+document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
+    if (e.target.textContent.trim() === ">") {
+        e.target.textContent = "<";
+    } else {
+        e.target.textContent = ">";
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+        if (link.getAttribute('href').includes(currentPath)) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+
+        </div>
+    </div>
 
 <?php $this->view('components/footer') ?>

@@ -1,6 +1,86 @@
 <?php $this->view('components/header') ?>
 
-<div class="main-container">
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
+            <p class="brand-subtitle">HR Admin</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/dashboard" class="nav-link">
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/create-job" class="nav-link">
+                        <span class="nav-text">Create Job</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/job-posts" class="nav-link">
+                        <span class="nav-text">Job Posts</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/applications" class="nav-link">
+                        <span class="nav-text">Applications</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/interview-schedule" class="nav-link active">
+                        <span class="nav-text">Interviews</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/reports" class="nav-link">
+                        <span class="nav-text">Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/profile" class="nav-link">
+                        <span class="nav-text">My Profile</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="<?= ROOT ?>/signout" class="logout-btn">
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <
+                </button>
+                <h1 class="page-title">Interview Schedule</h1>
+            </div>
+
+            <div class="header-right">
+                <div class="header-notifications">
+                    <button class="notification-btn"></button>
+                </div>
+
+                <div class="header-user">
+                    <div class="user-info">
+                        <span class="user-name">
+                            <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
+                        <span class="user-role">HR Administrator</span>
+                    </div>
+                    <div class="user-avatar">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="main-container">
     <div class="header-section">
         <h1 class="page-title">Interview Schedule</h1>
         <p class="page-description">Schedule and manage interviews with candidates</p>
@@ -766,6 +846,35 @@ document.getElementById('scheduleModal').addEventListener('click', function(e) {
 setInterval(() => {
     console.log('Checking for interview updates...');
 }, 30000);
+
+// Sidebar toggle functionality
+document.getElementById('sidebarToggle').addEventListener('click', function () {
+    document.querySelector('.sidebar').classList.toggle('collapsed');
+    document.querySelector('.main-content').classList.toggle('expanded');
+});
+
+document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
+    if (e.target.textContent.trim() === ">") {
+        e.target.textContent = "<";
+    } else {
+        e.target.textContent = ">";
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+        if (link.getAttribute('href').includes(currentPath)) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+});
 </script>
+
+        </div>
+    </div>
 
 <?php $this->view('components/footer') ?>

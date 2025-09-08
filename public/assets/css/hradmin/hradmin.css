@@ -1596,6 +1596,15 @@
     gap: 1.5rem;
 }
 
+/* Dashboard content full width styling */
+.dashboard-content {
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: none;
+}
+
 .sidebar {
     display: flex;
     flex-direction: column;
