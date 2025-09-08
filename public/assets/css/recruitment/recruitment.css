@@ -2,11 +2,12 @@
 
 /* Layout and Container */
 .main-container {
-    max-width: 1400px;
-    margin: 0 auto;
+    max-width: none;
+    margin: 0;
     padding: 1.5rem;
     background-color: #f8fafc;
     min-height: calc(100vh - 80px);
+    width: 100%;
 }
 
 @media (max-width: 768px) {
