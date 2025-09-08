@@ -1,104 +1,492 @@
 <?php $this->view('components/header') ?>
 
-<div class="main-container">
-    <div class="header-section">
-        <h1 class="page-title">User Management</h1>
-        <p class="page-description">Manage system users, roles, and permissions</p>
+<style>
+/* Page Controls Styling - Full Width */
+
+/* Page Header inside Controls */
+.page-header {
+    padding: 25px 25px 20px 25px;
+    border-bottom: 1px solid #e5e7eb;
+    background: linear-gradient(135deg, #4e31aa 0%, #3b2693 100%);
+    color: white;
+}
+
+.page-header .page-title {
+    margin: 0 0 8px 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+}
+
+.page-header .page-description {
+    margin: 0;
+    font-size: 1.1rem;
+    opacity: 0.9;
+    color: rgba(255,255,255,0.9);
+}
+
+/* Statistics Cards */
+.controls-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    padding: 25px;
+    border-bottom: 1px solid #e5e7eb;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.controls-stats .metric-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.controls-stats .metric-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.controls-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid #e5e7eb;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.controls-left {
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    flex: 1;
+    padding: 12px 45px 12px 15px;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #4e31aa;
+    box-shadow: 0 0 0 3px rgba(78, 49, 170, 0.1);
+}
+
+.search-btn {
+    position: absolute;
+    right: 5px;
+    background: #4e31aa;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.search-btn:hover {
+    background: #3b2693;
+}
+
+.controls-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.controls-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 25px;
+    background: white;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 200px;
+}
+
+.filter-group label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    white-space: nowrap;
+}
+
+.filter-select,
+.filter-input {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    background: white;
+    min-width: 120px;
+    transition: border-color 0.2s ease;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+    outline: none;
+    border-color: #4e31aa;
+}
+
+.filter-separator {
+    margin: 0 8px;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.filter-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+}
+
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 13px;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #d1d5db;
+    color: #374151;
+}
+
+.btn-outline:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+}
+
+.info-note {
+    padding: 15px 25px;
+    background: #f0f9ff;
+    border-top: 1px solid #e5e7eb;
+}
+
+.info-note p {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    color: #0369a1;
+}
+
+/* Table Container inside Page Controls */
+.page-controls .table-container {
+    margin: 20px 25px 0 25px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.page-controls .table-container table {
+    width: 100%;
+}
+
+.page-controls .pagination-container {
+    margin: 20px 25px 25px 25px;
+}
+
+/* Proper full width within content area */
+.dashboard-content {
+    padding: 20px;
+    width: 100%;
+    max-width: none;
+}
+
+.dashboard-content .alert {
+    margin-bottom: 20px;
+    border-radius: 8px;
+}
+
+.page-controls {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    width: 100%;
+    max-width: none;
+    display: block;
+}
+
+
+
+.text-muted {
+    color: #6b7280;
+}
+
+/* Icon Styles */
+.icon-search::before { content: "🔍"; }
+.icon-plus::before { content: "➕"; }
+.icon-download::before { content: "📥"; }
+.icon-edit::before { content: "✏️"; }
+.icon-info::before { content: "ℹ️"; }
+
+
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 20px 20px 15px 20px;
+    }
+    
+    .page-header .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .page-header .page-description {
+        font-size: 1rem;
+    }
+    
+    .controls-stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        padding: 20px;
+    }
+    
+    .controls-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .controls-left {
+        max-width: none;
+    }
+    
+    .controls-right {
+        justify-content: center;
+    }
+    
+    .controls-filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    
+    .filter-group {
+        min-width: auto;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 5px;
+    }
+    
+    .filter-actions {
+        margin-left: 0;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .controls-stats {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+
+<body>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
+            <p class="brand-subtitle">System Admin</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/dashboard" class="nav-link">
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/usermanage" class="nav-link active">
+                        <span class="nav-text">Manage Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/reports" class="nav-link">
+                        <span class="nav-text">Reports & Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/accesslogs" class="nav-link">
+                        <span class="nav-text">Access Logs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/profile" class="nav-link">
+                        <span class="nav-text">My Profile</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="<?= ROOT ?>/signout" class="logout-btn">
+                <span>Logout</span>
+            </a>
+        </div>
     </div>
 
-    <?php if(!empty($errors)): ?>
-        <div class="alert alert-error">
-            <?php foreach($errors as $error): ?>
-                <p><?php echo $error ?></p>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+    <div class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    < </button>
+                        <h1 class="page-title">User Management</h1>
+            </div>
 
-    <?php if(!empty($success)): ?>
-        <div class="alert alert-success">
-            <p><?php echo $success ?></p>
-        </div>
-    <?php endif; ?>
+            <div class="header-right">
+                <div class="header-notifications">
+                    <button class="notification-btn"></button>
+                </div>
 
-    <!-- User Statistics Cards -->
-    <div class="card-grid">
-        <div class="metric-card">
-            <div class="metric-value"><?= count($users ?? []) ?></div>
-            <div class="metric-label">Total Users</div>
-            <div class="metric-change neutral">All registered users</div>
-        </div>
-        <div class="metric-card">
-            <?php 
-                $activeUsers = array_filter($users ?? [], function($user) { return $user['status'] === 'active'; });
-            ?>
-            <div class="metric-value"><?= count($activeUsers) ?></div>
-            <div class="metric-label">Active Users</div>
-            <div class="metric-change positive">Currently active</div>
-        </div>
-        <div class="metric-card">
-            <?php 
-                $inactiveUsers = array_filter($users ?? [], function($user) { return $user['status'] === 'inactive'; });
-            ?>
-            <div class="metric-value"><?= count($inactiveUsers) ?></div>
-            <div class="metric-label">Inactive Users</div>
-            <div class="metric-change neutral">Currently inactive</div>
-        </div>
-        <div class="metric-card">
-            <div class="metric-value"><?= count($roles ?? []) ?></div>
-            <div class="metric-label">User Roles</div>
-            <div class="metric-change neutral">Available roles</div>
-        </div>
-    </div>
+                <div class="header-user">
+                    <div class="user-info">
+                        <span class="user-name">
+                            <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
+                        <span class="user-role">System Administrator</span>
+                    </div>
+                    <div class="user-avatar">
+                    </div>
+                </div>
+            </div>
+        </header>
 
-    <!-- User Management Actions -->
-    <div class="action-section">
-        <div class="action-buttons">
-            <?php if ($can_manage_users ?? false): ?>
-                <button class="btn btn-primary" onclick="openUserModal('add')">
-                    <i class="icon-plus"></i>Add Staff User
-                </button>
-                <button class="btn btn-secondary" onclick="exportUsers()">
-                    <i class="icon-download"></i>Export Users
-                </button>
-                <button class="btn btn-secondary" onclick="openBulkActionsModal()">
-                    <i class="icon-edit"></i>Bulk Actions
-                </button>
-            <?php else: ?>
-                <div class="alert alert-info">
-                    <p><strong>View Only Mode:</strong> You can view user information but cannot manage users. Contact a System Administrator for user management tasks.</p>
+        <div class="dashboard-content">
+            <?php if(!empty($errors)): ?>
+                <div class="alert alert-error">
+                    <?php foreach($errors as $error): ?>
+                        <p><?php echo $error ?></p>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+
+            <?php if(!empty($success)): ?>
+                <div class="alert alert-success">
+                    <p><?php echo $success ?></p>
+                </div>
+            <?php endif; ?>
+
+            <!-- User Management Controls -->
+            <div class="page-controls">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1 class="page-title">User Management</h1>
+                    <p class="page-description">Manage system users, roles, and permissions</p>
+                </div>
+                
+                <!-- Statistics Cards -->
+                <div class="controls-stats">
+            <div class="metric-card">
+                <div class="metric-value"><?= count($users ?? []) ?></div>
+                <div class="metric-label">Total Users</div>
+                <div class="metric-change neutral">All registered users</div>
+            </div>
+            <div class="metric-card">
+                <?php 
+                    $activeUsers = array_filter($users ?? [], function($user) { return $user['status'] === 'active'; });
+                ?>
+                <div class="metric-value"><?= count($activeUsers) ?></div>
+                <div class="metric-label">Active Users</div>
+                <div class="metric-change positive">Currently active</div>
+            </div>
+            <div class="metric-card">
+                <?php 
+                    $inactiveUsers = array_filter($users ?? [], function($user) { return $user['status'] === 'inactive'; });
+                ?>
+                <div class="metric-value"><?= count($inactiveUsers) ?></div>
+                <div class="metric-label">Inactive Users</div>
+                <div class="metric-change neutral">Currently inactive</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value"><?= count($roles ?? []) ?></div>
+                <div class="metric-label">User Roles</div>
+                <div class="metric-change neutral">Available roles</div>
+            </div>
+        </div>
+        
+        <div class="controls-header">
+            <div class="controls-left">
+                <div class="search-container">
+                    <input type="text" placeholder="Search users..." class="search-input" id="userSearch">
+                    <button class="search-btn" onclick="filterUsers()">
+                        <i class="icon-search"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="controls-right">
+                <?php if ($can_manage_users ?? false): ?>
+                    <button class="btn btn-primary" onclick="openUserModal('add')">
+                        <i class="icon-plus"></i>Add Staff User
+                    </button>
+                    <button class="btn btn-secondary" onclick="exportUsers()">
+                        <i class="icon-download"></i>Export
+                    </button>
+                    <button class="btn btn-outline" onclick="openBulkActionsModal()">
+                        <i class="icon-edit"></i>Bulk Actions
+                    </button>
+                <?php endif; ?>
+            </div>
+        </div>
+        
+        <div class="controls-filters">
+            <div class="filter-group">
+                <label>Filter by Role:</label>
+                <select class="filter-select" id="roleFilter">
+                    <option value="">All Roles</option>
+                    <option value="system_admin">System Admin</option>
+                    <option value="hr_admin">HR Admin</option>
+                    <option value="recruitment_manager">Recruitment Manager</option>
+                    <option value="applicant">Applicant</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Filter by Status:</label>
+                <select class="filter-select" id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                    <option value="suspended">Suspended</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-sm btn-outline" onclick="clearFilters()">Clear Filters</button>
+            </div>
         </div>
         
         <?php if ($can_manage_users ?? false): ?>
             <div class="info-note">
-                <p class="text-muted small">
-                    <strong>Note:</strong> Applicants self-register. Only create HR Admin and Recruitment Manager accounts here.
+                <p class="text-muted">
+                    <i class="icon-info"></i>
+                    <strong>Note:</strong> Applicants self-register through the public portal. Only create HR Admin and Recruitment Manager accounts here.
                 </p>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-info">
+                <p><strong>View Only Mode:</strong> You can view user information but cannot manage users. Contact a System Administrator for user management tasks.</p>
             </div>
         <?php endif; ?>
         
-        <div class="search-filter">
-            <input type="text" placeholder="Search users..." class="search-input" id="userSearch">
-            <select class="filter-select" id="roleFilter">
-                <option value="">All Roles</option>
-                <option value="system_admin">System Admin</option>
-                <option value="hr_admin">HR Admin</option>
-                <option value="recruitment_manager">Recruitment Manager</option>
-                <option value="applicant">Applicant</option>
-            </select>
-            <select class="filter-select" id="statusFilter">
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="inactive">Inactive</option>
-                <option value="suspended">Suspended</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Users Table -->
-    <div class="table-container">
-        <table class="data-table">
+        <!-- Users Table -->
+        <div class="table-container">
+            <table class="data-table">
             <thead>
                 <tr>
                     <th><input type="checkbox" id="selectAll"></th>
@@ -457,6 +845,21 @@ function filterUsers() {
     });
 }
 
+// Clear all filters
+function clearFilters() {
+    document.getElementById('userSearch').value = '';
+    document.getElementById('roleFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    
+    // Show all rows
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+        row.style.display = '';
+    });
+    
+    showToast('Filters cleared', 'info');
+}
+
 // Select all functionality
 document.getElementById('selectAll').addEventListener('change', function() {
     const checkboxes = document.querySelectorAll('.user-checkbox');
@@ -477,6 +880,35 @@ function showToast(message, type) {
         toast.remove();
     }, 3000);
 }
+
+// Sidebar toggle functionality
+document.getElementById('sidebarToggle').addEventListener('click', function () {
+    document.querySelector('.sidebar').classList.toggle('collapsed');
+    document.querySelector('.main-content').classList.toggle('expanded');
+});
+
+document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
+    if (e.target.textContent.trim() === ">") {
+        e.target.textContent = "<";
+    } else {
+        e.target.textContent = ">";
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+        if (link.getAttribute('href').includes(currentPath)) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+});
 </script>
+
+        </div>
+    </div>
 
 <?php $this->view('components/footer') ?>

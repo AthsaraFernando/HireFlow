@@ -39,7 +39,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/systemadmin/viewdata" class="nav-link">
+                    <a href="<?= ROOT ?>/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
                 </li>
