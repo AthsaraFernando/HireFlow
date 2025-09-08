@@ -130,7 +130,7 @@ body {
 }
 
 .main-content.expanded {
-    margin-left: -15px;
+    margin-left: 0;
 }
 
 .top-header {
@@ -253,6 +253,8 @@ body {
 
 .dashboard-content {
     padding: 24px;
+    display: flex;
+    flex-direction: column;
 }
 
 .stats-grid {

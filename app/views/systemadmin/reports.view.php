@@ -241,14 +241,75 @@ $popular_pages = [
 </head>
 
 <body>
-    <?php 
-    // Set user data for header
-    $user_role = 'System Admin';
-    $user_name = 'Admin User';
-    include '../views/components/header.view.php'; 
-    ?>
-    
-    <div class="reports-container">
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
+            <p class="brand-subtitle">System Admin</p>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/dashboard" class="nav-link">
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/usermanage" class="nav-link">
+                        <span class="nav-text">Manage Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/reports" class="nav-link active">
+                        <span class="nav-text">Reports & Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/accesslogs" class="nav-link">
+                        <span class="nav-text">Access Logs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/profile" class="nav-link">
+                        <span class="nav-text">My Profile</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="<?= ROOT ?>/signout" class="logout-btn">
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    < </button>
+                        <h1 class="page-title">System Reports</h1>
+            </div>
+
+            <div class="header-right">
+                <div class="header-notifications">
+                    <button class="notification-btn"></button>
+                </div>
+
+                <div class="header-user">
+                    <div class="user-info">
+                        <span class="user-name">
+                            <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
+                        <span class="user-role">System Administrator</span>
+                    </div>
+                    <div class="user-avatar">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="reports-container" style="padding: 30px; margin: 0; max-width: none;">
         <div class="page-header">
             <h1>📊 System Reports</h1>
             <p>Comprehensive system analytics and monitoring reports</p>
@@ -616,6 +677,35 @@ $popular_pages = [
             // In real implementation, this would fetch fresh data
             console.log('Refreshing report data...');
         }, 30000);
+
+        // Sidebar toggle functionality
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        });
+
+        document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
+            if (e.target.textContent.trim() === ">") {
+                e.target.textContent = "<";
+            } else {
+                e.target.textContent = ">";
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                if (link.getAttribute('href').includes(currentPath)) {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
     </script>
+
+        </div>
+    </div>
 </body>
 </html>

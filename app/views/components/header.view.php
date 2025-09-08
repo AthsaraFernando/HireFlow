@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/systemadmin/dashboard.style.css">
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/systemadmin/system-admin.css">
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/hradmin/hradmin.css">
-    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/recruitment/recruitment.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/recruitment/recruitment.css?v=<?= time() ?>">
     
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
