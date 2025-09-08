@@ -65,8 +65,8 @@
             </div>
             <div class="header-right">
                 <div class="user-info">
-                    <span class="user-name">John Smith</span>
-                    <div class="user-avatar">JS</div>
+                    <span class="user-name"><?= $user['name'] ?? 'User' ?></span>
+                    <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'U', 0, 2)) ?></div>
                 </div>
             </div>
         </header>

@@ -6,6 +6,17 @@
  */
 class Applicant extends Controller
 {
+    private function getUserData($user_id)
+    {
+        $userModel = new User();
+        $users = $userModel->where(['id' => $user_id]);
+        $current_user = $users[0] ?? null;
+        
+        return [
+            'name' => $current_user['full_name'] ?? 'User',
+            'email' => $current_user['email'] ?? ''
+        ];
+    }
 
     public function index()
     {
@@ -22,158 +33,292 @@ class Applicant extends Controller
         Auth::requireRole(4);
         
         $data = [];
+        $user_id = Auth::user_id();
         
-        // Sample dashboard data for frontend testing
+        // Get current user data
+        $userModel = new User();
+        $applicationModel = new Application();
+        $interviewModel = new Interview();
+        $notificationModel = new Notification();
+        
+        $current_user = Auth::user();
+        
+        // Get application statistics
+        $app_stats = $applicationModel->getApplicationStats($user_id);
+        if (!$app_stats) {
+            $app_stats = [
+                'total_applications' => 0,
+                'pending_applications' => 0,
+                'under_review_applications' => 0,
+                'shortlisted_applications' => 0,
+                'interview_scheduled' => 0,
+                'rejected_applications' => 0,
+                'offered_applications' => 0
+            ];
+        }
+        
+        // Get interview statistics
+        $interview_stats = $interviewModel->getInterviewCount($user_id);
+        if (!$interview_stats) {
+            $interview_stats = [
+                'total_interviews' => 0,
+                'upcoming_interviews' => 0,
+                'completed_interviews' => 0
+            ];
+        }
+        
+        // Calculate profile completion percentage
+        $profile_completion = $this->calculateProfileCompletion($current_user);
+        
+        // User data for dashboard
         $data['user'] = [
-            'name' => 'John Smith',
-            'email' => 'john.smith@example.com',
-            'profile_completion' => 85,
-            'applications_count' => 12,
-            'interviews_count' => 3,
-            'pending_count' => 7
+            'name' => $current_user['full_name'] ?? 'User',
+            'email' => $current_user['email'] ?? '',
+            'profile_completion' => $profile_completion,
+            'applications_count' => (int)($app_stats['total_applications'] ?? 0),
+            'interviews_count' => (int)($interview_stats['total_interviews'] ?? 0),
+            'pending_count' => (int)($app_stats['pending_applications'] ?? 0),
+            'shortlisted_count' => (int)($app_stats['shortlisted_applications'] ?? 0),
+            'under_review_count' => (int)($app_stats['under_review_applications'] ?? 0),
+            'interview_scheduled_count' => (int)($app_stats['interview_scheduled'] ?? 0)
         ];
 
-        $data['recent_applications'] = [
-            [
-                'id' => 1,
-                'job_title' => 'Senior Software Engineer',
-                'company' => 'TechCorp Inc.',
-                'status' => 'interviewed',
-                'applied_date' => '2024-01-15',
-                'salary' => '$120,000 - $150,000'
-            ],
-            [
-                'id' => 2,
-                'job_title' => 'Full Stack Developer',
-                'company' => 'StartupTech',
-                'status' => 'pending',
-                'applied_date' => '2024-01-12',
-                'salary' => '$90,000 - $120,000'
-            ],
-            [
-                'id' => 3,
-                'job_title' => 'Frontend Developer',
-                'company' => 'DesignStudio',
-                'status' => 'shortlisted',
-                'applied_date' => '2024-01-10',
-                'salary' => '$80,000 - $100,000'
-            ]
-        ];
+        // Get recent applications (last 5)
+        $recent_apps = $applicationModel->getUserApplications($user_id);
+        $data['recent_applications'] = [];
+        if ($recent_apps && is_array($recent_apps)) {
+            foreach (array_slice($recent_apps, 0, 5) as $app) {
+                $data['recent_applications'][] = [
+                    'id' => $app['id'],
+                    'job_title' => $app['job_title'] ?? 'Unknown Position',
+                    'company' => 'HireFlow Company', // Since we don't have company field, using default
+                    'status' => strtolower($app['status']),
+                    'applied_date' => date('Y-m-d', strtotime($app['applied_at'])),
+                    'salary' => $app['salary_range'] ?? 'Not specified'
+                ];
+            }
+        }
 
-        $data['upcoming_interviews'] = [
-            [
-                'id' => 1,
-                'job_title' => 'Senior Software Engineer',
-                'company' => 'TechCorp Inc.',
-                'date' => '2024-01-25',
-                'time' => '2:00 PM',
-                'type' => 'Technical Interview',
-                'interviewer' => 'Sarah Johnson'
-            ],
-            [
-                'id' => 2,
-                'job_title' => 'Frontend Developer',
-                'company' => 'DesignStudio',
-                'date' => '2024-01-28',
-                'time' => '10:00 AM',
-                'type' => 'HR Interview',
-                'interviewer' => 'Mike Wilson'
-            ]
-        ];
+        // Get upcoming interviews
+        $upcoming_interviews = $interviewModel->getUpcomingInterviews($user_id);
+        $data['upcoming_interviews'] = [];
+        if ($upcoming_interviews && is_array($upcoming_interviews)) {
+            foreach ($upcoming_interviews as $interview) {
+                $data['upcoming_interviews'][] = [
+                    'id' => $interview['id'],
+                    'job_title' => $interview['job_title'] ?? 'Unknown Position',
+                    'company' => 'HireFlow Company',
+                    'date' => date('Y-m-d', strtotime($interview['scheduled_date'])),
+                    'time' => date('g:i A', strtotime($interview['scheduled_time'])),
+                    'type' => $interview['interview_type'] ?? 'Interview',
+                    'interviewer' => $interview['interviewer_name'] ?? 'TBD'
+                ];
+            }
+        }
+
+        // Get unread notifications count
+        $data['unread_notifications'] = $notificationModel->getUnreadCount($user_id);
 
         $this->view('applicant/dashboard', $data);
+    }
+    
+    private function calculateProfileCompletion($user)
+    {
+        $completion = 0;
+        $total_fields = 6;
+        
+        if (!empty($user['full_name'])) $completion++;
+        if (!empty($user['email'])) $completion++;
+        if (!empty($user['phone'])) $completion++;
+        if (!empty($user['address'])) $completion++;
+        if (!empty($user['profile_picture'])) $completion++;
+        if (isset($user['created_at'])) $completion++; // Basic setup completion
+        
+        return round(($completion / $total_fields) * 100);
     }
 
     public function jobs($action = null, $id = null)
     {
+        Auth::requireRole(4);
+        
         if ($action === 'details') {
             return $this->jobDetails($id);
         }
 
         $data = [];
+        $jobModel = new JobPost();
+        $applicationModel = new Application();
+        $user_id = Auth::user_id();
         
-        // Sample jobs data for frontend testing
-        $data['jobs'] = [
-            [
-                'id' => 1,
-                'title' => 'Senior Software Engineer',
-                'company' => 'TechCorp Inc.',
-                'location' => 'San Francisco, CA',
-                'type' => 'Full-time',
-                'remote' => true,
-                'salary' => '$120,000 - $150,000',
-                'posted_date' => '2024-01-10',
-                'deadline' => '2024-02-15',
-                'description' => 'Join our team as a Senior Software Engineer and help build scalable web applications.',
-                'requirements' => ['5+ years experience', 'React/Node.js', 'Team leadership']
-            ],
-            [
-                'id' => 2,
-                'title' => 'Full Stack Developer',
-                'company' => 'StartupTech',
-                'location' => 'New York, NY',
-                'type' => 'Full-time',
-                'remote' => false,
-                'salary' => '$90,000 - $120,000',
-                'posted_date' => '2024-01-08',
-                'deadline' => '2024-02-10',
-                'description' => 'Looking for a versatile Full Stack Developer to work on exciting projects.',
-                'requirements' => ['3+ years experience', 'PHP/Laravel', 'MySQL']
-            ],
-            [
-                'id' => 3,
-                'title' => 'Frontend Developer',
-                'company' => 'DesignStudio',
-                'location' => 'Los Angeles, CA',
-                'type' => 'Contract',
-                'remote' => true,
-                'salary' => '$80,000 - $100,000',
-                'posted_date' => '2024-01-05',
-                'deadline' => '2024-02-05',
-                'description' => 'Create beautiful and responsive user interfaces for our clients.',
-                'requirements' => ['2+ years experience', 'React/Vue.js', 'UI/UX design']
-            ]
+        // Get current user data for navigation
+        $data['user'] = $this->getUserData($user_id);
+        
+        // Get filters from URL parameters
+        $filters = [];
+        if (isset($_GET['title'])) $filters['title'] = $_GET['title'];
+        if (isset($_GET['department'])) $filters['department'] = $_GET['department'];
+        if (isset($_GET['location'])) $filters['location'] = $_GET['location'];
+        if (isset($_GET['employment_type'])) $filters['employment_type'] = $_GET['employment_type'];
+        
+        // Pagination
+        $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+        $limit = 12; // Jobs per page
+        $offset = ($page - 1) * $limit;
+        
+        // Get jobs based on filters
+        if (!empty($filters)) {
+            $jobs = $jobModel->searchJobs($filters, $limit, $offset);
+            $total_jobs = $jobModel->getJobCount($filters);
+        } else {
+            $jobs = $jobModel->getActiveJobs($limit, $offset);
+            $total_jobs = $jobModel->getJobCount();
+        }
+        
+        // Format jobs data for view
+        $data['jobs'] = [];
+        if ($jobs && is_array($jobs)) {
+            foreach ($jobs as $job) {
+                // Check if user has already applied
+                $has_applied = $applicationModel->hasAppliedToJob($user_id, $job['id']);
+                
+                // Parse requirements from text format to array
+                $requirements = [];
+                if (!empty($job['requirements'])) {
+                    $req_lines = explode("\n", $job['requirements']);
+                    foreach ($req_lines as $line) {
+                        $line = trim($line);
+                        if (!empty($line) && $line !== '???') {
+                            // Remove bullet points and clean up
+                            $line = preg_replace('/^[•???*-]\s*/', '', $line);
+                            if (!empty($line)) {
+                                $requirements[] = $line;
+                            }
+                        }
+                    }
+                }
+
+                $data['jobs'][] = [
+                    'id' => $job['id'],
+                    'title' => $job['title'],
+                    'company' => 'HireFlow Company', // Default company name
+                    'location' => $job['location'] ?? 'Not specified',
+                    'type' => $job['employment_type'] ?? 'Full-time',
+                    'remote' => false, // We don't have remote field in DB
+                    'salary' => $job['salary_range'] ?? 'Competitive',
+                    'posted_date' => date('Y-m-d', strtotime($job['created_at'])),
+                    'deadline' => $job['deadline'] ? date('Y-m-d', strtotime($job['deadline'])) : 'Open',
+                    'description' => substr($job['description'], 0, 150) . '...', // Truncated for listing
+                    'department' => $job['department'] ?? 'General',
+                    'requirements' => $requirements, // Now properly formatted as array
+                    'has_applied' => $has_applied
+                ];
+            }
+        }
+        
+        // Pagination data
+        $data['pagination'] = [
+            'current_page' => $page,
+            'total_jobs' => $total_jobs,
+            'jobs_per_page' => $limit,
+            'total_pages' => ceil($total_jobs / $limit),
+            'has_previous' => $page > 1,
+            'has_next' => $page < ceil($total_jobs / $limit)
         ];
+        
+        // Filter options for dropdown
+        $data['filters'] = $filters;
+        $data['employment_types'] = ['Full-time', 'Part-time', 'Contract', 'Internship'];
+        
+        // Get unique departments from database
+        $all_jobs = $jobModel->findAll();
+        $departments = [];
+        if ($all_jobs && is_array($all_jobs)) {
+            foreach ($all_jobs as $job) {
+                if (!empty($job['department']) && !in_array($job['department'], $departments)) {
+                    $departments[] = $job['department'];
+                }
+            }
+        }
+        $data['departments'] = $departments;
 
         $this->view('applicant/jobs', $data);
     }
 
     public function jobDetails($id = null)
     {
-        $data = [];
+        Auth::requireRole(4);
         
-        // Sample job details for frontend testing
+        if (!$id) {
+            redirect('applicant/jobs');
+            return;
+        }
+        
+        $data = [];
+        $jobModel = new JobPost();
+        $applicationModel = new Application();
+        $user_id = Auth::user_id();
+        
+        // Get job details
+        $job = $jobModel->getJobById($id);
+        
+        if (!$job) {
+            redirect('applicant/jobs');
+            return;
+        }
+        
+        // Check if user has already applied
+        $has_applied = $applicationModel->hasAppliedToJob($user_id, $job['id']);
+        $user_application = null;
+        
+        if ($has_applied) {
+            $user_apps = $applicationModel->getUserApplications($user_id);
+            if ($user_apps && is_array($user_apps)) {
+                foreach ($user_apps as $app) {
+                    if ($app['job_id'] == $job['id']) {
+                        $user_application = $app;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // Parse requirements if they're stored as text
+        $requirements = [];
+        if (!empty($job['requirements'])) {
+            $requirements = array_filter(array_map('trim', explode("\n", $job['requirements'])));
+        }
+        
+        // Format job data for view
         $data['job'] = [
-            'id' => $id ?: 1,
-            'title' => 'Senior Software Engineer',
-            'company' => 'TechCorp Inc.',
-            'location' => 'San Francisco, CA',
-            'type' => 'Full-time',
-            'remote' => true,
-            'salary' => '$120,000 - $150,000',
-            'posted_date' => '2024-01-10',
-            'deadline' => '2024-02-15',
-            'description' => 'We are looking for a Senior Software Engineer to join our dynamic team. You will be responsible for developing and maintaining our core applications, mentoring junior developers, and contributing to architectural decisions.',
-            'requirements' => [
-                '5+ years of experience in software development',
-                'Strong proficiency in React and Node.js',
-                'Experience with cloud platforms (AWS/Azure)',
-                'Team leadership experience',
-                'Excellent problem-solving skills'
-            ],
+            'id' => $job['id'],
+            'title' => $job['title'],
+            'company' => 'HireFlow Company',
+            'location' => $job['location'] ?? 'Not specified',
+            'type' => $job['employment_type'] ?? 'Full-time',
+            'remote' => false, // We don't have this field in DB
+            'salary' => $job['salary_range'] ?? 'Competitive salary',
+            'posted_date' => date('Y-m-d', strtotime($job['created_at'])),
+            'deadline' => $job['deadline'] ? date('Y-m-d', strtotime($job['deadline'])) : null,
+            'description' => $job['description'],
+            'requirements' => $requirements,
+            'department' => $job['department'] ?? 'General',
+            'has_applied' => $has_applied,
+            'application_status' => $user_application['status'] ?? null,
+            'applied_at' => $user_application['applied_at'] ?? null,
+            // Default responsibilities and benefits since they're not in DB
             'responsibilities' => [
-                'Develop and maintain scalable web applications',
-                'Mentor junior developers and conduct code reviews',
-                'Participate in architectural decisions and planning',
-                'Collaborate with cross-functional teams',
-                'Ensure code quality and best practices'
+                'Execute job duties as per job description',
+                'Collaborate with team members effectively',
+                'Meet project deadlines and deliverables',
+                'Maintain professional standards',
+                'Contribute to team and company goals'
             ],
             'benefits' => [
-                'Competitive salary and equity',
-                'Health, dental, and vision insurance',
-                'Flexible working hours',
-                'Remote work options',
-                'Professional development budget'
+                'Competitive salary package',
+                'Health and medical benefits',
+                'Professional development opportunities',
+                'Flexible working arrangements',
+                'Performance-based incentives'
             ]
         ];
 
@@ -182,44 +327,64 @@ class Applicant extends Controller
 
     public function applications($action = null)
     {
+        Auth::requireRole(4);
+        
         if ($action === 'apply') {
             return $this->applyJob();
         }
 
         $data = [];
+        $applicationModel = new Application();
+        $user_id = Auth::user_id();
         
-        // Sample applications data for frontend testing
-        $data['applications'] = [
-            [
-                'id' => 1,
-                'job_title' => 'Senior Software Engineer',
-                'company' => 'TechCorp Inc.',
-                'status' => 'interviewed',
-                'applied_date' => '2024-01-15',
-                'last_update' => '2024-01-20',
-                'salary' => '$120,000 - $150,000',
-                'location' => 'San Francisco, CA'
-            ],
-            [
-                'id' => 2,
-                'job_title' => 'Full Stack Developer',
-                'company' => 'StartupTech',
-                'status' => 'pending',
-                'applied_date' => '2024-01-12',
-                'last_update' => '2024-01-12',
-                'salary' => '$90,000 - $120,000',
-                'location' => 'New York, NY'
-            ],
-            [
-                'id' => 3,
-                'job_title' => 'Frontend Developer',
-                'company' => 'DesignStudio',
-                'status' => 'shortlisted',
-                'applied_date' => '2024-01-10',
-                'last_update' => '2024-01-18',
-                'salary' => '$80,000 - $100,000',
-                'location' => 'Los Angeles, CA'
-            ]
+        // Get current user data for navigation
+        $data['user'] = $this->getUserData($user_id);
+        
+        // Get user's applications
+        $applications = $applicationModel->getUserApplications($user_id);
+        
+        $data['applications'] = [];
+        if ($applications && is_array($applications)) {
+            foreach ($applications as $app) {
+                $data['applications'][] = [
+                    'id' => $app['id'],
+                    'job_title' => $app['job_title'] ?? 'Unknown Position',
+                    'company' => 'HireFlow Company',
+                    'status' => strtolower($app['status']),
+                    'status_display' => $app['status'],
+                    'applied_date' => date('Y-m-d', strtotime($app['applied_at'])),
+                    'last_update' => date('Y-m-d', strtotime($app['applied_at'])), // Using applied_at as we don't have updated_at
+                    'salary' => $app['salary_range'] ?? 'Not specified',
+                    'location' => $app['location'] ?? 'Not specified',
+                    'job_id' => $app['job_id'],
+                    'department' => $app['department'] ?? 'General',
+                    'employment_type' => $app['employment_type'] ?? 'Full-time'
+                ];
+            }
+        }
+        
+        // Get statistics for display
+        $stats = $applicationModel->getApplicationStats($user_id);
+        if (!$stats) {
+            $stats = [
+                'total_applications' => 0,
+                'pending_applications' => 0,
+                'under_review_applications' => 0,
+                'shortlisted_applications' => 0,
+                'interview_scheduled' => 0,
+                'rejected_applications' => 0,
+                'offered_applications' => 0
+            ];
+        }
+        
+        $data['stats'] = [
+            'total' => (int)$stats['total_applications'],
+            'pending' => (int)$stats['pending_applications'],
+            'under_review' => (int)$stats['under_review_applications'],
+            'shortlisted' => (int)$stats['shortlisted_applications'],
+            'interview_scheduled' => (int)$stats['interview_scheduled'],
+            'rejected' => (int)$stats['rejected_applications'],
+            'offered' => (int)$stats['offered_applications']
         ];
 
         $this->view('applicant/applications', $data);
@@ -227,66 +392,203 @@ class Applicant extends Controller
 
     public function applyJob()
     {
-        $data = [];
+        Auth::requireRole(4);
         
-        // Sample job data for apply form
+        $data = [];
+        $job_id = $_GET['job_id'] ?? $_POST['job_id'] ?? null;
+        
+        if (!$job_id) {
+            redirect('applicant/jobs');
+            return;
+        }
+        
+        $jobModel = new JobPost();
+        $applicationModel = new Application();
+        $user_id = Auth::user_id();
+        
+        // Process application submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            return $this->processJobApplication();
+        }
+        
+        // Get job details for the application form
+        $job = $jobModel->getJobById($job_id);
+        
+        if (!$job) {
+            redirect('applicant/jobs');
+            return;
+        }
+        
+        // Check if already applied
+        if ($applicationModel->hasAppliedToJob($user_id, $job_id)) {
+            $_SESSION['error'] = "You have already applied to this position.";
+            redirect('applicant/jobs/details/' . $job_id);
+            return;
+        }
+        
         $data['job'] = [
-            'id' => $_GET['job_id'] ?? 1,
-            'title' => 'Senior Software Engineer',
-            'company' => 'TechCorp Inc.',
-            'location' => 'San Francisco, CA',
-            'salary' => '$120,000 - $150,000'
+            'id' => $job['id'],
+            'title' => $job['title'],
+            'company' => 'HireFlow Company',
+            'location' => $job['location'] ?? 'Not specified',
+            'salary' => $job['salary_range'] ?? 'Competitive salary',
+            'department' => $job['department'] ?? 'General'
         ];
 
         $this->view('applicant/apply', $data);
     }
+    
+    public function processJobApplication()
+    {
+        Auth::requireRole(4);
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('applicant/jobs');
+            return;
+        }
+        
+        $applicationModel = new Application();
+        $notificationModel = new Notification();
+        $user_id = Auth::user_id();
+        
+        $data = [
+            'job_id' => $_POST['job_id'] ?? null,
+            'applicant_id' => $user_id,
+            'cover_letter' => $_POST['cover_letter'] ?? '',
+            'resume_path' => '', // Will be set after file upload
+            'status' => 'Applied'
+        ];
+        
+        // Handle file upload (resume)
+        if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
+            $upload_result = $this->handleResumeUpload($_FILES['resume'], $user_id);
+            if ($upload_result['success']) {
+                $data['resume_path'] = $upload_result['path'];
+            } else {
+                $_SESSION['error'] = $upload_result['error'];
+                redirect('applicant/applications/apply?job_id=' . $data['job_id']);
+                return;
+            }
+        } else {
+            $_SESSION['error'] = "Resume file is required.";
+            redirect('applicant/applications/apply?job_id=' . $data['job_id']);
+            return;
+        }
+        
+        // Submit application
+        if ($applicationModel->submitApplication($data)) {
+            // Create notification
+            $notificationModel->insert([
+                'user_id' => $user_id,
+                'title' => 'Application Submitted',
+                'message' => 'Your job application has been submitted successfully.',
+                'type' => 'success'
+            ]);
+            
+            $_SESSION['success'] = "Your application has been submitted successfully!";
+            redirect('applicant/applications');
+        } else {
+            $_SESSION['error'] = "Failed to submit application. Please try again.";
+            redirect('applicant/applications/apply?job_id=' . $data['job_id']);
+        }
+    }
+    
+    private function handleResumeUpload($file, $user_id)
+    {
+        $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/HireFlow/public/uploads/resumes/';
+        
+        // Create directory if it doesn't exist
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+        
+        // Validate file type
+        $allowed_types = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!in_array($file['type'], $allowed_types)) {
+            return ['success' => false, 'error' => 'Only PDF, DOC, and DOCX files are allowed.'];
+        }
+        
+        // Validate file size (5MB max)
+        if ($file['size'] > 5242880) {
+            return ['success' => false, 'error' => 'File size must be less than 5MB.'];
+        }
+        
+        // Generate unique filename
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = 'resume_' . $user_id . '_' . time() . '.' . $extension;
+        $file_path = $upload_dir . $filename;
+        
+        if (move_uploaded_file($file['tmp_name'], $file_path)) {
+            return ['success' => true, 'path' => '/uploads/resumes/' . $filename];
+        } else {
+            return ['success' => false, 'error' => 'Failed to upload file.'];
+        }
+    }
 
     public function interviews($action = null)
     {
+        Auth::requireRole(4);
+        
         if ($action === 'feedback') {
             return $this->interviewFeedback();
         }
 
         $data = [];
+        $interviewModel = new Interview();
+        $user_id = Auth::user_id();
         
-        // Sample interviews data for frontend testing
-        $data['interviews'] = [
-            [
-                'id' => 1,
-                'job_title' => 'Senior Software Engineer',
-                'company' => 'TechCorp Inc.',
-                'date' => '2024-01-25',
-                'time' => '2:00 PM',
-                'type' => 'Technical Interview',
-                'interviewer' => 'Sarah Johnson',
-                'status' => 'scheduled',
-                'location' => 'Online - Zoom',
-                'duration' => '60 minutes'
-            ],
-            [
-                'id' => 2,
-                'job_title' => 'Frontend Developer',
-                'company' => 'DesignStudio',
-                'date' => '2024-01-28',
-                'time' => '10:00 AM',
-                'type' => 'HR Interview',
-                'interviewer' => 'Mike Wilson',
-                'status' => 'scheduled',
-                'location' => '123 Main St, Los Angeles',
-                'duration' => '45 minutes'
-            ],
-            [
-                'id' => 3,
-                'job_title' => 'Full Stack Developer',
-                'company' => 'StartupTech',
-                'date' => '2024-01-15',
-                'time' => '3:00 PM',
-                'type' => 'Final Interview',
-                'interviewer' => 'John Doe',
-                'status' => 'completed',
-                'location' => 'Online - Teams',
-                'duration' => '90 minutes'
-            ]
+        // Get current user data for navigation
+        $data['user'] = $this->getUserData($user_id);
+        
+        // Get all user's interviews
+        $interviews = $interviewModel->getUserInterviews($user_id);
+        
+        $data['interviews'] = [];
+        if ($interviews && is_array($interviews)) {
+            foreach ($interviews as $interview) {
+                $data['interviews'][] = [
+                    'id' => $interview['id'],
+                    'job_title' => $interview['job_title'] ?? 'Unknown Position',
+                    'company' => 'HireFlow Company',
+                    'date' => date('Y-m-d', strtotime($interview['scheduled_date'])),
+                    'time' => date('g:i A', strtotime($interview['scheduled_time'])),
+                    'type' => $interview['interview_type'] ?? 'Interview',
+                    'interviewer' => $interview['interviewer_name'] ?? 'TBD',
+                    'status' => strtolower($interview['status']),
+                    'location' => $interview['location'] ?? $interview['meeting_link'] ?? 'TBD',
+                    'duration' => ($interview['duration_minutes'] ?? 60) . ' minutes',
+                    'department' => $interview['department'] ?? 'General',
+                    'notes' => $interview['notes'] ?? ''
+                ];
+            }
+        }
+        
+        // Separate upcoming and past interviews
+        $data['upcoming_interviews'] = [];
+        $data['past_interviews'] = [];
+        
+        foreach ($data['interviews'] as $interview) {
+            if (strtotime($interview['date']) >= strtotime('today') && $interview['status'] !== 'completed') {
+                $data['upcoming_interviews'][] = $interview;
+            } else {
+                $data['past_interviews'][] = $interview;
+            }
+        }
+        
+        // Get interview statistics
+        $stats = $interviewModel->getInterviewCount($user_id);
+        if (!$stats) {
+            $stats = [
+                'total_interviews' => 0,
+                'upcoming_interviews' => 0,
+                'completed_interviews' => 0
+            ];
+        }
+        
+        $data['stats'] = [
+            'total' => (int)$stats['total_interviews'],
+            'upcoming' => (int)$stats['upcoming_interviews'], 
+            'completed' => (int)$stats['completed_interviews']
         ];
 
         $this->view('applicant/interviews', $data);
@@ -294,76 +596,178 @@ class Applicant extends Controller
 
     public function interviewFeedback()
     {
-        $data = [];
+        Auth::requireRole(4);
         
-        // Sample feedback data for frontend testing
-        $data['feedbacks'] = [
-            [
-                'id' => 1,
-                'job_title' => 'Full Stack Developer',
-                'company' => 'StartupTech',
-                'interview_date' => '2024-01-15',
-                'interviewer' => 'John Doe',
-                'feedback_date' => '2024-01-18',
-                'overall_rating' => 4,
-                'technical_score' => 4,
-                'communication_score' => 5,
-                'feedback_text' => 'Strong technical skills and excellent communication. Would be a great fit for our team.',
-                'status' => 'positive'
-            ],
-            [
-                'id' => 2,
-                'job_title' => 'Backend Developer',
-                'company' => 'DataTech',
-                'interview_date' => '2024-01-08',
-                'interviewer' => 'Lisa Zhang',
-                'feedback_date' => '2024-01-10',
-                'overall_rating' => 3,
-                'technical_score' => 3,
-                'communication_score' => 4,
-                'feedback_text' => 'Good foundation but needs more experience with our tech stack.',
-                'status' => 'neutral'
-            ]
-        ];
+        $data = [];
+        $user_id = Auth::user_id();
+        
+        // Get current user data for navigation
+        $data['user'] = $this->getUserData($user_id);
+        
+        // For now, since we don't have feedback table implemented in current schema,
+        // we'll show a placeholder message
+        $data['feedbacks'] = [];
+        $data['message'] = "Interview feedback will be available after your interviews are completed.";
 
         $this->view('applicant/feedback', $data);
     }
 
-    public function profile()
+    public function profile($action = null)
     {
-        $data = [];
+        Auth::requireRole(4);
         
-        // Sample profile data for frontend testing
+        if ($action === 'edit') {
+            return $this->editProfile();
+        }
+        
+        if ($action === 'update') {
+            return $this->updateProfile();
+        }
+
+        $data = [];
+        $userModel = new User();
+        $user_id = Auth::user_id();
+        
+        // Get current user data
+        $current_user = Auth::user();
+        
         $data['user'] = [
-            'name' => 'John Smith',
-            'email' => 'john.smith@example.com',
-            'phone' => '+1 (555) 123-4567',
-            'location' => 'San Francisco, CA',
-            'bio' => 'Experienced software engineer with 6+ years of full-stack development. Passionate about creating scalable web applications and leading development teams.',
-            'skills' => ['JavaScript', 'React', 'Node.js', 'Python', 'AWS', 'Docker'],
-            'experience' => [
-                [
-                    'title' => 'Senior Software Engineer',
-                    'company' => 'TechCorp',
-                    'duration' => '2022 - Present',
-                    'description' => 'Lead development of core platform features'
-                ],
-                [
-                    'title' => 'Full Stack Developer',
-                    'company' => 'StartupXYZ',
-                    'duration' => '2020 - 2022',
-                    'description' => 'Built and maintained web applications'
-                ]
-            ],
-            'education' => [
-                [
-                    'degree' => 'Bachelor of Computer Science',
-                    'school' => 'University of California',
-                    'year' => '2020'
-                ]
-            ]
+            'id' => $current_user['id'],
+            'name' => $current_user['full_name'] ?? 'Not provided',
+            'email' => $current_user['email'] ?? 'Not provided',
+            'phone' => $current_user['phone'] ?? 'Not provided',
+            'location' => $current_user['address'] ?? 'Not provided',
+            'profile_picture' => $current_user['profile_picture'] ?? '',
+            'created_at' => $current_user['created_at'] ?? '',
+            'last_login' => $current_user['last_login'] ?? 'Never',
+            'status' => $current_user['status'] ?? 'active',
+            // Default values for fields not in database
+            'bio' => 'Professional seeking new opportunities in the field.',
+            'skills' => [], // Could be implemented as separate table later
+            'experience' => [], // Could be implemented as separate table later
+            'education' => [] // Could be implemented as separate table later
         ];
+        
+        // Calculate profile completion
+        $data['profile_completion'] = $this->calculateProfileCompletion($current_user);
 
         $this->view('applicant/profile', $data);
+    }
+    
+    public function editProfile()
+    {
+        Auth::requireRole(4);
+        
+        $data = [];
+        $current_user = Auth::user();
+        
+        $data['user'] = [
+            'id' => $current_user['id'],
+            'full_name' => $current_user['full_name'] ?? '',
+            'email' => $current_user['email'] ?? '',
+            'phone' => $current_user['phone'] ?? '',
+            'address' => $current_user['address'] ?? '',
+            'profile_picture' => $current_user['profile_picture'] ?? ''
+        ];
+
+        $this->view('applicant/profile-edit', $data);
+    }
+    
+    public function updateProfile()
+    {
+        Auth::requireRole(4);
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('applicant/profile');
+            return;
+        }
+        
+        $userModel = new User();
+        $user_id = Auth::user_id();
+        
+        $data = [
+            'full_name' => $_POST['full_name'] ?? '',
+            'phone' => $_POST['phone'] ?? '',
+            'address' => $_POST['address'] ?? ''
+        ];
+        
+        // Handle profile picture upload
+        if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+            $upload_result = $this->handleProfilePictureUpload($_FILES['profile_picture'], $user_id);
+            if ($upload_result['success']) {
+                $data['profile_picture'] = $upload_result['path'];
+            }
+        }
+        
+        // Remove empty values
+        $data = array_filter($data, function($value) {
+            return $value !== '';
+        });
+        
+        if (!empty($data)) {
+            $data['updated_at'] = date('Y-m-d H:i:s');
+            
+            if ($userModel->update($user_id, $data)) {
+                // Update session data
+                $_SESSION['USER'] = array_merge($_SESSION['USER'], $data);
+                $_SESSION['success'] = "Profile updated successfully!";
+            } else {
+                $_SESSION['error'] = "Failed to update profile. Please try again.";
+            }
+        }
+        
+        redirect('applicant/profile');
+    }
+    
+    private function handleProfilePictureUpload($file, $user_id)
+    {
+        $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/HireFlow/public/uploads/profiles/';
+        
+        // Create directory if it doesn't exist
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+        
+        // Validate file type
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($file['type'], $allowed_types)) {
+            return ['success' => false, 'error' => 'Only JPEG, PNG, and GIF images are allowed.'];
+        }
+        
+        // Validate file size (2MB max)
+        if ($file['size'] > 2097152) {
+            return ['success' => false, 'error' => 'Image size must be less than 2MB.'];
+        }
+        
+        // Generate unique filename
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = 'profile_' . $user_id . '_' . time() . '.' . $extension;
+        $file_path = $upload_dir . $filename;
+        
+        if (move_uploaded_file($file['tmp_name'], $file_path)) {
+            return ['success' => true, 'path' => '/uploads/profiles/' . $filename];
+        } else {
+            return ['success' => false, 'error' => 'Failed to upload image.'];
+        }
+    }
+    
+    public function notifications($action = null)
+    {
+        Auth::requireRole(4);
+        
+        $notificationModel = new Notification();
+        $user_id = Auth::user_id();
+        
+        if ($action === 'mark-read' && isset($_POST['notification_id'])) {
+            $notificationModel->markAsRead($_POST['notification_id']);
+            echo json_encode(['success' => true]);
+            return;
+        }
+        
+        $data = [];
+        $data['notifications'] = $notificationModel->getUserNotifications($user_id, 50);
+        $data['unread_count'] = $notificationModel->getUnreadCount($user_id);
+
+        $this->view('applicant/notifications', $data);
     }
 }

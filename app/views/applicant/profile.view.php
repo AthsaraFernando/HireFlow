@@ -177,37 +177,7 @@
                         </div>
                     </div>
 
-                    <!-- Profile Stats -->
-                    <div class="profile-section">
-                        <h3>Profile Statistics</h3>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-number">12</div>
-                                <div class="stat-label">Applications</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number">3</div>
-                                <div class="stat-label">Interviews</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number">85%</div>
-                                <div class="stat-label">Profile Complete</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-number">248</div>
-                                <div class="stat-label">Profile Views</div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Profile Completion -->
-                    <div class="profile-section">
-                        <h3>Complete Your Profile</h3>
-                        <div class="completion-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 85%"></div>
-                            </div>
-                            <p class="progress-text">85% Complete</p>
                         </div>
                         <div class="completion-checklist">
                             <div class="checklist-item completed">

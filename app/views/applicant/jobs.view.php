@@ -65,8 +65,8 @@
             </div>
             <div class="header-right">
                 <div class="user-info">
-                    <span class="user-name">John Smith</span>
-                    <div class="user-avatar">JS</div>
+                    <span class="user-name"><?= $user['name'] ?? 'User' ?></span>
+                    <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'U', 0, 2)) ?></div>
                 </div>
             </div>
         </header>
@@ -135,9 +135,17 @@
                         <div class="job-requirements">
                             <h5>Key Requirements:</h5>
                             <ul>
-                                <?php foreach(array_slice($job['requirements'], 0, 3) as $req): ?>
-                                    <li><?= $req ?></li>
-                                <?php endforeach; ?>
+                                <?php 
+                                if (isset($job['requirements']) && is_array($job['requirements']) && !empty($job['requirements'])):
+                                    foreach(array_slice($job['requirements'], 0, 3) as $req): 
+                                ?>
+                                    <li><?= htmlspecialchars($req) ?></li>
+                                <?php 
+                                    endforeach;
+                                else: 
+                                ?>
+                                    <li>Requirements will be discussed during interview</li>
+                                <?php endif; ?>
                             </ul>
                         </div>
                     </div>

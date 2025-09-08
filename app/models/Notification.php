@@ -39,9 +39,9 @@ class Notification
         $query = "SELECT * FROM notifications 
                   WHERE user_id = ? 
                   ORDER BY created_at DESC 
-                  LIMIT ?";
+                  LIMIT $limit";
         
-        return $this->query($query, [$user_id, $limit]);
+        return $this->query($query, [$user_id]);
     }
 
     public function markAsRead($notification_id)
@@ -52,13 +52,13 @@ class Notification
         
         return $this->query($query, [$notification_id]);
     }
-
+    
     public function getUnreadCount($user_id)
     {
-        $query = "SELECT COUNT(*) as count FROM notifications 
+        $query = "SELECT COUNT(*) as unread_count FROM notifications 
                   WHERE user_id = ? AND is_read = 0";
         
-        $result = $this->query($query, [$user_id]);
-        return $result[0]->count ?? 0;
+        $result = $this->get_row($query, [$user_id]);
+        return $result ? $result['unread_count'] : 0;
     }
 }

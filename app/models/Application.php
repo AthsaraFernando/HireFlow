@@ -5,23 +5,28 @@ class Application
     use Model;
     protected $table = 'applications';
     protected $allowedColumns = [
-        'job_post_id',
+        'job_id',
         'applicant_id',
         'cover_letter',
         'resume_path',
-        'status'
+        'status',
+        'additional_documents'
     ];
 
     public function validate($data)
     {
         $this->errors = [];
 
-        if (empty($data['job_post_id'])) {
-            $this->errors['job_post_id'] = "Job post ID is required";
+        if (empty($data['job_id'])) {
+            $this->errors['job_id'] = "Job ID is required";
         }
 
         if (empty($data['applicant_id'])) {
             $this->errors['applicant_id'] = "Applicant ID is required";
+        }
+
+        if (empty($data['resume_path'])) {
+            $this->errors['resume_path'] = "Resume is required";
         }
 
         if (empty($this->errors)) {
@@ -33,9 +38,9 @@ class Application
 
     public function getApplicationsWithDetails()
     {
-        $query = "SELECT a.*, jp.title as job_title, u.first_name, u.last_name, u.email
+        $query = "SELECT a.*, jp.title as job_title, u.full_name, u.email
                   FROM applications a 
-                  LEFT JOIN job_posts jp ON a.job_post_id = jp.id 
+                  LEFT JOIN job_posts jp ON a.job_id = jp.id 
                   LEFT JOIN users u ON a.applicant_id = u.id 
                   ORDER BY a.applied_at DESC";
         
@@ -44,11 +49,51 @@ class Application
 
     public function getUserApplications($user_id)
     {
-        $query = "SELECT a.*, jp.title as job_title, jp.location, jp.employment_type
+        $query = "SELECT a.*, jp.title as job_title, jp.location, jp.employment_type, jp.salary_range, jp.department
                   FROM applications a 
-                  LEFT JOIN job_posts jp ON a.job_post_id = jp.id 
-                  WHERE a.applicant_id = ? 
+                  LEFT JOIN job_posts jp ON a.job_id = jp.id 
+                  WHERE a.applicant_id = ?
                   ORDER BY a.applied_at DESC";
+        
+        return $this->query($query, [$user_id]);
+    }
+    
+    public function getApplicationStats($user_id)
+    {
+        $query = "SELECT 
+                    COUNT(*) as total_applications,
+                    SUM(CASE WHEN status = 'Applied' THEN 1 ELSE 0 END) as pending_applications,
+                    SUM(CASE WHEN status = 'Under Review' THEN 1 ELSE 0 END) as under_review_applications,
+                    SUM(CASE WHEN status = 'Shortlisted' THEN 1 ELSE 0 END) as shortlisted_applications,
+                    SUM(CASE WHEN status = 'Interview Scheduled' THEN 1 ELSE 0 END) as interview_scheduled,
+                    SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) as rejected_applications,
+                    SUM(CASE WHEN status = 'Offered' THEN 1 ELSE 0 END) as offered_applications
+                  FROM applications 
+                  WHERE applicant_id = ?";
+        
+        return $this->get_row($query, [$user_id]);
+    }
+    
+    public function hasAppliedToJob($user_id, $job_id)
+    {
+        $query = "SELECT id FROM applications WHERE applicant_id = ? AND job_id = ?";
+        $result = $this->get_row($query, [$user_id, $job_id]);
+        return $result !== false;
+    }
+    
+    public function submitApplication($data)
+    {
+        // Check if user already applied
+        if ($this->hasAppliedToJob($data['applicant_id'], $data['job_id'])) {
+            $this->errors['duplicate'] = "You have already applied to this job";
+            return false;
+        }
+        
+        if ($this->validate($data)) {
+            $data['applied_at'] = date('Y-m-d H:i:s');
+            return $this->insert($data);
+        }
+        return false;
         
         return $this->query($query, [$user_id]);
     }
