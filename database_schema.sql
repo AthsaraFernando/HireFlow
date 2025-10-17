@@ -215,6 +215,7 @@ CREATE TABLE IF NOT EXISTS access_logs (
     ip_address VARCHAR(45),
     user_agent TEXT,
     action VARCHAR(255) NOT NULL,
+    details TEXT,
     resource VARCHAR(255),
     method VARCHAR(10),
     status_code INT,

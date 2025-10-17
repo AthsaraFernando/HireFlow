@@ -73,13 +73,18 @@ trait Model
 
         $keys = array_keys($data);
         $query = "insert into $this->table (" . implode(",", $keys) . ") values (:" . implode(",:", $keys) . ")";
-        // echo $query;
-        $result = $this->query($query, $data);
-
-        return false;
-
-
+        
+        try {
+            $con = $this->connect();
+            $stmt = $con->prepare($query);
+            $stmt->execute($data);
+            return $con->lastInsertId();
+        } catch (PDOException $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
     }
+    
     public function update($id, $data, $id_column = 'id')
     {
         // Removing non-allowed data before preparing the query
@@ -101,19 +106,28 @@ trait Model
         $query = trim($query, ", ");
         $query .= " where $id_column = :$id_column";
 
-        // echo $query;
-
         $data[$id_column] = $id;
-        $this->query($query, $data);
-        return false;
+        
+        try {
+            $this->query($query, $data);
+            return true;
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
     }
+    
     public function delete($id, $id_column = 'id')
     {
-        $data[$id_column] = $id;
-        $query = "update $this->table where $id_column = :$id_column";
-        // echo $query;
-
-        $this->query($query, $data);
-        return false;
+        $data = [$id_column => $id];
+        $query = "delete from $this->table where $id_column = :$id_column";
+        
+        try {
+            $this->query($query, $data);
+            return true;
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
     }
 }
