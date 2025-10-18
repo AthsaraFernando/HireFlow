@@ -37,7 +37,9 @@ class AccessLog
      */
     public function getUserActivity($userId, $limit = 10)
     {
-        return $this->where(['user_id' => $userId], 'created_at desc', $limit);
+        // return $this->where(['user_id' => $userId], 'created_at desc', $limit);
+        return $this->where(['user_id' => $userId], 'created_at desc');
+
     }
 
     /**
