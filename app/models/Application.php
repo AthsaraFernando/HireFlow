@@ -95,6 +95,6 @@ class Application
         }
         return false;
         
-        return $this->query($query, [$user_id]);
+        // return $this->query($query, [$user_id]);
     }
 }
