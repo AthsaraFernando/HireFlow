@@ -117,7 +117,7 @@ trait Model
 
     public function delete($id, $id_column = 'id')
     {
-        logger($id);
+        // logger($id);
         $data[$id_column] = $id;
         // $query = "update $this->table where $id_column = :$id_column";
         $query = "DELETE FROM $this->table WHERE $id_column = :$id_column";
