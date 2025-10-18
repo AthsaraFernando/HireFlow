@@ -186,3 +186,18 @@ function generateHash($data)
 {
     return hash('sha256', $data . date('Y-m-d H:i:s') . rand(1000, 9999));
 }
+
+function logger($data, $other = NULL) // Function to log data to a file for debugging purposes
+{
+    $logData = [
+        'data' => $data,
+        'other' => $other,
+        'timestamp' => date('Y-m-d H:i:s')
+    ];
+
+    file_put_contents(
+        'c:\\xampp\\htdocs\\HireFlow\\app\\controllers' . '/debug_logs.txt',
+        print_r($logData, true) . "\n",
+        FILE_APPEND
+    );
+}
