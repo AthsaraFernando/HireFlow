@@ -411,7 +411,7 @@
                     <div class="metric-card">
                         <div class="metric-value"><?= count($users ?? []) ?></div>
                         <div class="metric-label">Total Users</div>
-                        <div class="metric-change neutral">All registered users</div>
+                        <!-- <div class="metric-change neutral">All registered users</div> -->
                     </div>
                     <div class="metric-card">
                         <?php
@@ -421,7 +421,7 @@
                         ?>
                         <div class="metric-value"><?= count($activeUsers) ?></div>
                         <div class="metric-label">Active Users</div>
-                        <div class="metric-change positive">Currently active</div>
+                        <!-- <div class="metric-change positive">Currently active</div> -->
                     </div>
                     <div class="metric-card">
                         <?php
@@ -431,12 +431,12 @@
                         ?>
                         <div class="metric-value"><?= count($inactiveUsers) ?></div>
                         <div class="metric-label">Inactive Users</div>
-                        <div class="metric-change neutral">Currently inactive</div>
+                        <!-- <div class="metric-change neutral">Currently inactive</div> -->
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= count($roles ?? []) ?></div>
                         <div class="metric-label">User Roles</div>
-                        <div class="metric-change neutral">Available roles</div>
+                        <!-- <div class="metric-change neutral">Available roles</div> -->
                     </div>
                 </div>
 
@@ -627,13 +627,13 @@
                         <span class="close" onclick="closeUserModal()">&times;</span>
                     </div>
                     <div class="modal-body">
-                        <div class="info-box mb-3">
+                        <!-- <div class="info-box mb-3">
                             <p class="text-muted small">
                                 <strong>Account Creation Policy:</strong> Only create HR Admin and Recruitment Manager
                                 accounts here.
                                 Applicants register themselves through the public signup page.
                             </p>
-                        </div>
+                        </div> -->
                         <form id="userForm">
                             <div class="form-row">
                                 <div class="form-group">
@@ -666,8 +666,8 @@
                                         <option value="hr_admin">HR Admin</option>
                                         <option value="recruitment_manager">Recruitment Manager</option>
                                     </select>
-                                    <small class="form-text">Applicant accounts are created through public
-                                        registration</small>
+                                    <!-- <small class="form-text">Applicant accounts are created through public
+                                        registration</small> -->
                                 </div>
                                 <div class="form-group">
                                     <label for="status">Status</label>
@@ -690,12 +690,12 @@
                                 <input type="password" id="confirmPassword" name="confirmPassword" required>
                             </div>
 
-                            <div class="form-group">
+                            <!-- <div class="form-group">
                                 <label>
                                     <input type="checkbox" id="sendWelcome" name="sendWelcome" checked>
                                     Send welcome email to user
                                 </label>
-                            </div>
+                            </div> -->
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -713,6 +713,15 @@
                     const title = document.getElementById('modalTitle');
                     const form = document.getElementById('userForm');
                     const button = document.getElementById('action');
+
+                    // Reset all fields to be editable (remove readonly/disabled)
+                    form.querySelectorAll('input, select').forEach(field => {
+                        field.removeAttribute('readonly');
+                        field.removeAttribute('disabled');
+                    });
+
+                    // Show the action button
+                    button.style.display = 'inline-block';
 
                     if (action === 'add') {
                         title.textContent = 'Add Staff User';
@@ -910,8 +919,73 @@
                 }
 
                 function viewUser(userId) {
-                    // Open user details view
-                    window.location.href = `/HireFlow/public/systemadmin/userdetails/${userId}`;
+                    const formData = new FormData();
+                    formData.append('action', 'fetch');
+                    formData.append('user_id', userId);
+
+                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => {
+                            const contentType = response.headers.get('content-type');
+                            if (!contentType || !contentType.includes('application/json')) {
+                                throw new Error('Server did not return JSON');
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            if (data.success) {
+                                // Show user details in a modal or view
+                                showUserDetailsModal(data.user);
+                            } else {
+                                showToast('User not found: ' + (data.message || ''), 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToast('Failed to load user data: ' + error.message, 'error');
+                        });
+                }
+
+                function showUserDetailsModal(user) {
+                    // Create a view-only modal with user details
+                    const modal = document.getElementById('userModal');
+                    const title = document.getElementById('modalTitle');
+                    const form = document.getElementById('userForm');
+
+                    title.textContent = 'View User Details';
+
+                    // Populate fields
+                    const nameParts = user.full_name.split(' ');
+                    document.getElementById('firstName').value = nameParts[0] || '';
+                    document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
+                    document.getElementById('email').value = user.email;
+                    document.getElementById('phone').value = user.phone || '';
+
+                    const roleMap = {
+                        1: 'system_admin',
+                        2: 'hr_admin',
+                        3: 'recruitment_manager',
+                        4: 'applicant'
+                    };
+                    document.getElementById('role').value = roleMap[user.role_id] || '';
+                    document.getElementById('status').value = user.status;
+
+                    // Clear password fields for view mode
+                    document.getElementById('password').value = '';
+                    document.getElementById('confirmPassword').value = '';
+
+                    // Make all fields read-only AFTER populating them
+                    form.querySelectorAll('input, select').forEach(field => {
+                        field.setAttribute('readonly', true);
+                        field.setAttribute('disabled', true);
+                    });
+
+                    // Hide action button
+                    document.getElementById('action').style.display = 'none';
+
+                    modal.style.display = 'block';
                 }
 
                 function deleteUser(userId) {
