@@ -76,7 +76,7 @@ trait Model
         // echo $query;
         $result = $this->query($query, $data);
 
-        return false;
+        return true;
 
 
     }
@@ -91,6 +91,10 @@ trait Model
             }
         }
 
+        if (empty($data)) {
+            return false;
+        }
+
         $keys = array_keys($data);
         $query = "update $this->table set ";
 
@@ -103,17 +107,24 @@ trait Model
 
         // echo $query;
 
+        // $data[$id_column] = $id;
+        // $this->query($query, $data);
+        // return false;
+        
         $data[$id_column] = $id;
-        $this->query($query, $data);
-        return false;
+        return $this->query($query, $data);
     }
+
     public function delete($id, $id_column = 'id')
     {
+        logger($id);
         $data[$id_column] = $id;
-        $query = "update $this->table where $id_column = :$id_column";
+        // $query = "update $this->table where $id_column = :$id_column";
+        $query = "DELETE FROM $this->table WHERE $id_column = :$id_column";
         // echo $query;
 
-        $this->query($query, $data);
-        return false;
+        return $this->query($query, $data);
+        // $this->query($query, $data);
+        // return false;
     }
 }
