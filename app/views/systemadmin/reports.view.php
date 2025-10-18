@@ -118,6 +118,7 @@ $popular_pages = [
         .stat-label {
             font-size: 0.9em;
             opacity: 0.9;
+            color: white;
         }
 
         .chart-container {
@@ -312,8 +313,8 @@ $popular_pages = [
         <div class="dashboard-content">
             <div class="reports-container" style="padding: 30px; margin: 0; max-width: none;">
                 <div class="page-header">
-                    <h1>📊 System Reports</h1>
-                    <p style="padding:20px;">Comprehensive system analytics and monitoring reports</p>
+                    <h1 style="color: white;">📊 System Reports</h1>
+                    <p style="padding:20px; color: white;">Comprehensive system analytics and monitoring reports</p>
                 </div>
 
                 <!-- Report Filters -->
