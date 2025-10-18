@@ -509,7 +509,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th><input type="checkbox" id="selectAll"></th>
+                                <!-- <th><input type="checkbox" id="selectAll"></th> -->
                                 <th>User ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
@@ -533,14 +533,14 @@
                                     $initials = substr($initials, 0, 2);
 
                                     // Format role badge class
-                                    $roleClass = str_replace(' ', '-', strtolower($user['role_name'] ?? 'unknown'));
+                                    // $roleClass = str_replace(' ', '-', strtolower($user['role_name'] ?? 'unknown'));
 
                                     // Format dates
                                     $lastLogin = $user['last_login'] ? date('M j, Y g:i A', strtotime($user['last_login'])) : 'Never';
                                     $createdDate = date('M j, Y', strtotime($user['created_at']));
                                     ?>
                                     <tr data-user-id="<?= $user['id'] ?>">
-                                        <td><input type="checkbox" class="user-checkbox" value="<?= $user['id'] ?>"></td>
+                                        <!-- <td><input type="checkbox" class="user-checkbox" value="<?= $user['id'] ?>"></td> -->
                                         <td>USR-<?= str_pad($user['id'], 3, '0', STR_PAD_LEFT) ?></td>
                                         <td>
                                             <div class="user-info">
@@ -548,7 +548,7 @@
                                                 <div>
                                                     <div class="user-name"><?= htmlspecialchars($user['full_name']) ?></div>
                                                     <div class="user-meta">
-                                                        <?= htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?>
+                                                        <? // = htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?>
                                                     </div>
                                                 </div>
                                             </div>
