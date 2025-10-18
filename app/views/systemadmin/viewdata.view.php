@@ -25,22 +25,22 @@
         <div class="metric-card">
             <div class="metric-value">24,567</div>
             <div class="metric-label">Total Records</div>
-            <div class="metric-change positive">+2.5% this month</div>
+            <!-- <div class="metric-change positive">+2.5% this month</div> -->
         </div>
         <div class="metric-card">
             <div class="metric-value">3.2 GB</div>
             <div class="metric-label">Database Size</div>
-            <div class="metric-change neutral">75% capacity</div>
+            <!-- <div class="metric-change neutral">75% capacity</div> -->
         </div>
         <div class="metric-card">
             <div class="metric-value">98.7%</div>
             <div class="metric-label">Data Integrity</div>
-            <div class="metric-change positive">Excellent health</div>
+            <!-- <div class="metric-change positive">Excellent health</div> -->
         </div>
         <div class="metric-card">
             <div class="metric-value">156</div>
             <div class="metric-label">Active Connections</div>
-            <div class="metric-change neutral">Normal range</div>
+            <!-- <div class="metric-change neutral">Normal range</div> -->
         </div>
     </div>
 
@@ -51,7 +51,7 @@
             <button class="tab-btn" onclick="showTab('jobs')">Jobs Data</button>
             <button class="tab-btn" onclick="showTab('applications')">Applications Data</button>
             <button class="tab-btn" onclick="showTab('interviews')">Interviews Data</button>
-            <button class="tab-btn" onclick="showTab('analytics')">Analytics</button>
+            <!-- <button class="tab-btn" onclick="showTab('analytics')">Analytics</button> -->
         </div>
 
         <!-- Users Data Tab -->
@@ -63,9 +63,9 @@
                         <button class="btn btn-secondary" onclick="exportUserData()">
                             <i class="icon-download"></i>Export
                         </button>
-                        <button class="btn btn-secondary" onclick="refreshData('users')">
+                        <!-- <button class="btn btn-secondary" onclick="refreshData('users')">
                             <i class="icon-refresh"></i>Refresh
-                        </button>
+                        </button> -->
                     </div>
                 </div>
                 
@@ -107,9 +107,9 @@
                         <button class="btn btn-secondary" onclick="exportJobData()">
                             <i class="icon-download"></i>Export
                         </button>
-                        <button class="btn btn-secondary" onclick="refreshData('jobs')">
+                        <!-- <button class="btn btn-secondary" onclick="refreshData('jobs')">
                             <i class="icon-refresh"></i>Refresh
-                        </button>
+                        </button> -->
                     </div>
                 </div>
                 
@@ -151,9 +151,9 @@
                         <button class="btn btn-secondary" onclick="exportApplicationData()">
                             <i class="icon-download"></i>Export
                         </button>
-                        <button class="btn btn-secondary" onclick="refreshData('applications')">
+                        <!-- <button class="btn btn-secondary" onclick="refreshData('applications')">
                             <i class="icon-refresh"></i>Refresh
-                        </button>
+                        </button> -->
                     </div>
                 </div>
                 
@@ -195,9 +195,9 @@
                         <button class="btn btn-secondary" onclick="exportInterviewData()">
                             <i class="icon-download"></i>Export
                         </button>
-                        <button class="btn btn-secondary" onclick="refreshData('interviews')">
+                        <!-- <button class="btn btn-secondary" onclick="refreshData('interviews')">
                             <i class="icon-refresh"></i>Refresh
-                        </button>
+                        </button> -->
                     </div>
                 </div>
                 
@@ -218,10 +218,10 @@
                         <div class="stat-value">23</div>
                         <div class="stat-label">Cancelled</div>
                     </div>
-                    <div class="stat-item">
+                    <!-- <div class="stat-item">
                         <div class="stat-value">110</div>
                         <div class="stat-label">No Shows</div>
-                    </div>
+                    </div> -->
                 </div>
 
                 <div class="chart-container">

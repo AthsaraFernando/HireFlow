@@ -396,22 +396,22 @@
             <div class="metric-card">
                 <div class="metric-value">2,847</div>
                 <div class="metric-label">Total Logins Today</div>
-                <div class="metric-change positive">+15% from yesterday</div>
+                <!-- <div class="metric-change positive">+15% from yesterday</div> -->
             </div>
             <div class="metric-card">
                 <div class="metric-value">156</div>
                 <div class="metric-label">Unique Users</div>
-                <div class="metric-change positive">+8 new users</div>
+                <!-- <div class="metric-change positive">+8 new users</div> -->
             </div>
             <div class="metric-card">
                 <div class="metric-value">12</div>
                 <div class="metric-label">Failed Attempts</div>
-                <div class="metric-change negative">+4 from yesterday</div>
+                <!-- <div class="metric-change negative">+4 from yesterday</div> -->
             </div>
             <div class="metric-card">
                 <div class="metric-value">3</div>
                 <div class="metric-label">Suspicious Activities</div>
-                <div class="metric-change warning">Requires attention</div>
+                <!-- <div class="metric-change warning">Requires attention</div> -->
             </div>
         </div>
         
@@ -424,7 +424,7 @@
                     </button>
                 </div>
             </div>
-            <div class="controls-right">
+            <!-- <div class="controls-right">
                 <button class="btn btn-primary" onclick="exportLogs()">
                     <i class="icon-download"></i>Export Logs
                 </button>
@@ -434,16 +434,16 @@
                 <button class="btn btn-warning" onclick="clearOldLogs()">
                     <i class="icon-trash"></i>Clear Old
                 </button>
-            </div>
+            </div> -->
         </div>
         
         <div class="controls-filters">
-            <div class="filter-group">
+            <!-- <div class="filter-group">
                 <label>Date Range:</label>
                 <input type="date" id="startDate" class="filter-input">
                 <span class="filter-separator">to</span>
                 <input type="date" id="endDate" class="filter-input">
-            </div>
+            </div> -->
             <div class="filter-group">
                 <label>Filter by User:</label>
                 <select class="filter-select" id="userFilter">
@@ -454,7 +454,7 @@
                     <option value="applicant">Applicants</option>
                 </select>
             </div>
-            <div class="filter-group">
+            <!-- <div class="filter-group">
                 <label>Filter by Action:</label>
                 <select class="filter-select" id="actionFilter">
                     <option value="">All Actions</option>
@@ -466,7 +466,7 @@
                     <option value="data_access">Data Access</option>
                     <option value="admin_action">Admin Action</option>
                 </select>
-            </div>
+            </div> -->
             <div class="filter-actions">
                 <button class="btn btn-sm btn-primary" onclick="applyFilters()">Apply Filters</button>
                 <button class="btn btn-sm btn-outline" onclick="clearFilters()">Clear Filters</button>
@@ -481,7 +481,7 @@
                     <th>Timestamp</th>
                     <th>User</th>
                     <th>Role</th>
-                    <th>Action</th>
+                    <!-- <th>Action</th> -->
                     <th>IP Address</th>
                     <th>User Agent</th>
                     <th>Status</th>
@@ -501,7 +501,7 @@
                         </div>
                     </td>
                     <td><span class="role-badge system-admin">System Admin</span></td>
-                    <td><span class="action-badge login">Login</span></td>
+                    <!-- <td><span class="action-badge login">Login</span></td> -->
                     <td>192.168.1.100</td>
                     <td class="user-agent" title="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">Chrome 120.0 (Windows)</td>
                     <td><span class="status-badge success">Success</span></td>
@@ -523,7 +523,7 @@
                         </div>
                     </td>
                     <td><span class="role-badge hr-admin">HR Admin</span></td>
-                    <td><span class="action-badge data-access">Data Access</span></td>
+                    <!-- <td><span class="action-badge data-access">Data Access</span></td> -->
                     <td>192.168.1.105</td>
                     <td class="user-agent" title="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36">Chrome 120.0 (macOS)</td>
                     <td><span class="status-badge success">Success</span></td>
@@ -545,7 +545,7 @@
                         </div>
                     </td>
                     <td><span class="role-badge unknown">Unknown</span></td>
-                    <td><span class="action-badge failed-login">Failed Login</span></td>
+                    <!-- <td><span class="action-badge failed-login">Failed Login</span></td> -->
                     <td>203.145.67.89</td>
                     <td class="user-agent" title="Bot/Crawler attempting access">Suspicious Bot Activity</td>
                     <td><span class="status-badge error">Failed</span></td>
@@ -567,7 +567,7 @@
                         </div>
                     </td>
                     <td><span class="role-badge recruitment-manager">Recruitment Manager</span></td>
-                    <td><span class="action-badge profile-update">Profile Update</span></td>
+                    <!-- <td><span class="action-badge profile-update">Profile Update</span></td> -->
                     <td>192.168.1.112</td>
                     <td class="user-agent" title="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">Edge 120.0 (Windows)</td>
                     <td><span class="status-badge success">Success</span></td>
@@ -589,7 +589,7 @@
                         </div>
                     </td>
                     <td><span class="role-badge applicant">Applicant</span></td>
-                    <td><span class="action-badge login">Login</span></td>
+                    <!-- <td><span class="action-badge login">Login</span></td> -->
                     <td>203.123.45.67</td>
                     <td class="user-agent" title="Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15">Safari (iOS)</td>
                     <td><span class="status-badge success">Success</span></td>
@@ -611,7 +611,7 @@
                         </div>
                     </td>
                     <td><span class="role-badge system-admin">System Admin</span></td>
-                    <td><span class="action-badge admin-action">Admin Action</span></td>
+                    <!-- <td><span class="action-badge admin-action">Admin Action</span></td> -->
                     <td>192.168.1.100</td>
                     <td class="user-agent" title="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">Chrome 120.0 (Windows)</td>
                     <td><span class="status-badge success">Success</span></td>
