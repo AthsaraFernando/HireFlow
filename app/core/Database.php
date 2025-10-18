@@ -16,12 +16,19 @@ trait Database
 
         $check = $stmt->execute($data);
         if ($check) {
-            $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            if (is_array($result) && count($result)) {
-                return $result;
-            }
-        }
+            if (stripos(trim($query), 'select') === 0) {
+                $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                return $result ?: [];
 
+            }
+            return true;
+            // if ($check) {
+            //     $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            //     if (is_array($result) && count($result)) {
+            //         return $result;
+            //     }
+            // }
+        }
         return false;
     }
 
