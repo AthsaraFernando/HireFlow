@@ -534,7 +534,7 @@
 
                                     // Format role badge class
                                     // $roleClass = str_replace(' ', '-', strtolower($user['role_name'] ?? 'unknown'));
-
+                            
                                     // Format dates
                                     $lastLogin = $user['last_login'] ? date('M j, Y g:i A', strtotime($user['last_login'])) : 'Never';
                                     $createdDate = date('M j, Y', strtotime($user['created_at']));
@@ -707,6 +707,32 @@
             </div>
 
             <script>
+                // Sidebar toggle functionality
+                document.getElementById('sidebarToggle').addEventListener('click', function () {
+                    document.querySelector('.sidebar').classList.toggle('collapsed');
+                    document.querySelector('.main-content').classList.toggle('expanded');
+                });
+
+                document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
+                    if (e.target.textContent.trim() === ">") {
+                        e.target.textContent = "<";
+                    } else {
+                        e.target.textContent = ">";
+                    }
+                });
+
+                document.addEventListener('DOMContentLoaded', function () {
+                    const currentPath = window.location.pathname;
+                    const navLinks = document.querySelectorAll('.nav-link');
+
+                    navLinks.forEach(link => {
+                        if (link.getAttribute('href').includes(currentPath)) {
+                            navLinks.forEach(l => l.classList.remove('active'));
+                            link.classList.add('active');
+                        }
+                    });
+                });
+
                 // User management functionality
                 function openUserModal(action, userId = null) {
                     const modal = document.getElementById('userModal');
