@@ -313,13 +313,13 @@ $popular_pages = [
         <div class="dashboard-content">
             <div class="reports-container" style="padding: 30px; margin: 0; max-width: none;">
                 <div class="page-header">
-                    <h1 style="color: white;">📊 System Reports</h1>
+                    <h1 style="color: white;">System Reports</h1>
                     <p style="padding:20px; color: white;">Comprehensive system analytics and monitoring reports</p>
                 </div>
 
                 <!-- Report Filters -->
                 <div class="reports-section">
-                    <h2 class="section-title">🔍 Report Filters</h2>
+                    <h2 class="section-title">Report Filters</h2>
                     <div class="report-filters">
                         <div class="filter-grid">
                             <div class="form-group">
@@ -365,7 +365,7 @@ $popular_pages = [
 
                 <!-- System Overview -->
                 <div class="reports-section">
-                    <h2 class="section-title">📈 System Overview</h2>
+                    <h2 class="section-title">System Overview</h2>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-value"><?= number_format($system_stats['total_users']) ?></div>
@@ -404,18 +404,18 @@ $popular_pages = [
 
                 <!-- User Activity Chart -->
                 <!-- <div class="reports-section">
-                    <h2 class="section-title">👥 User Activity Trends</h2>
+                    <h2 class="section-title"> User Activity Trends</h2>
                     <div class="export-buttons">
                         <button class="btn btn-outline-primary" onclick="exportChart('user_activity')">
-                            📊 Export Chart
+                             Export Chart
                         </button>
                         <button class="btn btn-outline-secondary" onclick="downloadData('user_activity')">
-                            📄 Download Data
+                             Download Data
                         </button>
                     </div>
                     <div class="chart-container">
                         <div class="chart-placeholder">
-                            📈 Interactive chart would be rendered here<br>
+                             Interactive chart would be rendered here<br>
                             <small>Integration with Chart.js or similar library for production</small>
                         </div>
                     </div>
@@ -444,7 +444,7 @@ $popular_pages = [
 
                 <!-- System Performance -->
                 <!-- <div class="reports-section">
-                    <h2 class="section-title">⚡ System Performance</h2>
+                    <h2 class="section-title"> System Performance</h2>
                     <div class="form-grid">
                         <div>
                             <h4>Server Resources</h4>
@@ -504,7 +504,7 @@ $popular_pages = [
 
                 <!-- Error Logs -->
                 <!-- <div class="reports-section">
-                    <h2 class="section-title">🚨 Recent System Events</h2>
+                    <h2 class="section-title"> Recent System Events</h2>
                     <table class="reports-table">
                         <thead>
                             <tr>
@@ -533,7 +533,7 @@ $popular_pages = [
 
                 <!-- Popular Pages -->
                 <!-- <div class="reports-section">
-                    <h2 class="section-title">🔗 Popular Pages</h2>
+                    <h2 class="section-title"> Popular Pages</h2>
                     <table class="reports-table">
                         <thead>
                             <tr>
@@ -558,25 +558,25 @@ $popular_pages = [
 
                 <!-- Quick Actions -->
                 <div class="reports-section">
-                    <h2 class="section-title">⚡ Quick Actions</h2>
+                    <h2 class="section-title"> Quick Actions</h2>
                     <div class="quick-actions">
                         <a href="#" class="action-button" onclick="scheduleReport()">
-                            📅 Schedule Automated Reports
+                             Schedule Automated Reports
                         </a>
                         <a href="#" class="action-button" onclick="clearCache()">
-                            🗑️ Clear System Cache
+                             Clear System Cache
                         </a>
                         <a href="#" class="action-button" onclick="optimizeDatabase()">
-                            🔧 Optimize Database
+                             Optimize Database
                         </a>
                         <a href="#" class="action-button" onclick="exportAllData()">
-                            📦 Export All System Data
+                             Export All System Data
                         </a>
                         <a href="<?= ROOT ?>/systemadmin/accesslogs" class="action-button">
-                            📋 View Detailed Logs
+                             View Detailed Logs
                         </a>
                         <a href="#" class="action-button" onclick="systemHealthCheck()">
-                            🩺 Run Health Check
+                             Run Health Check
                         </a>
                     </div>
                 </div>

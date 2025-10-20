@@ -432,7 +432,7 @@
                             <input type="text" placeholder="Search by user, IP address, or action..."
                                 class="search-input" id="logSearch">
                             <button class="search-btn" onclick="searchLogs()">
-                                <i class="icon-search"></i>
+                                <!-- <i class="icon-search"></i> -->Search
                             </button>
                         </div>
                     </div>

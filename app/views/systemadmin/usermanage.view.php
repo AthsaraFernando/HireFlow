@@ -445,14 +445,15 @@
                         <div class="search-container">
                             <input type="text" placeholder="Search users..." class="search-input" id="userSearch">
                             <button class="search-btn" onclick="filterUsers()">
-                                <i class="icon-search"></i>
+                                <!-- <i class="icon-search"></i> -->Search
                             </button>
                         </div>
                     </div>
                     <div class="controls-right">
                         <?php if ($can_manage_users ?? false): ?>
                             <button class="btn btn-primary" onclick="openUserModal('add')">
-                                <i class="icon-plus"></i>Add Staff User
+                                <!-- <i class="icon-plus"></i> -->
+                                Add Staff User
                             </button>
                             <!-- <button class="btn btn-secondary" onclick="exportUsers()">
                                 <i class="icon-download"></i>Export
