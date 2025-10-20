@@ -156,7 +156,7 @@ if (!function_exists('old_value')) {
 
     <div class="settings-container">
         <div class="page-header">
-            <h1>🔧 System Settings</h1>
+            <h1>System Settings</h1>
             <p style="padding:20px;">Configure global system parameters and preferences</p>
         </div>
 

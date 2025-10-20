@@ -231,7 +231,7 @@ $active_sessions = [
 
     <div class="security-container">
         <div class="page-header">
-            <h1>🔒 Security Settings</h1>
+            <h1>Security Settings</h1>
             <p style="padding:20px;">Configure system security policies and monitor security events</p>
         </div>
 
@@ -249,7 +249,7 @@ $active_sessions = [
 
         <!-- Security Overview -->
         <div class="security-section">
-            <h2 class="section-title">🛡️ Security Overview</h2>
+            <h2 class="section-title">Security Overview</h2>
             <div class="security-grid">
                 <!-- <div class="security-card <?= $security_settings['brute_force_protection'] ? 'enabled' : 'disabled' ?>">
                     <div class="card-header">
@@ -312,7 +312,7 @@ $active_sessions = [
 
         <!-- Authentication Settings -->
         <div class="security-section">
-            <h2 class="section-title">🔐 Authentication Settings</h2>
+            <h2 class="section-title">Authentication Settings</h2>
             <form method="POST" action="<?= ROOT ?>/systemadmin/security-settings">
                 <div class="form-grid">
                     <div class="form-group">
@@ -355,7 +355,7 @@ $active_sessions = [
 
         <!-- IP Whitelist -->
         <!-- <div class="security-section">
-            <h2 class="section-title">🌐 IP Access Control</h2>
+            <h2 class="section-title"> IP Access Control</h2>
             <div class="mb-3">
                 <label class="form-label">
                     <input type="checkbox" <?= $security_settings['ip_whitelist_enabled'] ? 'checked' : '' ?>
@@ -403,7 +403,7 @@ $active_sessions = [
 
         <!-- Failed Login Attempts -->
         <div class="security-section">
-            <h2 class="section-title">⚠️ Security Monitoring</h2>
+            <h2 class="section-title">Security Monitoring</h2>
             <h3>Failed Login Attempts</h3>
             <table class="security-table">
                 <thead>
@@ -446,7 +446,7 @@ $active_sessions = [
 
         <!-- Active Sessions -->
         <div class="security-section">
-            <h2 class="section-title">👥 Active Sessions</h2>
+            <h2 class="section-title">Active Sessions</h2>
             <table class="security-table">
                 <thead>
                     <tr>

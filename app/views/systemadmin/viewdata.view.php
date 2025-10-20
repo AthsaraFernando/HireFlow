@@ -61,7 +61,8 @@
                     <h3>Users Overview</h3>
                     <div class="action-buttons">
                         <button class="btn btn-secondary" onclick="exportUserData()">
-                            <i class="icon-download"></i>Export
+                            <!-- <i class="icon-download"></i> -->
+                            Export
                         </button>
                         <!-- <button class="btn btn-secondary" onclick="refreshData('users')">
                             <i class="icon-refresh"></i>Refresh

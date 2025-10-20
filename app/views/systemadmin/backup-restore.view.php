@@ -223,28 +223,28 @@ $backup_schedule = [
             <h2 class="section-title">Quick Actions</h2>
             <div class="backup-actions">
                 <div class="action-card">
-                    <div class="action-icon">📦</div>
+                    <!-- <div class="action-icon"></div> -->
                     <h3>Create Backup</h3>
                     <!-- <p>Generate a full database backup</p> -->
                     <button class="btn btn-primary" onclick="createBackup()">Create Now</button>
                 </div>
 
                 <div class="action-card">
-                    <div class="action-icon">📤</div>
+                    <!-- <div class="action-icon"></div> -->
                     <h3>Export Data</h3>
                     <!-- <p>Export specific tables or data</p> -->
                     <!-- <button class="btn btn-outline-primary" onclick="showExportModal()">Export</button> -->
                 </div>
 
                 <div class="action-card">
-                    <div class="action-icon">📥</div>
+                    <!-- <div class="action-icon"></div> -->
                     <h3>Import Data</h3>
                     <!-- <p>Import from backup file</p> -->
                     <!-- <button class="btn btn-outline-secondary" onclick="showImportModal()">Import</button> -->
                 </div>
 
                 <div class="action-card">
-                    <div class="action-icon">🔄</div>
+                    <!-- <div class="action-icon"></div> -->
                     <h3>System Status</h3>
                     <!-- <p>Database: <span style="color: #27ae60;">✓ Online</span></p>
                     <p>Storage: <span style="color: #27ae60;">✓ 8.5GB Free</span></p> -->
@@ -353,7 +353,7 @@ $backup_schedule = [
 
         <!-- Restore Operations -->
         <div class="backup-section danger-zone">
-            <h2 class="section-title">⚠️ Restore Operations</h2>
+            <h2 class="section-title">Restore Operations</h2>
 
             <div class="restore-warning">
                 <strong>Warning:</strong> Restore operations will overwrite existing data.
@@ -377,7 +377,7 @@ $backup_schedule = [
             </div>
 
             <button class="btn btn-danger" onclick="confirmRestore()">
-                🔄 Start Restore Process
+                Start Restore Process
             </button>
         </div>
 
