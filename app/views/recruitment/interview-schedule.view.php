@@ -139,39 +139,23 @@
                     <label class="interview-form-label">Select Candidate</label>
                     <select class="interview-input" id="candidate-select" required>
                         <option value="">Choose a candidate</option>
-                        <option value="1">Sarah Johnson - Software Developer</option>
-                        <option value="2">Michael Brown - Marketing Manager</option>
-                        <option value="3">Emily Davis - UI/UX Designer</option>
-                        <option value="4">David Wilson - Data Analyst</option>
+                        <?php if(!empty($shortlisted_candidates)): ?>
+                            <?php foreach($shortlisted_candidates as $candidate): ?>
+                                <option value="<?= $candidate['application_id'] ?>" 
+                                        data-applicant-id="<?= $candidate['applicant_id'] ?>"
+                                        data-job-id="<?= $candidate['job_id'] ?>">
+                                    <?= htmlspecialchars($candidate['candidate_name']) ?> - <?= htmlspecialchars($candidate['job_title']) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <option value="" disabled>No shortlisted candidates available</option>
+                        <?php endif; ?>
                     </select>
                 </div>
                 
                 <div class="interview-form-section">
                     <label class="interview-form-label">Interview Date & Time</label>
                     <input type="datetime-local" class="interview-input" id="interview-datetime" required>
-                </div>
-                
-                <div class="interview-form-section">
-                    <label class="interview-form-label">Interview Type</label>
-                    <div class="interview-type-grid">
-                        <div class="interview-type-card" data-type="phone">
-                            <span class="interview-type-icon">📞</span>
-                            <div class="interview-type-label">Phone</div>
-                        </div>
-                        <div class="interview-type-card" data-type="video">
-                            <span class="interview-type-icon">💻</span>
-                            <div class="interview-type-label">Video</div>
-                        </div>
-                        <div class="interview-type-card" data-type="person">
-                            <span class="interview-type-icon">🏢</span>
-                            <div class="interview-type-label">In-Person</div>
-                        </div>
-                        <div class="interview-type-card" data-type="technical">
-                            <span class="interview-type-icon">⚡</span>
-                            <div class="interview-type-label">Technical</div>
-                        </div>
-                    </div>
-                    <input type="hidden" id="selected-interview-type" required>
                 </div>
 
                 <div class="interview-form-section">
@@ -189,15 +173,10 @@
                     <label class="interview-form-label">Interviewer</label>
                     <select class="interview-input" id="interviewer-select">
                         <option value="">Select Interviewer</option>
-                        <option value="john-doe">John Doe - Senior Developer</option>
-                        <option value="jane-smith">Jane Smith - Team Lead</option>
-                        <option value="mike-wilson">Mike Wilson - HR Manager</option>
+                        <option value="Tehan Isum">Tehan Isum - Recruit Manager</option>
+                        <option value="Chamali Perera">Chamali Perera - Team Lead</option>
+                        <option value="Nuwan Silva">Nuwan Silva - HR Manager</option>
                     </select>
-                </div>
-                
-                <div class="interview-form-section">
-                    <label class="interview-form-label">Notes (Optional)</label>
-                    <textarea class="interview-input" rows="3" placeholder="Additional notes or special requirements..."></textarea>
                 </div>
             </form>
         </div>
@@ -215,6 +194,15 @@ let selectedCandidateId = null;
 let isReschedule = false;
 
 function scheduleNewInterview() {
+    // Check if there are shortlisted candidates available
+    const candidateSelect = document.getElementById('candidate-select');
+    const hasOptions = candidateSelect.options.length > 1; // More than just the placeholder
+    
+    if (!hasOptions) {
+        alert('No shortlisted candidates available for scheduling interviews. Please shortlist candidates first.');
+        return;
+    }
+    
     isReschedule = false;
     selectedCandidateId = null;
     const overlay = document.getElementById('interview-modal-overlay');
@@ -262,19 +250,14 @@ function closeInterviewModal() {
 
 function resetInterviewForm() {
     // Clear all selections
-    document.querySelectorAll('.interview-type-card.selected').forEach(card => {
-        card.classList.remove('selected');
-    });
     document.querySelectorAll('.interview-duration-pill.selected').forEach(pill => {
         pill.classList.remove('selected');
     });
-    document.getElementById('selected-interview-type').value = '';
     document.getElementById('selected-duration').value = '';
     
     // Clear form fields
     document.getElementById('candidate-select').value = '';
     document.getElementById('interviewer-select').value = '';
-    document.querySelector('textarea').value = '';
     
     // Set default duration (45 min)
     const defaultDuration = document.querySelector('[data-duration="45"]');
@@ -313,50 +296,37 @@ document.addEventListener('click', function(event) {
     });
 });
 
-// Interview type and duration selection
+// Duration selection
 document.addEventListener('DOMContentLoaded', function() {
-    const typeOptions = document.querySelectorAll('.interview-type-option');
-    const typeInput = document.getElementById('interview-type');
+    const durationPills = document.querySelectorAll('.interview-duration-pill');
+    const durationInput = document.getElementById('selected-duration');
     
-    typeOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            typeOptions.forEach(opt => opt.classList.remove('selected'));
-            this.classList.add('selected');
-            typeInput.value = this.dataset.type;
-        });
-    });
-    
-    const durationOptions = document.querySelectorAll('.duration-option');
-    const durationInput = document.getElementById('interview-duration');
-    
-    durationOptions.forEach(option => {
-        option.addEventListener('click', function() {
-            durationOptions.forEach(opt => opt.classList.remove('selected'));
+    durationPills.forEach(pill => {
+        pill.addEventListener('click', function() {
+            durationPills.forEach(p => p.classList.remove('selected'));
             this.classList.add('selected');
             durationInput.value = this.dataset.duration;
         });
     });
     
-    // Set default duration
-    if (durationOptions.length > 1) {
-        durationOptions[1].click(); // Default to 45 min
+    // Set default duration (45 min)
+    if (durationPills.length > 1) {
+        durationPills[1].click();
     }
 });
 
 function submitInterviewSchedule() {
-    const form = document.getElementById('interview-form');
     const candidate = document.getElementById('candidate-select').value;
     const datetime = document.getElementById('interview-datetime').value;
-    const type = document.getElementById('interview-type').value;
-    const duration = document.getElementById('interview-duration').value;
+    const duration = document.getElementById('selected-duration').value;
     
-    if (!candidate || !datetime || !type || !duration) {
+    if (!candidate || !datetime || !duration) {
         alert('Please fill in all required fields');
         return;
     }
     
     alert('Interview scheduled successfully!');
-    closeModal('interview-modal');
+    closeInterviewModal();
     location.reload(); // Refresh to show new interview
 }
 

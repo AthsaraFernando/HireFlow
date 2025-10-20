@@ -10,6 +10,28 @@ class InterviewSchedule extends Controller
         $data = [];
         $data['page_title'] = 'Interview Schedule';
         
+        // Fetch shortlisted candidates for interview scheduling
+        // Query directly from applications table, only candidates with "Shortlisted" status
+        // Exclude records where applicant_name is NULL
+        $application = new Application();
+        $query = "SELECT 
+                    a.id as application_id,
+                    a.applicant_id,
+                    a.job_id,
+                    a.applicant_name as candidate_name,
+                    a.job_title,
+                    a.resume_path,
+                    a.status,
+                    a.applied_at
+                  FROM applications a
+                  WHERE a.status = 'Shortlisted'
+                  AND a.applicant_name IS NOT NULL
+                  AND a.applicant_name != ''
+                  ORDER BY a.applied_at DESC";
+        
+        $result = $application->query($query);
+        $data['shortlisted_candidates'] = is_array($result) ? $result : [];
+        
         $data['interviews'] = [
             [
                 'id' => 1,
