@@ -359,6 +359,31 @@ function submitInterviewSchedule() {
     closeModal('interview-modal');
     location.reload(); // Refresh to show new interview
 }
-</script>
+
+// Sidebar toggle functionality
+document.getElementById('sidebarToggle').addEventListener('click', function () {
+    document.querySelector('.sidebar').classList.toggle('collapsed');
+    document.querySelector('.main-content').classList.toggle('expanded');
+});
+
+document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
+    if (e.target.textContent.trim() === ">") {
+        e.target.textContent = "<";
+    } else {
+        e.target.textContent = ">";
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    navLinks.forEach(link => {
+        if (link.getAttribute('href').includes(currentPath)) {
+            navLinks.forEach(l => l.classList.remove('active'));
+            link.classList.add('active');
+        }
+    });
+});</script>
 
 <?php $this->view('components/footer') ?>
