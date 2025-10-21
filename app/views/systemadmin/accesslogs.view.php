@@ -436,26 +436,28 @@
                             </button>
                         </div>
                     </div>
-                    <!-- <div class="controls-right">
-                <button class="btn btn-primary" onclick="exportLogs()">
-                    <i class="icon-download"></i>Export Logs
-                </button>
-                <button class="btn btn-secondary" onclick="refreshLogs()">
-                    <i class="icon-refresh"></i>Refresh
-                </button>
-                <button class="btn btn-warning" onclick="clearOldLogs()">
+                    <div class="controls-right">
+                        <button class="btn btn-primary" onclick="exportLogs()">
+                            <!-- <i class="icon-download"></i> -->
+                            Export Logs
+                        </button>
+                        <button class="btn btn-secondary" onclick="refreshLogs()">
+                            <!-- <i class="icon-refresh"></i> -->
+                            Refresh
+                        </button>
+                        <!-- <button class="btn btn-warning" onclick="clearOldLogs()">
                     <i class="icon-trash"></i>Clear Old
-                </button>
-            </div> -->
+                </button> -->
+                    </div>
                 </div>
 
                 <div class="controls-filters">
-                    <!-- <div class="filter-group">
-                <label>Date Range:</label>
-                <input type="date" id="startDate" class="filter-input">
-                <span class="filter-separator">to</span>
-                <input type="date" id="endDate" class="filter-input">
-            </div> -->
+                    <div class="filter-group">
+                        <label>Date Range:</label>
+                        <input type="date" id="startDate" class="filter-input">
+                        <span class="filter-separator">to</span>
+                        <input type="date" id="endDate" class="filter-input">
+                    </div>
                     <div class="filter-group">
                         <label>Filter by User:</label>
                         <select class="filter-select" id="userFilter">
@@ -466,19 +468,19 @@
                             <option value="applicant">Applicants</option>
                         </select>
                     </div>
-                    <!-- <div class="filter-group">
-                <label>Filter by Action:</label>
-                <select class="filter-select" id="actionFilter">
-                    <option value="">All Actions</option>
-                    <option value="login">Login</option>
-                    <option value="logout">Logout</option>
-                    <option value="failed_login">Failed Login</option>
-                    <option value="password_change">Password Change</option>
-                    <option value="profile_update">Profile Update</option>
-                    <option value="data_access">Data Access</option>
-                    <option value="admin_action">Admin Action</option>
-                </select>
-            </div> -->
+                    <div class="filter-group">
+                        <label>Filter by Action:</label>
+                        <select class="filter-select" id="actionFilter">
+                            <option value="">All Actions</option>
+                            <option value="login">Login</option>
+                            <option value="logout">Logout</option>
+                            <option value="failed_login">Failed Login</option>
+                            <option value="password_change">Password Change</option>
+                            <option value="profile_update">Profile Update</option>
+                            <option value="data_access">Data Access</option>
+                            <option value="admin_action">Admin Action</option>
+                        </select>
+                    </div>
                     <div class="filter-actions">
                         <button class="btn btn-sm btn-primary" onclick="applyFilters()">Apply Filters</button>
                         <button class="btn btn-sm btn-outline" onclick="clearFilters()">Clear Filters</button>
@@ -753,9 +755,63 @@
                     const userFilter = document.getElementById('userFilter').value;
                     const actionFilter = document.getElementById('actionFilter').value;
 
-                    // Apply filters to the table
-                    showToast('Filters applied successfully', 'success');
-                    // In real implementation, this would make an AJAX call to fetch filtered data
+                    const tableRows = document.querySelectorAll('.data-table tbody tr');
+                    let visibleCount = 0;
+
+                    tableRows.forEach(row => {
+                        // Skip the "no logs found" row
+                        if (row.querySelector('td[colspan]')) {
+                            return;
+                        }
+
+                        const cells = row.querySelectorAll('td');
+                        const createdAt = cells[6]?.textContent.trim() || '';
+                        const userId = cells[1]?.textContent.trim() || '';
+                        const ipAddress = cells[2]?.textContent.trim() || '';
+                        const action = cells[3]?.textContent.trim().toLowerCase() || '';
+                        const details = cells[4]?.textContent.trim().toLowerCase() || '';
+                        const userAgent = cells[5]?.textContent.trim().toLowerCase() || '';
+
+                        let shouldShow = true;
+
+                        // Date range filter
+                        if (startDate && createdAt) {
+                            const logDate = new Date(createdAt).setHours(0, 0, 0, 0);
+                            const filterStartDate = new Date(startDate).setHours(0, 0, 0, 0);
+                            if (logDate < filterStartDate) {
+                                shouldShow = false;
+                            }
+                        }
+
+                        if (endDate && createdAt) {
+                            const logDate = new Date(createdAt).setHours(0, 0, 0, 0);
+                            const filterEndDate = new Date(endDate).setHours(23, 59, 59, 999);
+                            if (logDate > filterEndDate) {
+                                shouldShow = false;
+                            }
+                        }
+
+                        // Action filter
+                        if (actionFilter && !action.includes(actionFilter.toLowerCase())) {
+                            shouldShow = false;
+                        }
+
+                        // Show or hide row
+                        if (shouldShow) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
+
+                    // Update pagination info
+                    const paginationInfo = document.querySelector('.pagination-info');
+                    if (paginationInfo) {
+                        paginationInfo.textContent = `Showing ${visibleCount} log entries`;
+                    }
+
+                    showToast(`Filters applied. Showing ${visibleCount} results`, 'success');
                 }
 
                 function clearFilters() {
@@ -769,24 +825,130 @@
                 }
 
                 function searchLogs() {
-                    const searchTerm = document.getElementById('logSearch').value;
+                    const searchTerm = document.getElementById('logSearch').value.toLowerCase();
+                    const tableRows = document.querySelectorAll('.data-table tbody tr');
+                    let visibleCount = 0;
+
                     if (searchTerm.trim() === '') {
                         showToast('Please enter a search term', 'warning');
                         return;
                     }
+
+                    tableRows.forEach(row => {
+                        // Skip the "no logs found" row
+                        if (row.querySelector('td[colspan]')) {
+                            return;
+                        }
+
+                        const cells = row.querySelectorAll('td');
+                        const createdAt = cells[6]?.textContent.trim() || '';
+                        const userId = cells[1]?.textContent.trim() || '';
+                        const ipAddress = cells[2]?.textContent.trim() || '';
+                        const action = cells[3]?.textContent.trim().toLowerCase() || '';
+                        const details = cells[4]?.textContent.trim().toLowerCase() || '';
+                        const userAgent = cells[5]?.textContent.trim().toLowerCase() || '';
+
+                        let shouldShow = true;
+
+                        // Search term filter (searches across user_id, ip_address, action, details, user_agent)
+                        if (searchTerm) {
+                            const searchableText = `${userId} ${ipAddress} ${action} ${details} ${userAgent}`;
+                            if (!searchableText.includes(searchTerm)) {
+                                shouldShow = false;
+                            }
+                        }
+
+                        // Show or hide row
+                        if (shouldShow) {
+                            row.style.display = '';
+                            visibleCount++;
+                        } else {
+                            row.style.display = 'none';
+                        }
+                    });
 
                     // Perform search
                     showToast('Search completed', 'success');
                 }
 
                 function refreshLogs() {
+                    // Clear all filters
+                    document.getElementById('startDate').value = '';
+                    document.getElementById('endDate').value = '';
+                    document.getElementById('userFilter').value = '';
+                    document.getElementById('actionFilter').value = '';
+                    document.getElementById('logSearch').value = '';
+
+                    // Show all rows
+                    const tableRows = document.querySelectorAll('.data-table tbody tr');
+                    tableRows.forEach(row => {
+                        row.style.display = '';
+                    });
+
+                    // Reload the page to fetch fresh data from server
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 500);
                     showToast('Logs refreshed', 'success');
                     // In real implementation, this would reload the log data
                 }
 
                 function exportLogs() {
-                    showToast('Export started. Download will begin shortly.', 'info');
-                    // In real implementation, this would generate and download a CSV/PDF file
+                    // Get all visible table rows (filtered rows)
+                    const tableRows = document.querySelectorAll('.data-table tbody tr');
+                    const visibleRows = Array.from(tableRows).filter(row => {
+                        return row.style.display !== 'none' && !row.querySelector('td[colspan]');
+                    });
+
+                    if (visibleRows.length === 0) {
+                        showToast('No logs to export', 'warning');
+                        return;
+                    }
+
+                    // Prepare CSV data
+                    const csvRows = [];
+
+                    // Add header row
+                    const headers = ['ID', 'User ID', 'IP Address', 'Action', 'Details', 'User Agent', 'Created At'];
+                    csvRows.push(headers.join(','));
+
+                    // Add data rows
+                    visibleRows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        const rowData = [
+                            cells[0]?.textContent.trim() || '',
+                            cells[1]?.textContent.trim() || '',
+                            cells[2]?.textContent.trim() || '',
+                            cells[3]?.textContent.trim() || '',
+                            `"${(cells[4]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in details
+                            `"${(cells[5]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in user agent
+                            cells[6]?.textContent.trim() || ''
+                        ];
+                        csvRows.push(rowData.join(','));
+                    });
+
+                    // Create CSV string
+                    const csvString = csvRows.join('\n');
+
+                    // Create blob and download
+                    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+
+                    link.href = url;
+                    link.download = `access_logs_${new Date().toISOString().split('T')[0]}.csv`;
+
+                    // Append to body, click, and remove
+                    document.body.appendChild(link);
+                    link.click();
+
+                    // Clean up
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 100);
+
+                    showToast(`Successfully exported ${visibleRows.length} log entries`, 'success');
                 }
 
                 function clearOldLogs() {
