@@ -72,14 +72,36 @@
         </header>
 
         <div class="applications-content">
+            <?php if(isset($_SESSION['success'])): ?>
+                <div class="alert alert-success" style="margin-bottom: 20px; padding: 15px; background-color: #d4edda; color: #155724; border-radius: 8px;">
+                    <?= $_SESSION['success']; unset($_SESSION['success']); ?>
+                </div>
+            <?php endif; ?>
+            
+            <?php if(isset($_SESSION['error'])): ?>
+                <div class="alert alert-error" style="margin-bottom: 20px; padding: 15px; background-color: #f8d7da; color: #721c24; border-radius: 8px;">
+                    <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+                </div>
+            <?php endif; ?>
+            
             <!-- Status Filter -->
             <div class="filter-section">
                 <div class="status-filters">
-                    <button class="status-filter active" data-status="all">All Applications</button>
-                    <button class="status-filter" data-status="pending">Pending</button>
-                    <button class="status-filter" data-status="shortlisted">Shortlisted</button>
-                    <button class="status-filter" data-status="interviewed">Interviewed</button>
-                    <button class="status-filter" data-status="rejected">Rejected</button>
+                    <button class="status-filter active" data-status="all">
+                        All Applications (<?= $stats['total'] ?>)
+                    </button>
+                    <button class="status-filter" data-status="applied">
+                        Applied (<?= $stats['pending'] ?>)
+                    </button>
+                    <button class="status-filter" data-status="shortlisted">
+                        Shortlisted (<?= $stats['shortlisted'] ?>)
+                    </button>
+                    <button class="status-filter" data-status="interview scheduled">
+                        Interviewed (<?= $stats['interview_scheduled'] ?>)
+                    </button>
+                    <button class="status-filter" data-status="rejected">
+                        Rejected (<?= $stats['rejected'] ?>)
+                    </button>
                 </div>
                 <div class="view-toggle">
                     <button class="view-btn active" data-view="grid">📊 Grid</button>
@@ -121,9 +143,10 @@
                     </div>
                     
                     <div class="application-actions">
-                        <button class="btn btn-outline" onclick="viewApplication(<?= $application['id'] ?>)">View Details</button>
-                        <?php if($application['status'] === 'pending'): ?>
-                            <button class="btn btn-secondary" onclick="withdrawApplication(<?= $application['id'] ?>)">Withdraw</button>
+                        <a href="<?= ROOT ?>/applicant/viewApplication/<?= $application['id'] ?>" class="btn btn-outline">View Details</a>
+                        <?php if(in_array(strtolower($application['status']), ['applied', 'under review'])): ?>
+                            <a href="<?= ROOT ?>/applicant/editApplication/<?= $application['id'] ?>" class="btn btn-secondary">Edit</a>
+                            <button class="btn btn-danger" onclick="deleteApplication(<?= $application['id'] ?>)">Delete</button>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -188,13 +211,9 @@
             });
         });
         
-        function viewApplication(id) {
-            alert(`Viewing application details for ID: ${id} (Demo mode)`);
-        }
-        
-        function withdrawApplication(id) {
-            if (confirm('Are you sure you want to withdraw this application?')) {
-                alert(`Application withdrawn for ID: ${id} (Demo mode)`);
+        function deleteApplication(id) {
+            if (confirm('Are you sure you want to delete this application? This action cannot be undone.')) {
+                window.location.href = '<?= ROOT ?>/applicant/deleteApplication/' + id;
             }
         }
     </script>
