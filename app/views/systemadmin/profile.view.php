@@ -211,28 +211,28 @@
                     <h3 class="card-title">Quick Actions</h3>
                     <div class="quick-actions-grid">
                         <a href="<?= ROOT ?>/systemadmin/usermanage" class="quick-action">
-                            <div class="action-icon">👥</div>
+                            <!-- <div class="action-icon"></div> -->
                             <div class="action-content">
                                 <h4>Manage Users</h4>
                                 <p>Add, edit, or remove user accounts</p>
                             </div>
                         </a>
                         <a href="<?= ROOT ?>/systemadmin/reports" class="quick-action">
-                            <div class="action-icon">📊</div>
+                            <!-- <div class="action-icon"></div> -->
                             <div class="action-content">
                                 <h4>System Reports</h4>
                                 <p>View analytics and system insights</p>
                             </div>
                         </a>
                         <a href="<?= ROOT ?>/systemadmin/accesslogs" class="quick-action">
-                            <div class="action-icon">📋</div>
+                            <!-- <div class="action-icon"></div> -->
                             <div class="action-content">
                                 <h4>Access Logs</h4>
                                 <p>Monitor system access and security</p>
                             </div>
                         </a>
                         <a href="<?= ROOT ?>/systemadmin/dashboard" class="quick-action">
-                            <div class="action-icon">🏠</div>
+                            <!-- <div class="action-icon"></div> -->
                             <div class="action-content">
                                 <h4>Dashboard</h4>
                                 <p>Return to main dashboard</p>

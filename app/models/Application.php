@@ -91,7 +91,8 @@ class Application
         
         if ($this->validate($data)) {
             $data['applied_at'] = date('Y-m-d H:i:s');
-            return $this->insert($data);
+            $this->insert($data);
+            return true;
         }
         return false;
     }
@@ -135,5 +136,30 @@ class Application
         $data[$id_column] = $id;
         $this->query($query, $data);
         return true; // Override the false return from Model trait
+    }
+
+    public function updateApplication($application_id, $data)
+    {
+        return $this->update($application_id, $data);
+    }
+    
+    public function deleteApplication($application_id)
+    {
+        $query = "DELETE FROM applications WHERE id = ?";
+        $con = $this->connect();
+        $stmt = $con->prepare($query);
+        $result = $stmt->execute([$application_id]);
+        return $result; // Returns true if delete was successful
+    }
+    
+    public function getApplicationById($application_id)
+    {
+        $query = "SELECT a.*, jp.title as job_title, jp.location, jp.employment_type, 
+                         jp.salary_range, jp.department, jp.deadline
+                  FROM applications a 
+                  LEFT JOIN job_posts jp ON a.job_id = jp.id 
+                  WHERE a.id = ?";
+        
+        return $this->get_row($query, [$application_id]);
     }
 }

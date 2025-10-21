@@ -1,29 +1,35 @@
 <?php
 
-class Usermanage extends Controller 
+class Usermanage extends Controller
 {
     public function index()
     {
         // Require System Admin role (role_id = 1)
         Auth::requireRole(1);
-        
+
         $data = [];
         $user = new User();
         $role = new Role();
-        
+
         // Check if user has admin privileges for actions
         $canManageUsers = Auth::hasRole(1); // Only System Admin can manage users
         $data['can_manage_users'] = $canManageUsers;
-        
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Only System Admins can perform user management actions
             if (!$canManageUsers) {
                 $data['errors']['general'] = "Insufficient privileges to perform this action.";
             } elseif (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
-                $data['errors']['general'] = "Invalid request. Please try again.";
-            } else {
+                // Skip CSRF check for fetch action (read-only)
                 $action = $_POST['action'] ?? '';
-                
+                if ($action !== 'fetch') {
+                    $data['errors']['general'] = "Invalid request. Please try again.";
+                }
+            }
+
+            if (empty($data['errors'])) {
+                $action = $_POST['action'] ?? '';
+
                 switch ($action) {
                     case 'create':
                         $this->handleCreateUser($data, $user);
@@ -37,24 +43,29 @@ class Usermanage extends Controller
                     case 'toggle_status':
                         $this->handleToggleStatus($data, $user);
                         break;
+                    case 'fetch':
+                        $this->handleGetUser($data, $user);
+                        return;
                     default:
                         $data['errors']['general'] = "Invalid action";
                         break;
                 }
             }
+
         }
 
         // Get all users with role information
         $data['users'] = $this->getUsersWithRoles();
         $data['roles'] = $role->findAll();
         $data['csrf_token'] = Auth::generateCSRFToken();
-        
+
         $data['view'] = 'usermanage';
         $this->view('systemadmin', $data);
     }
 
     private function handleCreateUser(&$data, $user)
     {
+        // logger($data);
         // Validate input
         $requiredFields = ['full_name', 'email', 'password', 'role_id'];
         foreach ($requiredFields as $field) {
@@ -80,7 +91,7 @@ class Usermanage extends Controller
 
         // Validate role (only allow HR Admin and Recruitment Manager creation)
         $allowedRoles = [2, 3]; // HR Admin, Recruitment Manager
-        if (!empty($_POST['role_id']) && !in_array((int)$_POST['role_id'], $allowedRoles)) {
+        if (!empty($_POST['role_id']) && !in_array((int) $_POST['role_id'], $allowedRoles)) {
             $data['errors']['role_id'] = "Invalid role selection";
         }
 
@@ -89,7 +100,7 @@ class Usermanage extends Controller
                 'full_name' => trim($_POST['full_name']),
                 'email' => strtolower(trim($_POST['email'])),
                 'password' => $_POST['password'],
-                'role_id' => (int)$_POST['role_id'],
+                'role_id' => (int) $_POST['role_id'],
                 'phone' => $_POST['phone'] ?? '',
                 'address' => $_POST['address'] ?? '',
                 'status' => $_POST['status'] ?? 'active'
@@ -104,9 +115,32 @@ class Usermanage extends Controller
         }
     }
 
+    private function handleGetUser(&$data, $user)
+    {
+        header('Content-Type: application/json');
+
+        $userId = (int) ($_POST['user_id'] ?? 0);
+
+        if (empty($userId)) {
+            echo json_encode(['success' => false, 'message' => 'User ID is required']);
+            return;
+        }
+
+        $userData = $user->first(['id' => $userId], []);
+
+        if ($userData) {
+            echo json_encode([
+                'success' => true,
+                'user' => $userData
+            ]);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'User not found']);
+        }
+    }
+
     private function handleUpdateUser(&$data, $user)
     {
-        $userId = (int)$_POST['user_id'];
+        $userId = (int) $_POST['user_id'];
         if (empty($userId)) {
             $data['errors']['general'] = "Invalid user ID";
             return;
@@ -123,20 +157,22 @@ class Usermanage extends Controller
             'email' => strtolower(trim($_POST['email'])),
             'phone' => $_POST['phone'] ?? '',
             'address' => $_POST['address'] ?? '',
-            'status' => $_POST['status'] ?? 'active'
+            'status' => $_POST['status'] ?? 'active',
+            'role_id' => (int) ($_POST['role_id'] ?? 0),
+            'updated_at' => date('Y-m-d H:i:s')
         ];
 
         // Only update password if provided
         if (!empty($_POST['password'])) {
             if (isStrongPassword($_POST['password'])) {
-                $updateData['password'] = $_POST['password'];
+                $updateData['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
             } else {
                 $data['errors']['password'] = "Password must be at least 8 characters with uppercase, lowercase, number, and special character";
                 return;
             }
         }
 
-        if ($user->updateProfile($userId, $updateData)) {
+        if ($user->update($userId, $updateData)) {
             AccessLog::log('user_updated', 'Updated user ID: ' . $userId);
             $data['success'] = "User updated successfully!";
         } else {
@@ -146,7 +182,7 @@ class Usermanage extends Controller
 
     private function handleDeleteUser(&$data, $user)
     {
-        $userId = (int)$_POST['user_id'];
+        $userId = (int) $_POST['user_id'];
         if (empty($userId)) {
             $data['errors']['general'] = "Invalid user ID";
             return;
@@ -160,20 +196,21 @@ class Usermanage extends Controller
 
         // Get user info for logging
         $userData = $user->first(['id' => $userId], []);
-        
+
         if ($user->delete($userId)) {
             AccessLog::log('user_deleted', 'Deleted user: ' . ($userData['email'] ?? 'Unknown'));
             $data['success'] = "User deleted successfully!";
         } else {
+            logger($userData);
             $data['errors']['general'] = "Failed to delete user";
         }
     }
 
     private function handleToggleStatus(&$data, $user)
     {
-        $userId = (int)$_POST['user_id'];
+        $userId = (int) $_POST['user_id'];
         $newStatus = $_POST['status'];
-        
+
         if (empty($userId) || !in_array($newStatus, ['active', 'inactive'])) {
             $data['errors']['general'] = "Invalid parameters";
             return;
@@ -200,7 +237,7 @@ class Usermanage extends Controller
                   FROM users u 
                   LEFT JOIN roles r ON u.role_id = r.id 
                   ORDER BY u.created_at DESC";
-        
+
         return $user->query($query) ?: [];
     }
 
@@ -208,24 +245,24 @@ class Usermanage extends Controller
     {
         // Require System Admin role (role_id = 1)
         Auth::requireRole(1);
-        
+
         // Set JSON response header
         header('Content-Type: application/json');
-        
+
         // Check if user has System Admin privileges
         if (!Auth::hasRole(1)) {
             echo json_encode(['success' => false, 'message' => 'Insufficient privileges to create users']);
             return;
         }
-        
+
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             echo json_encode(['success' => false, 'message' => 'Invalid request method']);
             return;
         }
-        
+
         $user = new User();
         $response = ['success' => false, 'message' => '', 'errors' => []];
-        
+
         // Validate input
         $firstName = trim($_POST['firstName'] ?? '');
         $lastName = trim($_POST['lastName'] ?? '');
@@ -235,7 +272,7 @@ class Usermanage extends Controller
         $status = $_POST['status'] ?? 'active';
         $password = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirmPassword'] ?? '';
-        
+
         // Validation
         if (empty($firstName)) {
             $response['errors']['firstName'] = 'First name is required';
@@ -250,13 +287,13 @@ class Usermanage extends Controller
         } elseif ($user->emailExists($email)) {
             $response['errors']['email'] = 'Email already exists';
         }
-        
+
         if (empty($role)) {
             $response['errors']['role'] = 'Role is required';
         } elseif (!in_array($role, ['system_admin', 'hr_admin', 'recruitment_manager'])) {
             $response['errors']['role'] = 'Invalid role';
         }
-        
+
         if (empty($password)) {
             $response['errors']['password'] = 'Password is required';
         } elseif (strlen($password) < 8) {
@@ -264,20 +301,21 @@ class Usermanage extends Controller
         } elseif ($password !== $confirmPassword) {
             $response['errors']['password'] = 'Passwords do not match';
         }
-        
+
         if (!empty($response['errors'])) {
+            // logger($response['errors']);
             $response['message'] = 'Please fix the errors and try again';
             echo json_encode($response);
             return;
         }
-        
+
         // Map role names to IDs
         $roleMap = [
             'system_admin' => 1,
-            'hr_admin' => 2, 
+            'hr_admin' => 2,
             'recruitment_manager' => 3
         ];
-        
+
         $userData = [
             'full_name' => $firstName . ' ' . $lastName,
             'email' => $email,
@@ -286,15 +324,16 @@ class Usermanage extends Controller
             'phone' => $phone,
             'status' => $status
         ];
-        
+
         if ($user->createUser($userData)) {
             AccessLog::log('user_created', 'Created user: ' . $email);
             $response['success'] = true;
             $response['message'] = 'Staff account created successfully!';
         } else {
+            // logger($userData);
             $response['message'] = 'Failed to create user account';
         }
-        
+
         echo json_encode($response);
     }
 }
