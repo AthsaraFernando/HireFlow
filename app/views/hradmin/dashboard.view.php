@@ -128,16 +128,16 @@
     <div class="action-section">
         <div class="action-buttons">
             <a href="<?= ROOT ?>/hradmin/create-job" class="btn btn-primary">
-                <i class="icon-plus"></i>Create Job Post
+                Create Job Post
             </a>
             <a href="<?= ROOT ?>/hradmin/applications" class="btn btn-secondary">
-                <i class="icon-eye"></i>Review Applications
+                Review Applications
             </a>
             <a href="<?= ROOT ?>/hradmin/interview-schedule" class="btn btn-secondary">
-                <i class="icon-calendar"></i>Schedule Interview
+                Schedule Interview
             </a>
             <a href="<?= ROOT ?>/hradmin/reports" class="btn btn-secondary">
-                <i class="icon-chart"></i>View Reports
+                View Reports
             </a>
         </div>
     </div>

@@ -86,10 +86,10 @@
         <p class="page-description">Comprehensive recruitment analytics and performance insights</p>
         <div class="action-buttons">
             <button class="btn btn-primary" onclick="exportReport()">
-                <i class="icon-export"></i>Export Report
+                Export Report
             </button>
             <button class="btn btn-secondary" onclick="scheduleReport()">
-                <i class="icon-schedule"></i>Schedule Report
+                Schedule Report
             </button>
         </div>
     </div>
@@ -158,7 +158,6 @@
             <div class="metric-card primary">
                 <div class="metric-header">
                     <h4>Total Applications</h4>
-                    <i class="metric-icon">📊</i>
                 </div>
                 <div class="metric-value">1,247</div>
                 <div class="metric-change positive">
@@ -170,7 +169,6 @@
             <div class="metric-card success">
                 <div class="metric-header">
                     <h4>Successful Hires</h4>
-                    <i class="metric-icon">✅</i>
                 </div>
                 <div class="metric-value">89</div>
                 <div class="metric-change positive">
@@ -182,7 +180,6 @@
             <div class="metric-card warning">
                 <div class="metric-header">
                     <h4>Avg. Time to Hire</h4>
-                    <i class="metric-icon">⏱️</i>
                 </div>
                 <div class="metric-value">23 days</div>
                 <div class="metric-change negative">
@@ -194,7 +191,6 @@
             <div class="metric-card info">
                 <div class="metric-header">
                     <h4>Cost per Hire</h4>
-                    <i class="metric-icon">💰</i>
                 </div>
                 <div class="metric-value">$3,450</div>
                 <div class="metric-change positive">
@@ -213,8 +209,8 @@
                 <div class="chart-header">
                     <h4>Recruitment Funnel</h4>
                     <div class="chart-actions">
-                        <button class="chart-btn" onclick="toggleChartView('funnel')">📊</button>
-                        <button class="chart-btn" onclick="exportChart('funnel')">💾</button>
+                        <button class="chart-btn" onclick="toggleChartView('funnel')">View</button>
+                        <button class="chart-btn" onclick="exportChart('funnel')">Export</button>
                     </div>
                 </div>
                 <div class="chart-content">
@@ -248,8 +244,8 @@
                 <div class="chart-header">
                     <h4>Applications Over Time</h4>
                     <div class="chart-actions">
-                        <button class="chart-btn" onclick="toggleChartView('timeline')">📈</button>
-                        <button class="chart-btn" onclick="exportChart('timeline')">💾</button>
+                        <button class="chart-btn" onclick="toggleChartView('timeline')">View</button>
+                        <button class="chart-btn" onclick="exportChart('timeline')">Export</button>
                     </div>
                 </div>
                 <div class="chart-content">
@@ -274,8 +270,8 @@
                 <div class="chart-header">
                     <h4>Hiring by Department</h4>
                     <div class="chart-actions">
-                        <button class="chart-btn" onclick="toggleChartView('department')">🍰</button>
-                        <button class="chart-btn" onclick="exportChart('department')">💾</button>
+                        <button class="chart-btn" onclick="toggleChartView('department')">View</button>
+                        <button class="chart-btn" onclick="exportChart('department')">Export</button>
                     </div>
                 </div>
                 <div class="chart-content">
@@ -311,8 +307,8 @@
                 <div class="chart-header">
                     <h4>Application Sources</h4>
                     <div class="chart-actions">
-                        <button class="chart-btn" onclick="toggleChartView('sources')">📊</button>
-                        <button class="chart-btn" onclick="exportChart('sources')">💾</button>
+                        <button class="chart-btn" onclick="toggleChartView('sources')">View</button>
+                        <button class="chart-btn" onclick="exportChart('sources')">Export</button>
                     </div>
                 </div>
                 <div class="chart-content">
@@ -840,9 +836,27 @@
 .rate-average { color: #ffc107; font-weight: 600; }
 .rate-poor { color: #dc3545; font-weight: 600; }
 
-/* Icon styles */
-.icon-export::before { content: '📤'; }
-.icon-schedule::before { content: '📅'; }
+/* Icon styles - removed emojis */
+
+/* Chart button styling */
+.chart-btn {
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background: white;
+    color: #495057;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.chart-btn:hover {
+    background: #4e31aa;
+    color: white;
+    border-color: #4e31aa;
+    box-shadow: 0 2px 4px rgba(78, 49, 170, 0.2);
+}
 
 /* Responsive design */
 @media (max-width: 768px) {

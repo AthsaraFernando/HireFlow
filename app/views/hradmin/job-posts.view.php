@@ -91,7 +91,7 @@
         <p class="page-description">Create, edit and manage all job postings</p>
         <div class="action-buttons">
             <a href="<?= ROOT ?>/hradmin/create-job" class="btn btn-primary">
-                <i class="icon-plus"></i>Create New Job Post
+                Create New Job Post
             </a>
         </div>
     </div>
@@ -115,7 +115,7 @@
         <div class="filter-controls">
             <div class="search-box">
                 <input type="text" placeholder="Search job posts..." class="search-input">
-                <button class="search-btn"><i class="icon-search"></i></button>
+                <button class="search-btn">Search</button>
             </div>
             <div class="filter-group">
                 <select class="filter-select">
@@ -178,14 +178,14 @@
                             <td><span class="status-badge <?= strtolower($job['status']) ?>"><?= htmlspecialchars($job['status']) ?></span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="<?= ROOT ?>/hradmin/job-posts/viewJob/<?= $job['id'] ?>" class="btn-icon" title="View">
-                                        <i class="icon-eye"></i>
+                                    <a href="<?= ROOT ?>/hradmin/job-posts/viewJob/<?= $job['id'] ?>" class="action-btn view-btn" title="View">
+                                        View
                                     </a>
-                                    <a href="<?= ROOT ?>/hradmin/job-posts/edit/<?= $job['id'] ?>" class="btn-icon" title="Edit">
-                                        <i class="icon-edit"></i>
+                                    <a href="<?= ROOT ?>/hradmin/job-posts/edit/<?= $job['id'] ?>" class="action-btn edit-btn" title="Edit">
+                                        Edit
                                     </a>
-                                    <button class="btn-icon danger" title="Delete" onclick="confirmDelete(<?= $job['id'] ?>)">
-                                        <i class="icon-delete"></i>
+                                    <button class="action-btn delete-btn" title="Delete" onclick="confirmDelete(<?= $job['id'] ?>)">
+                                        Delete
                                     </button>
                                 </div>
                             </td>
@@ -231,6 +231,81 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Action buttons styling */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.view-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.view-btn:hover {
+    background: #2563eb;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.edit-btn {
+    background: #f59e0b;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #d97706;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+    transform: translateY(-1px);
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Search button styling */
+.search-btn {
+    padding: 0.625rem 1.25rem;
+    background: #4e31aa;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+    background: #3d2687;
+}
+</style>
 
 <script>
 let deleteJobId = null;
