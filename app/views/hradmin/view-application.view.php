@@ -252,7 +252,7 @@ John Smith')) ?>
                         <div class="candidate-role">UI/UX Designer</div>
                         <div class="match-score">92% match</div>
                     </div>
-                    <a href="<?= ROOT ?>/hradmin/applications/view/2" class="view-candidate-btn">View</a>
+                    <a href="<?= ROOT ?>/hradmin/view-application/2" class="view-candidate-btn">View</a>
                 </div>
                 <div class="candidate-card">
                     <div class="candidate-avatar">MW</div>
@@ -261,7 +261,7 @@ John Smith')) ?>
                         <div class="candidate-role">Full Stack Developer</div>
                         <div class="match-score">88% match</div>
                     </div>
-                    <a href="<?= ROOT ?>/hradmin/applications/view/3" class="view-candidate-btn">View</a>
+                    <a href="<?= ROOT ?>/hradmin/view-application/3" class="view-candidate-btn">View</a>
                 </div>
                 <div class="candidate-card">
                     <div class="candidate-avatar">AL</div>
@@ -270,7 +270,7 @@ John Smith')) ?>
                         <div class="candidate-role">Frontend Developer</div>
                         <div class="match-score">85% match</div>
                     </div>
-                    <a href="<?= ROOT ?>/hradmin/applications/view/4" class="view-candidate-btn">View</a>
+                    <a href="<?= ROOT ?>/hradmin/view-application/4" class="view-candidate-btn">View</a>
                 </div>
             </div>
         </div>
@@ -295,6 +295,377 @@ John Smith')) ?>
 </div>
 
 <style>
+.main-container {
+    padding: 1.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header-section {
+    margin-bottom: 2rem;
+}
+
+.page-title {
+    color: #2c3e50;
+    font-size: 1.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.page-description {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 0.625rem 1.25rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-primary {
+    background: #4e31aa;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #3d2687;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-success {
+    background: #28a745;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #218838;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-outline {
+    background: white;
+    color: #4e31aa;
+    border: 1px solid #4e31aa;
+}
+
+.btn-outline:hover {
+    background: #4e31aa;
+    color: white;
+}
+
+.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.status-section {
+    margin-bottom: 1.5rem;
+}
+
+.status-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.status-info {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 500;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+}
+
+.status-badge.pending { background: #fff3cd; color: #856404; }
+.status-badge.under.review, .status-badge.reviewing { background: #cfe2ff; color: #004085; }
+.status-badge.shortlisted { background: #d4edda; color: #155724; }
+.status-badge.interviewed { background: #e2e3e5; color: #383d41; }
+.status-badge.offered { background: #d1ecf1; color: #0c5460; }
+.status-badge.hired { background: #d4edda; color: #155724; }
+.status-badge.rejected { background: #f8d7da; color: #721c24; }
+
+.status-details {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+}
+
+.page-actions-bar {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.actions-label {
+    font-weight: 600;
+    color: #2c3e50;
+    min-width: 140px;
+}
+
+.page-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    flex: 1;
+}
+
+.page-action-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    background: white;
+    color: #495057;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.page-action-btn:hover {
+    background: #f8f9fa;
+    border-color: #adb5bd;
+}
+
+.page-action-btn.primary {
+    background: #4e31aa;
+    color: white;
+    border-color: #4e31aa;
+}
+
+.page-action-btn.primary:hover {
+    background: #3d2687;
+}
+
+.page-action-btn.success {
+    background: #28a745;
+    color: white;
+    border-color: #28a745;
+}
+
+.page-action-btn.success:hover {
+    background: #218838;
+}
+
+.page-action-btn.danger {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+}
+
+.page-action-btn.danger:hover {
+    background: #c82333;
+}
+
+.single-column-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.content-card {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 1.5rem;
+}
+
+.card-title {
+    color: #2c3e50;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f1f3f4;
+}
+
+.timeline-simple {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.timeline-event {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: #f8f9fa;
+    border-radius: 6px;
+    border-left: 3px solid #4e31aa;
+}
+
+.timeline-date {
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+    min-width: 100px;
+}
+
+.timeline-description {
+    color: #2c3e50;
+}
+
+.candidates-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.candidate-card {
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.75rem;
+}
+
+.candidate-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #4e31aa;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.125rem;
+}
+
+.candidate-details {
+    flex: 1;
+}
+
+.candidate-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.candidate-role {
+    color: #6c757d;
+    font-size: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+
+.match-score {
+    color: #28a745;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.view-candidate-btn {
+    padding: 0.375rem 0.75rem;
+    background: #4e31aa;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.view-candidate-btn:hover {
+    background: #3d2687;
+}
+
+.notes-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.notes-input {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    resize: vertical;
+    font-family: inherit;
+    font-size: 0.875rem;
+}
+
+.notes-input:focus {
+    outline: none;
+    border-color: #4e31aa;
+    box-shadow: 0 0 0 3px rgba(78, 49, 170, 0.1);
+}
+
+.notes-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
 .candidate-profile {
     margin-bottom: 1.5rem;
 }
@@ -487,108 +858,6 @@ John Smith')) ?>
     color: #495057;
 }
 
-.action-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.action-button {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s;
-    text-align: left;
-}
-
-.action-button.primary { background: #4e31aa; color: white; }
-.action-button.success { background: #28a745; color: white; }
-.action-button.secondary { background: #6c757d; color: white; }
-.action-button.warning { background: #dc3545; color: white; }
-
-.action-button:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
-
-.timeline {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.timeline-item {
-    padding: 0.75rem;
-    background: #f8f9fa;
-    border-radius: 6px;
-    border-left: 3px solid #4e31aa;
-}
-
-.timeline-date {
-    font-size: 0.875rem;
-    color: #6c757d;
-    margin-bottom: 0.25rem;
-}
-
-.timeline-event {
-    font-weight: 500;
-    color: #2c3e50;
-}
-
-.similar-candidates {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.candidate-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.75rem;
-    background: #f8f9fa;
-    border-radius: 6px;
-}
-
-.candidate-item .candidate-name {
-    font-weight: 600;
-    color: #2c3e50;
-    font-size: 0.875rem;
-}
-
-.candidate-position {
-    color: #6c757d;
-    font-size: 0.75rem;
-}
-
-.view-link {
-    color: #4e31aa;
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.notes-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.notes-textarea {
-    width: 100%;
-    min-height: 100px;
-    padding: 0.75rem;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    resize: vertical;
-    font-family: inherit;
-}
-
 .rating-section {
     display: flex;
     align-items: center;
@@ -606,26 +875,67 @@ John Smith')) ?>
     color: #2c3e50;
 }
 
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 0.125rem;
+}
+
+.star {
+    font-size: 0.875rem;
+    color: #ffc107;
+}
+
+.star.empty {
+    color: #e9ecef;
+}
+
+.rating-text {
+    margin-left: 0.5rem;
+    font-size: 0.875rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
 /* Icon styles */
-.icon-back::before { content: '←'; }
-.icon-calendar::before { content: '📅'; }
-.icon-star::before { content: '⭐'; }
-.icon-email::before { content: '📧'; }
-.icon-phone::before { content: '📞'; }
-.icon-location::before { content: '📍'; }
-.icon-linkedin::before { content: '💼'; }
-.icon-download::before { content: '⬇️'; }
-.icon-reject::before { content: '❌'; }
+.icon-back::before { content: '←'; margin-right: 0.25rem; }
+.icon-calendar::before { content: '📅'; margin-right: 0.25rem; }
+.icon-star::before { content: '⭐'; margin-right: 0.25rem; }
+.icon-check::before { content: '✓'; margin-right: 0.25rem; }
+.icon-email::before { content: '📧'; margin-right: 0.25rem; }
+.icon-phone::before { content: '📞'; margin-right: 0.25rem; }
+.icon-location::before { content: '📍'; margin-right: 0.25rem; }
+.icon-linkedin::before { content: '💼'; margin-right: 0.25rem; }
+.icon-download::before { content: '⬇️'; margin-right: 0.25rem; }
+.icon-mail::before { content: '✉️'; margin-right: 0.25rem; }
+.icon-close::before { content: '❌'; margin-right: 0.25rem; }
 
 /* Responsive design */
 @media (max-width: 768px) {
-    .content-grid {
-        grid-template-columns: 1fr;
+    .main-container {
+        padding: 1rem;
+    }
+    
+    .page-actions-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .actions-label {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    
+    .status-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
     }
     
     .profile-header {
         flex-direction: column;
         text-align: center;
+        align-items: center;
     }
     
     .experience-item {
@@ -637,6 +947,10 @@ John Smith')) ?>
         flex-direction: column;
         align-items: flex-start;
         gap: 0.25rem;
+    }
+    
+    .candidates-grid {
+        grid-template-columns: 1fr;
     }
 }
 </style>

@@ -86,10 +86,10 @@
         <p class="page-description">Review and manage job applications from candidates</p>
         <div class="action-buttons">
             <a href="<?= ROOT ?>/hradmin/applicant-database" class="btn btn-secondary">
-                <i class="icon-database"></i>Applicant Database
+                Applicant Database
             </a>
             <a href="<?= ROOT ?>/hradmin/interview-schedule" class="btn btn-secondary">
-                <i class="icon-calendar"></i>Schedule Interviews
+                Schedule Interviews
             </a>
         </div>
     </div>
@@ -137,7 +137,7 @@
         <div class="filter-controls">
             <div class="search-box">
                 <input type="text" placeholder="Search applicants..." class="search-input">
-                <button class="search-btn"><i class="icon-search"></i></button>
+                <button class="search-btn">Search</button>
             </div>
             <div class="filter-group">
                 <select class="filter-select">
@@ -219,15 +219,15 @@
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <a href="<?= ROOT ?>/hradmin/applications/view/1" class="btn-icon" title="View Details">
-                                <i class="icon-eye"></i>
+                            <a href="<?= ROOT ?>/hradmin/view-application/1" class="action-btn view-btn" title="View Details">
+                                View
                             </a>
-                            <button class="btn-icon" title="Download Resume" onclick="downloadResume(1)">
-                                <i class="icon-download"></i>
+                            <button class="action-btn download-btn" title="Download Resume" onclick="downloadResume(1)">
+                                Download
                             </button>
                             <div class="dropdown">
-                                <button class="btn-icon dropdown-toggle" title="Change Status">
-                                    <i class="icon-status"></i>
+                                <button class="action-btn status-btn dropdown-toggle" title="Change Status">
+                                    Status
                                 </button>
                                 <div class="dropdown-menu">
                                     <button onclick="updateStatus(1, 'reviewing')">Mark as Reviewing</button>
@@ -265,15 +265,15 @@
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <a href="<?= ROOT ?>/hradmin/applications/view/2" class="btn-icon" title="View Details">
-                                <i class="icon-eye"></i>
+                            <a href="<?= ROOT ?>/hradmin/view-application/2" class="action-btn view-btn" title="View Details">
+                                View
                             </a>
-                            <button class="btn-icon" title="Download Resume" onclick="downloadResume(2)">
-                                <i class="icon-download"></i>
+                            <button class="action-btn download-btn" title="Download Resume" onclick="downloadResume(2)">
+                                Download
                             </button>
                             <div class="dropdown">
-                                <button class="btn-icon dropdown-toggle" title="Change Status">
-                                    <i class="icon-status"></i>
+                                <button class="action-btn status-btn dropdown-toggle" title="Change Status">
+                                    Status
                                 </button>
                                 <div class="dropdown-menu">
                                     <button onclick="updateStatus(2, 'interviewed')">Mark Interviewed</button>
@@ -310,15 +310,15 @@
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <a href="<?= ROOT ?>/hradmin/applications/view/3" class="btn-icon" title="View Details">
-                                <i class="icon-eye"></i>
+                            <a href="<?= ROOT ?>/hradmin/view-application/3" class="action-btn view-btn" title="View Details">
+                                View
                             </a>
-                            <button class="btn-icon" title="Download Resume" onclick="downloadResume(3)">
-                                <i class="icon-download"></i>
+                            <button class="action-btn download-btn" title="Download Resume" onclick="downloadResume(3)">
+                                Download
                             </button>
                             <div class="dropdown">
-                                <button class="btn-icon dropdown-toggle" title="Change Status">
-                                    <i class="icon-status"></i>
+                                <button class="action-btn status-btn dropdown-toggle" title="Change Status">
+                                    Status
                                 </button>
                                 <div class="dropdown-menu">
                                     <button onclick="updateStatus(3, 'offered')">Extend Offer</button>
@@ -355,15 +355,15 @@
                     </td>
                     <td>
                         <div class="action-buttons">
-                            <a href="<?= ROOT ?>/hradmin/applications/view/4" class="btn-icon" title="View Details">
-                                <i class="icon-eye"></i>
+                            <a href="<?= ROOT ?>/hradmin/view-application/4" class="action-btn view-btn" title="View Details">
+                                View
                             </a>
-                            <button class="btn-icon" title="Download Resume" onclick="downloadResume(4)">
-                                <i class="icon-download"></i>
+                            <button class="action-btn download-btn" title="Download Resume" onclick="downloadResume(4)">
+                                Download
                             </button>
                             <div class="dropdown">
-                                <button class="btn-icon dropdown-toggle" title="Change Status">
-                                    <i class="icon-status"></i>
+                                <button class="action-btn status-btn dropdown-toggle" title="Change Status">
+                                    Status
                                 </button>
                                 <div class="dropdown-menu">
                                     <button onclick="updateStatus(4, 'hired')">Mark as Hired</button>
@@ -384,13 +384,13 @@
         </div>
         <div class="bulk-buttons">
             <button class="btn btn-secondary" onclick="bulkDownload()">
-                <i class="icon-download"></i>Download Resumes
+                Download Resumes
             </button>
             <button class="btn btn-primary" onclick="bulkShortlist()">
-                <i class="icon-star"></i>Bulk Shortlist
+                Bulk Shortlist
             </button>
             <button class="btn btn-warning" onclick="bulkReject()">
-                <i class="icon-reject"></i>Bulk Reject
+                Bulk Reject
             </button>
         </div>
     </div>
@@ -593,15 +593,74 @@
     border-radius: 3px;
 }
 
-/* Icon styles */
-.icon-database::before { content: '🗄️'; }
-.icon-calendar::before { content: '📅'; }
-.icon-search::before { content: '🔍'; }
-.icon-eye::before { content: '👁️'; }
-.icon-download::before { content: '⬇️'; }
-.icon-status::before { content: '🔄'; }
-.icon-star::before { content: '⭐'; }
-.icon-reject::before { content: '❌'; }
+/* Icon styles - removed emojis */
+
+/* Action buttons styling */
+.action-btn {
+    padding: 0.4rem 0.9rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    background: white;
+}
+
+.view-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.view-btn:hover {
+    background: #2563eb;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.download-btn {
+    background: #10b981;
+    color: white;
+}
+
+.download-btn:hover {
+    background: #059669;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);
+    transform: translateY(-1px);
+}
+
+.status-btn {
+    background: #6366f1;
+    color: white;
+}
+
+.status-btn:hover {
+    background: #4f46e5;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Search button styling */
+.search-btn {
+    padding: 0.625rem 1.25rem;
+    background: #4e31aa;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+    background: #3d2687;
+}
 </style>
 
 <script>

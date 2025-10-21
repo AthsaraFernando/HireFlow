@@ -91,7 +91,7 @@
         <p class="page-description">Create, edit and manage all job postings</p>
         <div class="action-buttons">
             <a href="<?= ROOT ?>/hradmin/create-job" class="btn btn-primary">
-                <i class="icon-plus"></i>Create New Job Post
+                Create New Job Post
             </a>
         </div>
     </div>
@@ -115,7 +115,7 @@
         <div class="filter-controls">
             <div class="search-box">
                 <input type="text" placeholder="Search job posts..." class="search-input">
-                <button class="search-btn"><i class="icon-search"></i></button>
+                <button class="search-btn">Search</button>
             </div>
             <div class="filter-group">
                 <select class="filter-select">
@@ -159,151 +159,45 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <td>
-                        <div class="job-info">
-                            <div class="job-title">Senior Software Developer</div>
-                            <div class="job-location">San Francisco, CA</div>
-                        </div>
-                    </td>
-                    <td><span class="dept-tag engineering">Engineering</span></td>
-                    <td>Full-time</td>
-                    <td>Jan 15, 2024</td>
-                    <td>
-                        <span class="application-count">23</span>
-                        <a href="<?= ROOT ?>/hradmin/applications?job=1" class="view-applications">View</a>
-                    </td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="<?= ROOT ?>/hradmin/view-job/1" class="btn-icon" title="View">
-                                <i class="icon-eye"></i>
-                            </a>
-                            <a href="<?= ROOT ?>/hradmin/edit-job/1" class="btn-icon" title="Edit">
-                                <i class="icon-edit"></i>
-                            </a>
-                            <button class="btn-icon danger" title="Delete" onclick="confirmDelete(1)">
-                                <i class="icon-delete"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="job-info">
-                            <div class="job-title">UI/UX Designer</div>
-                            <div class="job-location">Remote</div>
-                        </div>
-                    </td>
-                    <td><span class="dept-tag design">Design</span></td>
-                    <td>Full-time</td>
-                    <td>Jan 12, 2024</td>
-                    <td>
-                        <span class="application-count">18</span>
-                        <a href="<?= ROOT ?>/hradmin/applications?job=2" class="view-applications">View</a>
-                    </td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="<?= ROOT ?>/hradmin/view-job/2" class="btn-icon" title="View">
-                                <i class="icon-eye"></i>
-                            </a>
-                            <a href="<?= ROOT ?>/hradmin/edit-job/2" class="btn-icon" title="Edit">
-                                <i class="icon-edit"></i>
-                            </a>
-                            <button class="btn-icon danger" title="Delete" onclick="confirmDelete(2)">
-                                <i class="icon-delete"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="job-info">
-                            <div class="job-title">Marketing Manager</div>
-                            <div class="job-location">New York, NY</div>
-                        </div>
-                    </td>
-                    <td><span class="dept-tag marketing">Marketing</span></td>
-                    <td>Full-time</td>
-                    <td>Jan 10, 2024</td>
-                    <td>
-                        <span class="application-count">12</span>
-                        <a href="<?= ROOT ?>/hradmin/applications?job=3" class="view-applications">View</a>
-                    </td>
-                    <td><span class="status-badge active">Active</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="<?= ROOT ?>/hradmin/view-job/3" class="btn-icon" title="View">
-                                <i class="icon-eye"></i>
-                            </a>
-                            <a href="<?= ROOT ?>/hradmin/edit-job/3" class="btn-icon" title="Edit">
-                                <i class="icon-edit"></i>
-                            </a>
-                            <button class="btn-icon danger" title="Delete" onclick="confirmDelete(3)">
-                                <i class="icon-delete"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="job-info">
-                            <div class="job-title">Project Manager</div>
-                            <div class="job-location">Chicago, IL</div>
-                        </div>
-                    </td>
-                    <td><span class="dept-tag management">Management</span></td>
-                    <td>Full-time</td>
-                    <td>Jan 8, 2024</td>
-                    <td>
-                        <span class="application-count">15</span>
-                        <a href="<?= ROOT ?>/hradmin/applications?job=4" class="view-applications">View</a>
-                    </td>
-                    <td><span class="status-badge paused">Paused</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="<?= ROOT ?>/hradmin/view-job/4" class="btn-icon" title="View">
-                                <i class="icon-eye"></i>
-                            </a>
-                            <a href="<?= ROOT ?>/hradmin/edit-job/4" class="btn-icon" title="Edit">
-                                <i class="icon-edit"></i>
-                            </a>
-                            <button class="btn-icon danger" title="Delete" onclick="confirmDelete(4)">
-                                <i class="icon-delete"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="job-info">
-                            <div class="job-title">Sales Representative</div>
-                            <div class="job-location">Austin, TX</div>
-                        </div>
-                    </td>
-                    <td><span class="dept-tag sales">Sales</span></td>
-                    <td>Full-time</td>
-                    <td>Jan 5, 2024</td>
-                    <td>
-                        <span class="application-count">9</span>
-                        <a href="<?= ROOT ?>/hradmin/applications?job=5" class="view-applications">View</a>
-                    </td>
-                    <td><span class="status-badge closed">Closed</span></td>
-                    <td>
-                        <div class="action-buttons">
-                            <a href="<?= ROOT ?>/hradmin/view-job/5" class="btn-icon" title="View">
-                                <i class="icon-eye"></i>
-                            </a>
-                            <a href="<?= ROOT ?>/hradmin/edit-job/5" class="btn-icon" title="Edit">
-                                <i class="icon-edit"></i>
-                            </a>
-                            <button class="btn-icon danger" title="Delete" onclick="confirmDelete(5)">
-                                <i class="icon-delete"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
+                <?php if(!empty($job_posts)): ?>
+                    <?php foreach($job_posts as $job): ?>
+                        <tr>
+                            <td>
+                                <div class="job-info">
+                                    <div class="job-title"><?= htmlspecialchars($job['title']) ?></div>
+                                    <div class="job-location"><?= htmlspecialchars($job['location']) ?></div>
+                                </div>
+                            </td>
+                            <td><span class="dept-tag <?= strtolower(str_replace(' ', '-', $job['department'])) ?>"><?= htmlspecialchars($job['department']) ?></span></td>
+                            <td><?= htmlspecialchars($job['type']) ?></td>
+                            <td><?= date('M d, Y', strtotime($job['created_date'])) ?></td>
+                            <td>
+                                <span class="application-count"><?= $job['applications'] ?></span>
+                                <a href="<?= ROOT ?>/hradmin/applications?job=<?= $job['id'] ?>" class="view-applications">View</a>
+                            </td>
+                            <td><span class="status-badge <?= strtolower($job['status']) ?>"><?= htmlspecialchars($job['status']) ?></span></td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="<?= ROOT ?>/hradmin/job-posts/viewJob/<?= $job['id'] ?>" class="action-btn view-btn" title="View">
+                                        View
+                                    </a>
+                                    <a href="<?= ROOT ?>/hradmin/job-posts/edit/<?= $job['id'] ?>" class="action-btn edit-btn" title="Edit">
+                                        Edit
+                                    </a>
+                                    <button class="action-btn delete-btn" title="Delete" onclick="confirmDelete(<?= $job['id'] ?>)">
+                                        Delete
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 2rem;">
+                            <p>No job posts found. <a href="<?= ROOT ?>/hradmin/create-job">Create your first job post</a></p>
+                        </td>
+                    </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -311,35 +205,22 @@
     <!-- Pagination -->
     <div class="pagination-container">
         <div class="pagination-info">
-            Showing 1-5 of 15 job posts
+            Showing <?= count($job_posts ?? []) ?> job post<?= count($job_posts ?? []) != 1 ? 's' : '' ?>
         </div>
         <div class="pagination">
             <button class="pagination-btn" disabled>Previous</button>
             <button class="pagination-btn active">1</button>
-            <button class="pagination-btn">2</button>
-            <button class="pagination-btn">3</button>
             <button class="pagination-btn">Next</button>
         </div>
     </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="modal" style="display: none;">
+<div id="deleteModal" class="modal-overlay" style="display: none;">
     <div class="modal-content">
         <div class="modal-header">
             <h3>Confirm Delete</h3>
             <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <p>Are you sure you want to delete this job post? This action cannot be undone.</p>
-</div>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="modal-overlay" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Confirm Deletion</h3>
         </div>
         <div class="modal-body">
             <p>Are you sure you want to delete this job post? This action cannot be undone.</p>
@@ -350,6 +231,81 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Action buttons styling */
+.action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-start;
+    align-items: center;
+}
+
+.action-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.view-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.view-btn:hover {
+    background: #2563eb;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+    transform: translateY(-1px);
+}
+
+.edit-btn {
+    background: #f59e0b;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #d97706;
+    box-shadow: 0 2px 6px rgba(245, 158, 11, 0.3);
+    transform: translateY(-1px);
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Search button styling */
+.search-btn {
+    padding: 0.625rem 1.25rem;
+    background: #4e31aa;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.search-btn:hover {
+    background: #3d2687;
+}
+</style>
 
 <script>
 let deleteJobId = null;
@@ -366,11 +322,8 @@ function closeDeleteModal() {
 
 function deleteJob() {
     if (deleteJobId) {
-        // Here you would make an AJAX call to delete the job
-        alert('Job post deleted successfully');
-        closeDeleteModal();
-        // Refresh the page or remove the row
-        location.reload();
+        // Redirect to delete action
+        window.location.href = '<?= ROOT ?>/hradmin/job-posts/delete/' + deleteJobId;
     }
 }
 

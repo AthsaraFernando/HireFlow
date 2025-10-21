@@ -7,13 +7,17 @@ class JobPost
     protected $allowedColumns = [
         'title',
         'department_id',
+        'department',
         'description',
         'requirements',
+        'responsibilities',
         'salary_range',
         'location',
         'employment_type',
+        'experience_level',
         'status',
         'posted_by',
+        'hr_id',
         'deadline'
     ];
 
@@ -44,6 +48,17 @@ class JobPost
         return false;
     }
 
+    public function getAllJobs()
+    {
+        $query = "SELECT jp.*, u.full_name as posted_by_name,
+                  (SELECT COUNT(*) FROM applications WHERE job_id = jp.id) as applications_count
+                  FROM job_posts jp 
+                  LEFT JOIN users u ON jp.hr_id = u.id 
+                  ORDER BY jp.created_at DESC";
+        
+        return $this->query($query);
+    }
+    
     public function getJobsWithDepartments()
     {
         $query = "SELECT jp.*, d.name as department_name, u.first_name, u.last_name 

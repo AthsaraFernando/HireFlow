@@ -86,10 +86,10 @@
         <p class="page-description">Schedule and manage interviews with candidates</p>
         <div class="action-buttons">
             <button class="btn btn-primary" onclick="scheduleNewInterview()">
-                <i class="icon-plus"></i>Schedule Interview
+                Schedule Interview
             </button>
             <a href="<?= ROOT ?>/hradmin/applications" class="btn btn-secondary">
-                <i class="icon-applications"></i>View Applications
+                View Applications
             </a>
         </div>
     </div>
@@ -138,11 +138,11 @@
         <div class="calendar-header">
             <div class="calendar-nav">
                 <button class="nav-btn" onclick="previousWeek()">
-                    <i class="icon-prev"></i>
+                    ←
                 </button>
                 <h3 class="calendar-title">January 15-21, 2024</h3>
                 <button class="nav-btn" onclick="nextWeek()">
-                    <i class="icon-next"></i>
+                    →
                 </button>
             </div>
             <div class="view-toggles">
@@ -718,11 +718,7 @@
     max-width: 800px;
 }
 
-/* Icon styles */
-.icon-plus::before { content: '+'; }
-.icon-applications::before { content: '📋'; }
-.icon-prev::before { content: '←'; }
-.icon-next::before { content: '→'; }
+/* Icon styles - removed emojis */
 
 /* Responsive design */
 @media (max-width: 768px) {
