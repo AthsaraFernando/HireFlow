@@ -31,10 +31,11 @@ spl_autoload_register(function ($className) {
     }
 });
 
-require 'config.php';
-require 'functions.php';
-require 'Database.php';
-require 'Model.php';
-require 'Controller.php';
-require 'Auth.php';
-require 'App.php';
+// Use __DIR__ to ensure we load project files, not system files
+require __DIR__ . '/config.php';
+require __DIR__ . '/functions.php';
+require __DIR__ . '/Database.php';
+require __DIR__ . '/Model.php';
+require __DIR__ . '/Controller.php';
+require __DIR__ . '/Auth.php';
+require __DIR__ . '/App.php';

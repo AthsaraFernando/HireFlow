@@ -92,5 +92,135 @@ class Interview
         
         return $this->get_row($query, [$user_id]);
     }
+
+    
+    //Get all interviews for recruitment manager with candidate and job details
+    
+    public function getInterviewsForRecruitment()
+    {
+        $query = "SELECT 
+                    i.id,
+                    i.application_id,
+                    i.interviewer_id,
+                    i.interview_type,
+                    i.scheduled_date,
+                    i.scheduled_time,
+                    i.duration_minutes,
+                    i.location,
+                    i.meeting_link,
+                    i.status,
+                    i.notes,
+                    a.applicant_id,
+                    u.full_name as candidate_name,
+                    jp.title as job_title,
+                    interviewer.full_name as interviewer_name,
+                    r.role_name as interviewer_role
+                  FROM interviews i
+                  JOIN applications a ON i.application_id = a.id
+                  JOIN users u ON a.applicant_id = u.id
+                  JOIN job_posts jp ON a.job_id = jp.id
+                  LEFT JOIN users interviewer ON i.interviewer_id = interviewer.id
+                  LEFT JOIN roles r ON interviewer.role_id = r.id
+                  ORDER BY i.scheduled_date DESC, i.scheduled_time DESC";
+        
+        return $this->query($query);
+    }
+
+    /**
+     * Get a single interview by ID with all details
+     */
+    public function getInterviewById($id)
+    {
+        $query = "SELECT 
+                    i.*,
+                    a.applicant_id,
+                    a.job_id,
+                    u.full_name as candidate_name,
+                    jp.title as job_title,
+                    interviewer.full_name as interviewer_name,
+                    r.role_name as interviewer_role
+                  FROM interviews i
+                  JOIN applications a ON i.application_id = a.id
+                  JOIN users u ON a.applicant_id = u.id
+                  JOIN job_posts jp ON a.job_id = jp.id
+                  LEFT JOIN users interviewer ON i.interviewer_id = interviewer.id
+                  LEFT JOIN roles r ON interviewer.role_id = r.id
+                  WHERE i.id = ?
+                  LIMIT 1";
+        
+        return $this->get_row($query, [$id]);
+    }
+
+    /**
+     * Create a new interview
+     * Overrides the Model trait's insert method to return true on success
+     */
+    public function createInterview($data)
+    {
+        // Set default status to 'Pending'
+        if (!isset($data['status'])) {
+            $data['status'] = 'Pending';
+        }
+
+        // Set default interview type if not provided
+        if (!isset($data['interview_type'])) {
+            $data['interview_type'] = 'Video';
+        }
+
+        // Call parent insert and explicitly return true if successful
+        $this->insert($data);
+        return true; // Override the false return from Model trait
+    }
+
+    /**
+     * Update an existing interview
+     * Overrides the Model trait's update method to return true on success
+     */
+    public function updateInterview($id, $data)
+    {
+        // Call parent update and explicitly return true if successful
+        $this->update($id, $data);
+        return true; // Override the false return from Model trait
+    }
+
+    /**
+     * Delete an interview
+     * Overrides the Model trait's delete method with correct implementation
+     */
+    public function deleteInterview($id)
+    {
+        // Use direct query instead of the buggy Model trait delete
+        $query = "DELETE FROM {$this->table} WHERE id = :id";
+        $this->query($query, ['id' => $id]);
+        return true;
+    }
+
+    /**
+     * Get shortlisted candidates who don't have pending/scheduled interviews
+     * Only returns candidates with role_id = 4 (Applicant)
+     */
+    public function getAvailableCandidates()
+    {
+        $query = "SELECT 
+                    a.id as application_id,
+                    a.applicant_id,
+                    a.job_id,
+                    u.full_name as candidate_name,
+                    jp.title as job_title,
+                    a.status
+                  FROM applications a
+                  JOIN users u ON a.applicant_id = u.id
+                  JOIN job_posts jp ON a.job_id = jp.id
+                  WHERE a.status = 'Shortlisted'
+                  AND u.role_id = 4
+                  AND NOT EXISTS (
+                      SELECT 1 FROM interviews i 
+                      WHERE i.application_id = a.id 
+                      AND i.status IN ('Pending', 'Scheduled')
+                  )
+                  ORDER BY a.applied_at DESC";
+        
+        return $this->query($query);
+    }
 }
 ?>
