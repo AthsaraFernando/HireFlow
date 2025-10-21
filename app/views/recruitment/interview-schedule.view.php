@@ -102,25 +102,40 @@
 
     <div class="calendar-view">
         <div class="interviews-list">
-            <?php foreach($interviews as $interview): ?>
-            <div class="interview-card">
-                <div class="interview-time">
-                    <div class="date"><?= date('M j', strtotime($interview['date'])) ?></div>
-                    <div class="time"><?= date('g:i A', strtotime($interview['time'])) ?></div>
+            <?php if(!empty($interviews)): ?>
+                <?php foreach($interviews as $interview): ?>
+                <div class="interview-card">
+                    <div class="interview-time">
+                        <div class="date"><?= date('M j', strtotime($interview['scheduled_date'])) ?></div>
+                        <div class="time"><?= date('g:i A', strtotime($interview['scheduled_time'])) ?></div>
+                    </div>
+                    <div class="interview-details">
+                        <h3><?= htmlspecialchars($interview['candidate_name']) ?></h3>
+                        <p><?= htmlspecialchars($interview['job_title']) ?></p>
+                        <span class="interview-type"><?= htmlspecialchars($interview['interview_type']) ?></span>
+                        <span class="duration"><?= htmlspecialchars($interview['duration_minutes']) ?> min</span>
+                        <?php if(!empty($interview['interviewer_name'])): ?>
+                            <p class="interviewer-info">
+                                <strong>Interviewer:</strong> <?= htmlspecialchars($interview['interviewer_name']) ?>
+                                <?php if(!empty($interview['interviewer_role'])): ?>
+                                    (<?= htmlspecialchars($interview['interviewer_role']) ?>)
+                                <?php endif; ?>
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                    <span class="status-badge <?= strtolower($interview['status']) ?>"><?= ucfirst($interview['status']) ?></span>
+                    <div class="interview-actions">
+                        <a href="<?= ROOT ?>/recruitment/conduct-interview/<?= $interview['id'] ?>" class="btn btn-primary">Join Interview</a>
+                        <button class="btn btn-outline" onclick="rescheduleInterview(<?= $interview['id'] ?>)">Reschedule</button>
+                        <button class="btn btn-danger" onclick="deleteInterview(<?= $interview['id'] ?>)">Delete</button>
+                    </div>
                 </div>
-                <div class="interview-details">
-                    <h3><?= htmlspecialchars($interview['candidate_name']) ?></h3>
-                    <p><?= htmlspecialchars($interview['job_title']) ?></p>
-                    <span class="interview-type"><?= $interview['type'] ?></span>
-                    <span class="duration"><?= $interview['duration'] ?> min</span>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="empty-state">
+                    <p>No interviews scheduled yet. Click "Schedule New Interview" to get started.</p>
                 </div>
-                <span class="status-badge <?= $interview['status'] ?>"><?= ucfirst($interview['status']) ?></span>
-                <div class="interview-actions">
-                    <a href="<?= ROOT ?>/recruitment/conduct-interview/<?= $interview['id'] ?>" class="btn btn-primary">Join Interview</a>
-                    <button class="btn btn-outline" onclick="rescheduleInterview(<?= $interview['id'] ?>)">Reschedule</button>
-                </div>
-            </div>
-            <?php endforeach; ?>
+            <?php endif; ?>
         </div>
     </div>
 </div>
@@ -171,12 +186,31 @@
                 
                 <div class="interview-form-section">
                     <label class="interview-form-label">Interviewer</label>
-                    <select class="interview-input" id="interviewer-select">
+                    <select class="interview-input" id="interviewer-select" required>
                         <option value="">Select Interviewer</option>
-                        <option value="Tehan Isum">Tehan Isum - Recruit Manager</option>
-                        <option value="Chamali Perera">Chamali Perera - Team Lead</option>
-                        <option value="Nuwan Silva">Nuwan Silva - HR Manager</option>
+                        <?php if(!empty($interviewers)): ?>
+                            <?php foreach($interviewers as $interviewer): ?>
+                                <option value="<?= $interviewer['id'] ?>">
+                                    <?= htmlspecialchars($interviewer['full_name']) ?> - <?= $interviewer['role_id'] == 2 ? 'HR Admin' : 'Recruitment Manager' ?>
+                                </option>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </select>
+                </div>
+
+                <div class="interview-form-section">
+                    <label class="interview-form-label">Interview Type</label>
+                    <select class="interview-input" id="interview-type-select" required>
+                        <option value="Video">Video Interview</option>
+                        <option value="Phone">Phone Interview</option>
+                        <option value="In-person">In person Interview</option>
+                        <option value="Panel">Panel Interview</option>
+                    </select>
+                </div>
+
+                <div class="interview-form-section">
+                    <label class="interview-form-label">Location / Meeting Link</label>
+                    <input type="text" class="interview-input" id="interview-location" placeholder="Conference Room or Zoom Link">
                 </div>
             </form>
         </div>
@@ -190,7 +224,7 @@
 
 <script>
 // Global variables
-let selectedCandidateId = null;
+let selectedInterviewId = null;
 let isReschedule = false;
 
 function scheduleNewInterview() {
@@ -199,12 +233,12 @@ function scheduleNewInterview() {
     const hasOptions = candidateSelect.options.length > 1; // More than just the placeholder
     
     if (!hasOptions) {
-        alert('No shortlisted candidates available for scheduling interviews. Please shortlist candidates first.');
+        alert('No shortlisted candidates available for scheduling interviews. All shortlisted candidates may already have interviews scheduled, or no candidates have been shortlisted yet.');
         return;
     }
     
     isReschedule = false;
-    selectedCandidateId = null;
+    selectedInterviewId = null;
     const overlay = document.getElementById('interview-modal-overlay');
     overlay.classList.add('active');
     
@@ -222,9 +256,7 @@ function scheduleNewInterview() {
 
 function rescheduleInterview(interviewId) {
     isReschedule = true;
-    selectedCandidateId = interviewId;
-    const overlay = document.getElementById('interview-modal-overlay');
-    overlay.classList.add('active');
+    selectedInterviewId = interviewId;
     
     // Update title for reschedule
     document.querySelector('.interview-modal-title').textContent = 'Reschedule Interview';
@@ -234,18 +266,96 @@ function rescheduleInterview(interviewId) {
     now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
     document.getElementById('interview-datetime').min = now.toISOString().slice(0, 16);
     
-    // Reset form
-    resetInterviewForm();
+    // Fetch and populate interview data BEFORE showing modal
+    fetch('<?= ROOT ?>/recruitment/interview-schedule/get/' + interviewId)
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                const data = result.data;
+                
+                console.log('Loading interview data for reschedule:', data);
+                
+                // Populate form fields
+                document.getElementById('candidate-select').value = data.application_id;
+                document.getElementById('candidate-select').disabled = true; // Can't change candidate
+                
+                // Combine date and time for datetime-local input
+                const datetime = data.scheduled_date + 'T' + data.scheduled_time.substring(0, 5);
+                document.getElementById('interview-datetime').value = datetime;
+                
+                // Set duration
+                const durationPill = document.querySelector(`[data-duration="${data.duration_minutes}"]`);
+                if (durationPill) {
+                    document.querySelectorAll('.interview-duration-pill').forEach(p => p.classList.remove('selected'));
+                    durationPill.classList.add('selected');
+                    document.getElementById('selected-duration').value = data.duration_minutes;
+                } else {
+                    // If no matching pill, set the value directly
+                    document.getElementById('selected-duration').value = data.duration_minutes;
+                }
+                
+                // Set interviewer
+                document.getElementById('interviewer-select').value = data.interviewer_id;
+                
+                // Set interview type
+                document.getElementById('interview-type-select').value = data.interview_type;
+                
+                // Set location
+                document.getElementById('interview-location').value = data.location || data.meeting_link || '';
+                
+                console.log('Form populated with:', {
+                    application_id: data.application_id,
+                    datetime: datetime,
+                    duration: data.duration_minutes,
+                    interviewer: data.interviewer_id
+                });
+                
+                // NOW show the modal after data is loaded
+                const overlay = document.getElementById('interview-modal-overlay');
+                overlay.classList.add('active');
+            } else {
+                alert('Failed to load interview data: ' + result.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while loading interview data');
+        });
+}
+
+function deleteInterview(interviewId) {
+    if (!confirm('Are you sure you want to delete this interview? This action cannot be undone.')) {
+        return;
+    }
     
-    // In real implementation, you would load existing interview data here
-    alert('Loading existing interview data for rescheduling...');
+    const formData = new FormData();
+    formData.append('id', interviewId);
+    
+    fetch('<?= ROOT ?>/recruitment/interview-schedule/delete/' + interviewId, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert('Interview deleted successfully!');
+            window.location.reload(); // Use window.location explicitly
+        } else {
+            alert('Failed to delete interview: ' + result.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the interview');
+    });
 }
 
 function closeInterviewModal() {
     const overlay = document.getElementById('interview-modal-overlay');
     overlay.classList.remove('active');
-    selectedCandidateId = null;
+    selectedInterviewId = null;
     isReschedule = false;
+    document.getElementById('candidate-select').disabled = false;
 }
 
 function resetInterviewForm() {
@@ -257,7 +367,11 @@ function resetInterviewForm() {
     
     // Clear form fields
     document.getElementById('candidate-select').value = '';
+    document.getElementById('candidate-select').disabled = false;
     document.getElementById('interviewer-select').value = '';
+    document.getElementById('interview-type-select').value = 'Video';
+    document.getElementById('interview-location').value = '';
+    document.getElementById('interview-datetime').value = '';
     
     // Set default duration (45 min)
     const defaultDuration = document.querySelector('[data-duration="45"]');
@@ -268,32 +382,20 @@ function resetInterviewForm() {
 
 // Close modal when clicking outside
 document.addEventListener('click', function(event) {
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        if (event.target === modal) {
-            modal.classList.remove('show');
-        }
-    });
+    const overlay = document.getElementById('interview-modal-overlay');
+    if (event.target === overlay) {
+        closeInterviewModal();
+    }
 });
 
 // Close modal with Escape key
 document.addEventListener('keydown', function(event) {
     if (event.key === 'Escape') {
-        const openModal = document.querySelector('.modal.show');
-        if (openModal) {
-            openModal.classList.remove('show');
+        const overlay = document.getElementById('interview-modal-overlay');
+        if (overlay.classList.contains('active')) {
+            closeInterviewModal();
         }
     }
-});
-
-// Close modal when clicking outside
-document.addEventListener('click', function(event) {
-    const modals = document.querySelectorAll('.modal');
-    modals.forEach(modal => {
-        if (event.target === modal) {
-            modal.classList.remove('show');
-        }
-    });
 });
 
 // Duration selection
@@ -316,18 +418,121 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function submitInterviewSchedule() {
-    const candidate = document.getElementById('candidate-select').value;
+    const candidateSelect = document.getElementById('candidate-select');
     const datetime = document.getElementById('interview-datetime').value;
     const duration = document.getElementById('selected-duration').value;
+    const interviewer = document.getElementById('interviewer-select').value;
+    const interviewType = document.getElementById('interview-type-select').value;
+    const locationValue = document.getElementById('interview-location').value; // Renamed to avoid conflict
     
-    if (!candidate || !datetime || !duration) {
-        alert('Please fill in all required fields');
-        return;
+    // Debug logging
+    console.log('Validation check:', {
+        candidateValue: candidateSelect.value,
+        candidateDisabled: candidateSelect.disabled,
+        datetime: datetime,
+        duration: duration,
+        interviewer: interviewer,
+        isReschedule: isReschedule
+    });
+    
+    // Validation - different for create vs reschedule
+    // For reschedule, candidate field might be disabled so we skip it in validation
+    if (isReschedule) {
+        // Reschedule: Only validate editable fields
+        if (!datetime || !duration || !interviewer) {
+            console.error('Reschedule validation failed:', {
+                hasDatetime: !!datetime,
+                hasDuration: !!duration,
+                hasInterviewer: !!interviewer
+            });
+            alert('Please fill in all required fields (date/time, duration, and interviewer)');
+            return;
+        }
+    } else {
+        // Create new: Validate all fields including candidate
+        if (!candidateSelect.value) {
+            alert('Please select a candidate');
+            return;
+        }
+        if (!datetime || !duration || !interviewer) {
+            console.error('Create validation failed:', {
+                hasCandidate: !!candidateSelect.value,
+                hasDatetime: !!datetime,
+                hasDuration: !!duration,
+                hasInterviewer: !!interviewer
+            });
+            alert('Please fill in all required fields');
+            return;
+        }
     }
     
-    alert('Interview scheduled successfully!');
-    closeInterviewModal();
-    location.reload(); // Refresh to show new interview
+    // Prepare form data
+    const formData = new FormData();
+    
+    // Only send application_id if creating new interview (not reschedule)
+    if (!isReschedule) {
+        formData.append('application_id', candidateSelect.value);
+    }
+    
+    formData.append('interviewer_id', interviewer);
+    formData.append('datetime', datetime);
+    formData.append('duration', duration);
+    formData.append('interview_type', interviewType);
+    formData.append('location', locationValue); // Use renamed variable
+    formData.append('meeting_link', locationValue); // Use same field for both
+    
+    // Determine URL based on create or update
+    const url = isReschedule 
+        ? '<?= ROOT ?>/recruitment/interview-schedule/update/' + selectedInterviewId
+        : '<?= ROOT ?>/recruitment/interview-schedule/create';
+    
+    console.log('Submitting to URL:', url);
+    console.log('Form data:', {
+        application_id: candidateSelect.value,
+        interviewer_id: interviewer,
+        datetime: datetime,
+        duration: duration,
+        interview_type: interviewType,
+        location: locationValue
+    });
+    
+    // Submit data
+    fetch(url, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+        
+        // Check if response is JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            return response.text().then(text => {
+                console.error('Non-JSON response:', text);
+                throw new Error('Server returned non-JSON response. Check console for details.');
+            });
+        }
+        
+        return response.json();
+    })
+    .then(result => {
+        console.log('Result:', result);
+        if (result.success) {
+            alert(result.message);
+            closeInterviewModal();
+            window.location.reload(); // Use window.location explicitly
+        } else {
+            alert('Error: ' + result.message);
+            if (result.errors) {
+                console.error('Validation errors:', result.errors);
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while submitting the form: ' + error.message);
+    });
 }
 
 // Sidebar toggle functionality

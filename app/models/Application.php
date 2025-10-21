@@ -94,7 +94,46 @@ class Application
             return $this->insert($data);
         }
         return false;
-        
-        return $this->query($query, [$user_id]);
+    }
+
+    /**
+     * Update application status
+     * Overrides the Model trait's update method to return true on success
+     */
+    public function updateStatus($id, $status)
+    {
+        $query = "UPDATE {$this->table} SET status = :status WHERE id = :id";
+        $this->query($query, ['status' => $status, 'id' => $id]);
+        return true;
+    }
+
+    /**
+     * Override update method to return true on success
+     * Cannot use parent:: because Model is a trait, not a parent class
+     */
+    public function update($id, $data, $id_column = 'id')
+    {
+        // Removing non-allowed data before preparing the query
+        if (!empty($this->allowedColumns)) {
+            foreach ($data as $key => $value) {
+                if (!in_array($key, $this->allowedColumns)) {
+                    unset($data[$key]);
+                }
+            }
+        }
+
+        $keys = array_keys($data);
+        $query = "update $this->table set ";
+
+        foreach ($keys as $key) {
+            $query .= $key . "=:" . $key . ", ";
+        }
+
+        $query = trim($query, ", ");
+        $query .= " where $id_column = :$id_column";
+
+        $data[$id_column] = $id;
+        $this->query($query, $data);
+        return true; // Override the false return from Model trait
     }
 }

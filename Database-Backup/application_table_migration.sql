@@ -13,8 +13,8 @@ INSERT INTO applications (applicant_id, applicant_name, job_id, job_title, resum
 (6, 'Nuwan Silva', 5, 'Project Manager', '/uploads/resumes/nuwan_resume_pm.pdf', 'With my experience in coordinating teams, I believe I can excel as a Project Manager.', 'Under Review'),
 (7, 'Priya Jayasinghe', 1, 'Senior Software Engineer', '/uploads/resumes/priya_resume_dev.pdf', 'I have 6 years of experience in full-stack development.', 'Applied'),
 (8, 'Kamal Fernando', 2, 'Marketing Specialist', '/uploads/resumes/kamal_resume_marketing.pdf', 'My creative approach to digital marketing aligns perfectly with this position.', 'Applied'),
-(4, 'Kelum Disanayake', 4, 'HR Assistant', '/uploads/resumes/kelum_resume_hr.pdf', 'I have excellent communication skills and interest in HR.', 'Applied');
+(9, 'Kelum Disanayake', 4, 'HR Assistant', '/uploads/resumes/kelum_resume_hr.pdf', 'I have excellent communication skills and interest in HR.', 'Applied');
 
--- 3. Update 3 applications to 'Shortlisted' status
+-- 3. Update 2 applications to 'Shortlisted' status
 UPDATE applications SET status = 'Shortlisted' WHERE id IN (8, 9);
 
