@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apply for Job - HireFlow</title>
+    <title>Edit Application - HireFlow</title>
     <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/applicant/apply.style.css">
     <link rel="icon" type="image/x-icon" href="<?= ROOT ?>/assets/images/logo.png">
 </head>
@@ -61,26 +61,26 @@
         <header class="header">
             <div class="header-left">
                 <div class="breadcrumb">
-                    <a href="<?= ROOT ?>/applicant/jobs" class="breadcrumb-link">Browse Jobs</a>
+                    <a href="<?= ROOT ?>/applicant/applications" class="breadcrumb-link">My Applications</a>
                     <span class="breadcrumb-separator">›</span>
-                    <span class="breadcrumb-current">Apply for Job</span>
+                    <span class="breadcrumb-current">Edit Application</span>
                 </div>
-                <h1 class="page-title">Apply for <?= $job['title'] ?></h1>
-                <p class="page-subtitle"><?= $job['company'] ?> • <?= $job['location'] ?></p>
+                <h1 class="page-title">Edit Application for <?= $application['job_title'] ?></h1>
+                <p class="page-subtitle"><?= $application['company'] ?> • <?= $application['location'] ?></p>
             </div>
             <div class="header-right">
                 <div class="user-info">
-                    <span class="user-name">John Smith</span>
-                    <div class="user-avatar">JS</div>
+                    <span class="user-name"><?= $user['name'] ?? 'User' ?></span>
+                    <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'U', 0, 2)) ?></div>
                 </div>
             </div>
         </header>
 
         <div class="apply-content">
             <div class="apply-main">
-                <!-- Application Form -->
+                <!-- Application Edit Form -->
                 <div class="form-card">
-                    <h3>Application Details</h3>
+                    <h3>Update Application Details</h3>
                     
                     <?php if(isset($_SESSION['error'])): ?>
                         <div class="alert alert-error">
@@ -88,31 +88,35 @@
                         </div>
                     <?php endif; ?>
                     
-                    <form id="applicationForm" class="application-form" method="POST" action="<?= ROOT ?>/applicant/applications/apply" enctype="multipart/form-data">
-                        <input type="hidden" name="job_id" value="<?= $job['id'] ?>">
-                        
+                    <form id="editApplicationForm" class="application-form" method="POST" action="<?= ROOT ?>/applicant/editApplication/<?= $application['id'] ?>" enctype="multipart/form-data">
                         <div class="form-grid">
                             <div class="form-group">
                                 <label>Cover Letter *</label>
-                                <textarea name="cover_letter" class="form-input" rows="6" placeholder="Write a compelling cover letter explaining why you're perfect for this role..." required></textarea>
+                                <textarea name="cover_letter" class="form-input" rows="6" placeholder="Write a compelling cover letter explaining why you're perfect for this role..." required><?= htmlspecialchars($application['cover_letter']) ?></textarea>
                             </div>
                             
                             <div class="form-group">
-                                <label>Resume * (PDF only)</label>
+                                <label>Current Resume</label>
+                                <div style="margin-bottom: 10px;">
+                                    <a href="<?= ROOT . $application['resume_path'] ?>" target="_blank" class="btn btn-outline" style="display: inline-block;">
+                                        📄 View Current Resume
+                                    </a>
+                                </div>
+                                <label>Upload New Resume (Optional - PDF only)</label>
                                 <div class="file-upload">
-                                    <input type="file" name="resume" id="resume" accept=".pdf" required>
+                                    <input type="file" name="resume" id="resume" accept=".pdf">
                                     <label for="resume" class="file-upload-label">
                                         <span class="upload-icon">📄</span>
-                                        <span id="resumeLabel">Choose Resume (PDF only, max 5MB)</span>
+                                        <span id="resumeLabel">Choose New Resume (PDF only, max 5MB)</span>
                                     </label>
                                 </div>
-                                <small style="display: block; margin-top: 5px; color: #666;">Only PDF files are accepted. Maximum file size: 5MB</small>
+                                <small style="display: block; margin-top: 5px; color: #666;">Leave empty to keep current resume. Only PDF files are accepted.</small>
                             </div>
                         </div>
                         
                         <div class="form-actions">
-                            <a href="<?= ROOT ?>/applicant/jobs/details?id=<?= $job['id'] ?>" class="btn btn-outline">Back to Job</a>
-                            <button type="submit" class="btn btn-primary" id="submitBtn">Submit Application</button>
+                            <a href="<?= ROOT ?>/applicant/applications" class="btn btn-outline">Cancel</a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">Update Application</button>
                         </div>
                     </form>
                 </div>
@@ -124,35 +128,35 @@
                 <div class="sidebar-card">
                     <h4>Job Summary</h4>
                     <div class="job-summary">
-                        <div class="company-logo"><?= strtoupper(substr($job['company'], 0, 2)) ?></div>
+                        <div class="company-logo"><?= strtoupper(substr($application['company'], 0, 2)) ?></div>
                         <div class="job-info">
-                            <h5><?= $job['title'] ?></h5>
-                            <p><?= $job['company'] ?></p>
-                            <p>📍 <?= $job['location'] ?></p>
-                            <p>💰 <?= $job['salary'] ?></p>
+                            <h5><?= $application['job_title'] ?></h5>
+                            <p><?= $application['company'] ?></p>
+                            <p>📍 <?= $application['location'] ?></p>
+                            <p>💰 <?= $application['salary'] ?></p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Application Tips -->
+                <!-- Update Tips -->
                 <div class="sidebar-card">
-                    <h4>Application Tips</h4>
+                    <h4>Update Tips</h4>
                     <div class="tips-list">
                         <div class="tip-item">
                             <span class="tip-icon">✅</span>
-                            <span>Tailor your cover letter to the specific role</span>
+                            <span>Review and improve your cover letter</span>
                         </div>
                         <div class="tip-item">
                             <span class="tip-icon">✅</span>
-                            <span>Highlight relevant experience and skills</span>
+                            <span>Update resume only if you have significant changes</span>
                         </div>
                         <div class="tip-item">
                             <span class="tip-icon">✅</span>
-                            <span>Keep your resume updated and error-free</span>
+                            <span>Ensure all information is accurate and up-to-date</span>
                         </div>
                         <div class="tip-item">
-                            <span class="tip-icon">✅</span>
-                            <span>Be honest about your availability</span>
+                            <span class="tip-icon">⚠️</span>
+                            <span>You can only edit applications that haven't been shortlisted</span>
                         </div>
                     </div>
                 </div>
@@ -162,11 +166,11 @@
 
     <script>
         // Form validation
-        document.getElementById('applicationForm').addEventListener('submit', function(e) {
+        document.getElementById('editApplicationForm').addEventListener('submit', function(e) {
             const resumeInput = document.getElementById('resume');
             const submitBtn = document.getElementById('submitBtn');
             
-            // Validate file size (5MB)
+            // Validate file size and type if new resume is uploaded
             if (resumeInput.files.length > 0) {
                 const fileSize = resumeInput.files[0].size;
                 const maxSize = 5 * 1024 * 1024; // 5MB in bytes
@@ -188,7 +192,7 @@
             
             // Disable submit button to prevent double submission
             submitBtn.disabled = true;
-            submitBtn.textContent = 'Submitting...';
+            submitBtn.textContent = 'Updating...';
         });
         
         // File upload feedback
@@ -199,7 +203,7 @@
                 const fileSize = (file.size / (1024 * 1024)).toFixed(2); // Convert to MB
                 label.textContent = `${file.name} (${fileSize} MB)`;
             } else {
-                label.textContent = 'Choose Resume (PDF only, max 5MB)';
+                label.textContent = 'Choose New Resume (PDF only, max 5MB)';
             }
         });
     </script>

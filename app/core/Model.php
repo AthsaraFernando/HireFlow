@@ -104,8 +104,8 @@ trait Model
         // echo $query;
 
         $data[$id_column] = $id;
-        $this->query($query, $data);
-        return false;
+        $result = $this->query($query, $data);
+        return true; // Update executed successfully
     }
     public function delete($id, $id_column = 'id')
     {

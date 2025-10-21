@@ -502,10 +502,12 @@ class Applicant extends Controller
             mkdir($upload_dir, 0755, true);
         }
         
-        // Validate file type
-        $allowed_types = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        if (!in_array($file['type'], $allowed_types)) {
-            return ['success' => false, 'error' => 'Only PDF, DOC, and DOCX files are allowed.'];
+        // Validate file type - Only PDF allowed
+        $allowed_types = ['application/pdf'];
+        $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        
+        if (!in_array($file['type'], $allowed_types) || $file_extension !== 'pdf') {
+            return ['success' => false, 'error' => 'Only PDF files are allowed.'];
         }
         
         // Validate file size (5MB max)
@@ -514,8 +516,7 @@ class Applicant extends Controller
         }
         
         // Generate unique filename
-        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = 'resume_' . $user_id . '_' . time() . '.' . $extension;
+        $filename = 'resume_' . $user_id . '_' . time() . '.pdf';
         $file_path = $upload_dir . $filename;
         
         if (move_uploaded_file($file['tmp_name'], $file_path)) {
@@ -769,5 +770,211 @@ class Applicant extends Controller
         $data['unread_count'] = $notificationModel->getUnreadCount($user_id);
 
         $this->view('applicant/notifications', $data);
+    }
+    
+    // View single application details
+    public function viewApplication($application_id = null)
+    {
+        Auth::requireRole(4);
+        
+        if (!$application_id) {
+            redirect('applicant/applications');
+            return;
+        }
+        
+        $applicationModel = new Application();
+        $user_id = Auth::user_id();
+        
+        // Get application details
+        $application = $applicationModel->getApplicationById($application_id);
+        
+        // Verify application belongs to current user
+        if (!$application || $application['applicant_id'] != $user_id) {
+            $_SESSION['error'] = "Application not found.";
+            redirect('applicant/applications');
+            return;
+        }
+        
+        $data = [];
+        $data['user'] = $this->getUserData($user_id);
+        $data['application'] = [
+            'id' => $application['id'],
+            'job_id' => $application['job_id'],
+            'job_title' => $application['job_title'] ?? 'Unknown Position',
+            'company' => 'HireFlow Company',
+            'location' => $application['location'] ?? 'Not specified',
+            'salary' => $application['salary_range'] ?? 'Not specified',
+            'department' => $application['department'] ?? 'General',
+            'employment_type' => $application['employment_type'] ?? 'Full-time',
+            'status' => $application['status'],
+            'cover_letter' => $application['cover_letter'],
+            'resume_path' => $application['resume_path'],
+            'applied_date' => date('M d, Y', strtotime($application['applied_at'])),
+            'deadline' => $application['deadline'] ? date('M d, Y', strtotime($application['deadline'])) : 'Open'
+        ];
+        
+        $this->view('applicant/view-application', $data);
+    }
+    
+    // Edit application
+    public function editApplication($application_id = null)
+    {
+        Auth::requireRole(4);
+        
+        if (!$application_id) {
+            redirect('applicant/applications');
+            return;
+        }
+        
+        $applicationModel = new Application();
+        $user_id = Auth::user_id();
+        
+        // Handle form submission
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            return $this->updateApplication($application_id);
+        }
+        
+        // Get application details
+        $application = $applicationModel->getApplicationById($application_id);
+        
+        // Verify application belongs to current user
+        if (!$application || $application['applicant_id'] != $user_id) {
+            $_SESSION['error'] = "Application not found.";
+            redirect('applicant/applications');
+            return;
+        }
+        
+        // Check if application can be edited (only "Applied" or "Under Review" status)
+        if (!in_array($application['status'], ['Applied', 'Under Review'])) {
+            $_SESSION['error'] = "This application cannot be edited at this stage.";
+            redirect('applicant/applications');
+            return;
+        }
+        
+        // Check deadline
+        if ($application['deadline'] && strtotime($application['deadline']) < time()) {
+            $_SESSION['error'] = "The deadline for this job has passed. You cannot edit this application.";
+            redirect('applicant/applications');
+            return;
+        }
+        
+        $data = [];
+        $data['user'] = $this->getUserData($user_id);
+        $data['application'] = [
+            'id' => $application['id'],
+            'job_id' => $application['job_id'],
+            'job_title' => $application['job_title'] ?? 'Unknown Position',
+            'company' => 'HireFlow Company',
+            'location' => $application['location'] ?? 'Not specified',
+            'salary' => $application['salary_range'] ?? 'Not specified',
+            'department' => $application['department'] ?? 'General',
+            'cover_letter' => $application['cover_letter'],
+            'resume_path' => $application['resume_path']
+        ];
+        
+        $this->view('applicant/edit-application', $data);
+    }
+    
+    // Update application
+    private function updateApplication($application_id)
+    {
+        Auth::requireRole(4);
+        
+        $applicationModel = new Application();
+        $user_id = Auth::user_id();
+        
+        // Get current application
+        $application = $applicationModel->getApplicationById($application_id);
+        
+        // Verify ownership
+        if (!$application || $application['applicant_id'] != $user_id) {
+            $_SESSION['error'] = "Application not found.";
+            redirect('applicant/applications');
+            return;
+        }
+        
+        $update_data = [];
+        
+        // Update cover letter
+        if (!empty($_POST['cover_letter'])) {
+            $update_data['cover_letter'] = $_POST['cover_letter'];
+        }
+        
+        // Handle resume upload if new file provided
+        if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
+            $upload_result = $this->handleResumeUpload($_FILES['resume'], $user_id);
+            if ($upload_result['success']) {
+                $update_data['resume_path'] = $upload_result['path'];
+                
+                // Delete old resume file
+                $old_resume_path = $_SERVER['DOCUMENT_ROOT'] . '/HireFlow/public' . $application['resume_path'];
+                if (file_exists($old_resume_path)) {
+                    unlink($old_resume_path);
+                }
+            } else {
+                $_SESSION['error'] = $upload_result['error'];
+                redirect('applicant/editApplication/' . $application_id);
+                return;
+            }
+        }
+        
+        // Update application in database
+        if (!empty($update_data)) {
+            if ($applicationModel->updateApplication($application_id, $update_data)) {
+                $_SESSION['success'] = "Application updated successfully!";
+            } else {
+                $_SESSION['error'] = "Failed to update application. Please try again.";
+            }
+        } else {
+            $_SESSION['error'] = "No changes were made.";
+        }
+        
+        redirect('applicant/applications');
+    }
+    
+    // Delete application
+    public function deleteApplication($application_id = null)
+    {
+        Auth::requireRole(4);
+        
+        if (!$application_id) {
+            redirect('applicant/applications');
+            return;
+        }
+        
+        $applicationModel = new Application();
+        $user_id = Auth::user_id();
+        
+        // Get application details
+        $application = $applicationModel->getApplicationById($application_id);
+        
+        // Verify ownership
+        if (!$application || $application['applicant_id'] != $user_id) {
+            $_SESSION['error'] = "Application not found.";
+            redirect('applicant/applications');
+            return;
+        }
+        
+        // Check if application can be deleted (only "Applied" or "Under Review" status)
+        if (!in_array($application['status'], ['Applied', 'Under Review'])) {
+            $_SESSION['error'] = "This application cannot be deleted at this stage.";
+            redirect('applicant/applications');
+            return;
+        }
+        
+        // Delete resume file
+        $resume_path = $_SERVER['DOCUMENT_ROOT'] . '/HireFlow/public' . $application['resume_path'];
+        if (file_exists($resume_path)) {
+            unlink($resume_path);
+        }
+        
+        // Delete application from database
+        if ($applicationModel->deleteApplication($application_id)) {
+            $_SESSION['success'] = "Application deleted successfully!";
+        } else {
+            $_SESSION['error'] = "Failed to delete application. Please try again.";
+        }
+        
+        redirect('applicant/applications');
     }
 }
