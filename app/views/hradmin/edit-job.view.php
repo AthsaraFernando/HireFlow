@@ -264,9 +264,9 @@
 
 /* Icon styles */
 .icon-back::before { content: '←'; }
-.icon-eye::before { content: '👁️'; }
-.icon-save::before { content: '💾'; }
-.icon-publish::before { content: '🚀'; }
+.icon-eye::before { content: ''; }
+.icon-save::before { content: ''; }
+.icon-publish::before { content: ''; }
 
 .last-updated {
     background: #e7f3ff;

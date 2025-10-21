@@ -336,7 +336,7 @@
 
 /* Icon styles */
 .icon-back::before { content: '←'; }
-.icon-save::before { content: '💾'; }
+.icon-save::before { content: ''; }
 
 /* Responsive design */
 @media (max-width: 768px) {
