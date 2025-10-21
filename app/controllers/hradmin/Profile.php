@@ -34,7 +34,7 @@ class Profile extends Controller
                 if (empty($data['errors'])) {
                     if ($user->updateProfile(Auth::user_id(), $updateData)) {
                         // Update session data
-                        $updatedUser = $user->first(['id' => Auth::user_id()]);
+                        $updatedUser = $user->first(['id' => Auth::user_id()], []);
                         $_SESSION['USER'] = $updatedUser;
                         
                         $data['success'] = "Profile updated successfully!";
