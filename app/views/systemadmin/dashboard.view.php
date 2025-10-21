@@ -81,7 +81,8 @@
             <?php if (!($is_system_admin ?? false)): ?>
                 <div class="alert alert-info mb-4">
                     <h4>👁️ Viewing as <?= htmlspecialchars($user_role_name ?? 'Unknown Role') ?></h4>
-                    <p>You are viewing the System Admin dashboard with limited permissions. Some features may be restricted or hidden based on your role.</p>
+                    <p>You are viewing the System Admin dashboard with limited permissions. Some features may be restricted
+                        or hidden based on your role.</p>
                 </div>
             <?php endif; ?>
             <div class="stats-grid">
@@ -89,7 +90,7 @@
                     <div class="stat-icon">
                     </div>
                     <div class="stat-content">
-                        <h3 class="stat-number"><?= $stats['total_users'] ?? 0 ?></h3>
+                        <h3 class="stat-number"><?= $data['total_users'] ?? 0 ?></h3>
                         <p class="stat-label">Total Users</p>
                     </div>
                 </div>
@@ -98,7 +99,7 @@
                     <div class="stat-icon">
                     </div>
                     <div class="stat-content">
-                        <h3 class="stat-number"><?= $stats['active_users'] ?? 0 ?></h3>
+                        <h3 class="stat-number"><?= $data['active_users'] ?? 0 ?></h3>
                         <p class="stat-label">Active Users</p>
                     </div>
                 </div>
@@ -107,7 +108,7 @@
                     <div class="stat-icon">
                     </div>
                     <div class="stat-content">
-                        <h3 class="stat-number"><?= $stats['recent_registrations'] ?? 0 ?></h3>
+                        <h3 class="stat-number"><?= $data['recent_registrations'] ?? 0 ?></h3>
                         <p class="stat-label">New This Week</p>
                     </div>
                 </div>
@@ -116,7 +117,7 @@
                     <div class="stat-icon">
                     </div>
                     <div class="stat-content">
-                        <h3 class="stat-number"><?= $stats['pending_applications'] ?? 0 ?></h3>
+                        <h3 class="stat-number"><?= $data['pending_applications'] ?? 0 ?></h3>
                         <p class="stat-label">Pending Applications</p>
                     </div>
                 </div>
@@ -128,7 +129,7 @@
                         <h2 class="section-title">Quick Actions</h2>
                     </div>
                     <div class="quick-actions">
-                        <a href="<?= ROOT ?>/systemadmin/users" class="action-card">
+                        <a href="<?= ROOT ?>/systemadmin/usermanage" class="action-card">
                             <div class="action-icon">
                             </div>
                             <div class="action-content">
@@ -146,7 +147,7 @@
                             </div>
                         </a>
 
-                        <a href="<?= ROOT ?>/systemadmin/logs" class="action-card">
+                        <a href="<?= ROOT ?>/systemadmin/accesslogs" class="action-card">
                             <div class="action-icon">
                             </div>
                             <div class="action-content">
@@ -164,13 +165,13 @@
                     </div>
                     <div class="activity-list">
 
-                        <?php if (!empty($roles)): ?>
-                            <?php foreach ($roles as $role): ?>
+                        <?php if (!empty($recent_logins)): ?>
+                            <?php foreach ($recent_logins as $recent_login): ?>
                                 <div class="activity-item">
                                     <div class="activity-icon"></div>
                                     <div class="activity-content">
-                                        <p class="activity-text"><?= htmlspecialchars($role['id']) ?>
-                                            (<?= htmlspecialchars($role['role_name']) ?>)</p>
+                                        <p class="activity-text"><?= htmlspecialchars($recent_login['id']) ?>
+                                            (<?= htmlspecialchars($recent_login['details']) ?>)</p>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
