@@ -9,7 +9,7 @@ class EditJob extends Controller
         
         if (!$id) {
             // Redirect to job posts if no ID provided
-            header('Location: /HireFlow/public/hradmin/job-posts');
+            redirect('hradmin/job-posts');
             exit;
         }
         
@@ -19,22 +19,17 @@ class EditJob extends Controller
         $data['page_title'] = 'Edit Job';
         $data['job_id'] = $id;
         
-        // Sample job data - in real implementation this would come from database
-        $data['job'] = [
-            'id' => $id,
-            'title' => 'Senior Software Developer',
-            'department' => 'Engineering',
-            'location' => 'New York, NY',
-            'type' => 'Full-time',
-            'status' => 'Active',
-            'experience_level' => 'Senior Level',
-            'description' => 'We are looking for a Senior Software Developer to join our growing team...',
-            'requirements' => 'Bachelor\'s degree in Computer Science or related field...',
-            'benefits' => 'Health insurance, 401k, flexible working hours...',
-            'salary_min' => 80000,
-            'salary_max' => 120000,
-            'deadline' => '2024-02-10'
-        ];
+        // Fetch job from database
+        $jobPost = new JobPost();
+        $job = $jobPost->first(['id' => $id], []);
+        
+        if (!$job) {
+            $_SESSION['error_message'] = 'Job post not found.';
+            redirect('hradmin/job-posts');
+            exit;
+        }
+        
+        $data['job'] = $job;
         
         // Sample data for dropdowns
         $data['departments'] = [
@@ -78,23 +73,51 @@ class EditJob extends Controller
         // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate form data
-            $required_fields = ['job_title', 'department', 'location', 'job_type', 'description'];
+            $required_fields = ['job_title', 'department', 'location', 'employment_type', 'summary'];
+            
+            $field_labels = [
+                'job_title' => 'Job title',
+                'department' => 'Department',
+                'location' => 'Location',
+                'employment_type' => 'Employment type',
+                'summary' => 'Job summary'
+            ];
             
             foreach ($required_fields as $field) {
                 if (empty($_POST[$field])) {
-                    $data['errors'][] = ucfirst(str_replace('_', ' ', $field)) . ' is required.';
+                    $label = $field_labels[$field] ?? ucfirst(str_replace('_', ' ', $field));
+                    $data['errors'][] = $label . ' is required.';
                 }
             }
             
             if (empty($data['errors'])) {
-                // In real implementation, update database
-                $data['success'] = 'Job updated successfully!';
-                // Update the job data with form data
-                $data['job'] = array_merge($data['job'], $_POST);
+                // Update job in database
+                $updateData = [
+                    'title' => $_POST['job_title'] ?? '',
+                    'department' => $_POST['department'] ?? '',
+                    'description' => $_POST['summary'] ?? '',
+                    'requirements' => $_POST['requirements'] ?? '',
+                    'responsibilities' => $_POST['responsibilities'] ?? '',
+                    'salary_range' => $_POST['salary_range'] ?? '',
+                    'location' => $_POST['location'] ?? '',
+                    'employment_type' => $_POST['employment_type'] ?? '',
+                    'experience_level' => $_POST['experience_level'] ?? '',
+                    'status' => $_POST['status'] ?? 'Draft',
+                    'deadline' => !empty($_POST['application_deadline']) ? $_POST['application_deadline'] : null
+                ];
+                
+                if ($jobPost->update($id, $updateData)) {
+                    $_SESSION['success_message'] = 'Job updated successfully!';
+                    redirect('hradmin/view-job/' . $id);
+                } else {
+                    $data['errors'][] = 'Failed to update job post. Please try again.';
+                }
             }
             
-            // Keep form data for display
-            $data['form_data'] = $_POST;
+            // Keep form data for display on error
+            if (!empty($data['errors'])) {
+                $data['form_data'] = $_POST;
+            }
         }
         
         $this->view('hradmin/edit-job', $data);

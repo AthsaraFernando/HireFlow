@@ -125,34 +125,21 @@
         <div class="content-card">
             <h3 class="card-title">Job Summary</h3>
             <div class="job-content">
-                <?= nl2br(htmlspecialchars($job['summary'] ?? 'We are seeking a talented Senior Software Developer to join our engineering team and help build innovative solutions that impact millions of users worldwide. This role offers the opportunity to work with cutting-edge technologies while collaborating with a diverse team of professionals.')) ?>
+                <?= nl2br(htmlspecialchars($job['summary'] ?? $job['description'] ?? 'No summary available.')) ?>
             </div>
         </div>
 
         <div class="content-card">
             <h3 class="card-title">Key Responsibilities</h3>
             <div class="job-content">
-                <?= nl2br(htmlspecialchars($job['responsibilities'] ?? '• Design and develop scalable web applications using modern technologies
-• Collaborate with cross-functional teams to define and implement new features
-• Write clean, maintainable, and well-documented code
-• Participate in code reviews and provide constructive feedback
-• Mentor junior developers and contribute to technical discussions
-• Troubleshoot and resolve technical issues in production environments
-• Stay up-to-date with industry best practices and emerging technologies')) ?>
+                <?= nl2br(htmlspecialchars($job['responsibilities'] ?? 'No responsibilities specified.')) ?>
                 </div>
             </div>
 
             <div class="content-card">
                 <h3 class="card-title">Requirements</h3>
                 <div class="job-content">
-                    <?= nl2br(htmlspecialchars($job['requirements'] ?? '• Bachelor\'s degree in Computer Science or related field
-• 5+ years of experience in software development
-• Proficiency in JavaScript, React, Node.js, and modern web technologies
-• Experience with database design and optimization (SQL and NoSQL)
-• Strong understanding of RESTful APIs and microservices architecture
-• Experience with cloud platforms (AWS, Azure, or GCP)
-• Excellent problem-solving and communication skills
-• Experience with Agile development methodologies')) ?>
+                    <?= nl2br(htmlspecialchars($job['requirements'] ?? 'No requirements specified.')) ?>
                 </div>
             </div>
 

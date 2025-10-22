@@ -17,78 +17,85 @@ class ViewJob extends Controller
         $data['page_title'] = 'Job Details';
         $data['job_id'] = $id;
         
-        // Sample job data - in real implementation this would come from database
-        $data['job'] = [
-            'id' => $id,
-            'title' => 'Senior Software Developer',
-            'department' => 'Engineering',
-            'location' => 'New York, NY',
-            'type' => 'Full-time',
-            'status' => 'Active',
-            'experience_level' => 'Senior Level',
-            'description' => 'We are looking for a Senior Software Developer to join our growing team. You will be responsible for developing high-quality software solutions and mentoring junior developers.',
-            'requirements' => 'Bachelor\'s degree in Computer Science or related field, 5+ years of experience in software development, proficiency in Java, Python, or C++, experience with agile methodologies.',
-            'benefits' => 'Health insurance, dental and vision coverage, 401k with company matching, flexible working hours, professional development opportunities, stock options.',
-            'salary_min' => 80000,
-            'salary_max' => 120000,
-            'created_date' => '2024-01-10',
-            'deadline' => '2024-02-10',
-            'created_by' => 'Sarah Johnson',
-            'total_applications' => 23,
-            'new_applications' => 5,
-            'interviews_scheduled' => 8,
-            'offers_made' => 2
-        ];
+        // Fetch job data from database
+        $jobPost = new JobPost();
+        $job = $jobPost->first(['id' => $id], []);
         
-        // Sample applications data
-        $data['recent_applications'] = [
-            [
-                'id' => 1,
-                'applicant_name' => 'John Smith',
-                'email' => 'john.smith@email.com',
-                'applied_date' => '2024-01-15',
-                'status' => 'Under Review',
-                'experience' => '6 years',
-                'score' => 85
-            ],
-            [
-                'id' => 2,
-                'applicant_name' => 'Jane Doe',
-                'email' => 'jane.doe@email.com',
-                'applied_date' => '2024-01-14',
-                'status' => 'Interview Scheduled',
-                'experience' => '8 years',
-                'score' => 92
-            ],
-            [
-                'id' => 3,
-                'applicant_name' => 'Mike Johnson',
-                'email' => 'mike.johnson@email.com',
-                'applied_date' => '2024-01-13',
-                'status' => 'Initial Screening',
-                'experience' => '4 years',
-                'score' => 78
-            ]
-        ];
+        if (!$job) {
+            $_SESSION['error_message'] = 'Job post not found.';
+            redirect('hradmin/job-posts');
+            exit;
+        }
         
-        // Analytics data for charts
+        // Get creator information
+        $user = new User();
+        $creator = $user->first(['id' => $job['hr_id']], []);
+        $job['created_by'] = $creator ? $creator['full_name'] : 'Unknown';
+        
+        // Get application statistics
+        $application = new Application();
+        $allApplications = $application->where(['job_id' => $id], []);
+        $job['total_applications'] = count($allApplications);
+        
+        // Count new applications (Applied status)
+        $job['new_applications'] = 0;
+        $job['interviews_scheduled'] = 0;
+        $job['offers_made'] = 0;
+        
+        foreach ($allApplications as $app) {
+            if ($app['status'] === 'Applied' || $app['status'] === 'Under Review') {
+                $job['new_applications']++;
+            } elseif ($app['status'] === 'Interview Scheduled') {
+                $job['interviews_scheduled']++;
+            } elseif ($app['status'] === 'Offer Made') {
+                $job['offers_made']++;
+            }
+        }
+        
+        // Map database fields to view expectations
+        $job['summary'] = $job['description'];
+        $job['type'] = $job['employment_type'];
+        $job['created_date'] = $job['created_at'] ?? date('Y-m-d');
+        
+        $data['job'] = $job;
+        
+        $data['job'] = $job;
+        
+        // Get recent applications for this job
+        $recentApps = array_slice($allApplications, 0, 5);
+        $data['recent_applications'] = [];
+        
+        foreach ($recentApps as $app) {
+            $applicant = $user->first(['id' => $app['applicant_id']], []);
+            if ($applicant) {
+                $data['recent_applications'][] = [
+                    'id' => $app['id'],
+                    'applicant_name' => $applicant['full_name'],
+                    'email' => $applicant['email'],
+                    'applied_date' => $app['applied_at'] ?? $app['created_at'],
+                    'status' => $app['status'],
+                    'experience' => $app['years_of_experience'] ?? 'N/A',
+                    'score' => $app['score'] ?? 0
+                ];
+            }
+        }
+        
+        // Analytics data for charts (simplified)
         $data['application_stats'] = [
-            'daily_applications' => [
-                ['date' => '2024-01-10', 'count' => 3],
-                ['date' => '2024-01-11', 'count' => 5],
-                ['date' => '2024-01-12', 'count' => 2],
-                ['date' => '2024-01-13', 'count' => 4],
-                ['date' => '2024-01-14', 'count' => 6],
-                ['date' => '2024-01-15', 'count' => 3]
-            ],
-            'status_breakdown' => [
-                'Under Review' => 8,
-                'Interview Scheduled' => 6,
-                'Initial Screening' => 5,
-                'Rejected' => 3,
-                'Offer Made' => 1
-            ]
+            'daily_applications' => [],
+            'status_breakdown' => []
         ];
+        
+        // Count status breakdown
+        $statusCounts = [];
+        foreach ($allApplications as $app) {
+            $status = $app['status'];
+            if (!isset($statusCounts[$status])) {
+                $statusCounts[$status] = 0;
+            }
+            $statusCounts[$status]++;
+        }
+        $data['application_stats']['status_breakdown'] = $statusCounts;
         
         $this->view('hradmin/view-job', $data);
     }
