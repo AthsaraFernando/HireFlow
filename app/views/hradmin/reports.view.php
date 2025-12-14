@@ -201,148 +201,315 @@
         </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="charts-section">
-        <div class="charts-grid">
-            <!-- Recruitment Funnel Chart -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h4>Recruitment Funnel</h4>
-                    <div class="chart-actions">
-                        <button class="chart-btn" onclick="toggleChartView('funnel')">View</button>
-                        <button class="chart-btn" onclick="exportChart('funnel')">Export</button>
+    <!-- Recruitment Funnel Summary -->
+    <div class="data-section">
+        <div class="section-header">
+            <h3>Recruitment Funnel Status</h3>
+            <button class="btn btn-outline btn-sm" onclick="exportData('funnel')">Export Data</button>
+        </div>
+        <div class="data-grid">
+            <div class="data-summary-card stage-applications">
+                <div class="stage-info">
+                    <div class="stage-icon"></div>
+                    <div class="stage-details">
+                        <h4>Applications Received</h4>
+                        <p class="stage-number">1,247</p>
+                        <p class="stage-percentage">100% of funnel</p>
                     </div>
                 </div>
-                <div class="chart-content">
-                    <div class="funnel-chart">
-                        <div class="funnel-stage" style="width: 100%;">
-                            <div class="stage-label">Applications</div>
-                            <div class="stage-value">1,247</div>
-                        </div>
-                        <div class="funnel-stage" style="width: 45%;">
-                            <div class="stage-label">Screening</div>
-                            <div class="stage-value">562</div>
-                        </div>
-                        <div class="funnel-stage" style="width: 25%;">
-                            <div class="stage-label">Interviews</div>
-                            <div class="stage-value">312</div>
-                        </div>
-                        <div class="funnel-stage" style="width: 15%;">
-                            <div class="stage-label">Offers</div>
-                            <div class="stage-value">187</div>
-                        </div>
-                        <div class="funnel-stage" style="width: 7%;">
-                            <div class="stage-label">Hires</div>
-                            <div class="stage-value">89</div>
-                        </div>
-                    </div>
+                <div class="stage-stats">
+                    <span class="stat-label">This Period</span>
+                    <span class="stat-change positive">+12.5%</span>
                 </div>
             </div>
 
-            <!-- Applications Over Time -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h4>Applications Over Time</h4>
-                    <div class="chart-actions">
-                        <button class="chart-btn" onclick="toggleChartView('timeline')">View</button>
-                        <button class="chart-btn" onclick="exportChart('timeline')">Export</button>
+            <div class="data-summary-card stage-screening">
+                <div class="stage-info">
+                    <div class="stage-icon"></div>
+                    <div class="stage-details">
+                        <h4>In Screening</h4>
+                        <p class="stage-number">562</p>
+                        <p class="stage-percentage">45.1% pass rate</p>
                     </div>
                 </div>
-                <div class="chart-content">
-                    <div class="line-chart">
-                        <div class="chart-placeholder">
-                            <div class="chart-line"></div>
-                            <div class="chart-data">
-                                <div class="data-point" style="left: 10%; height: 40%;" title="Week 1: 45 applications"></div>
-                                <div class="data-point" style="left: 25%; height: 60%;" title="Week 2: 68 applications"></div>
-                                <div class="data-point" style="left: 40%; height: 80%;" title="Week 3: 89 applications"></div>
-                                <div class="data-point" style="left: 55%; height: 70%;" title="Week 4: 78 applications"></div>
-                                <div class="data-point" style="left: 70%; height: 95%;" title="Week 5: 105 applications"></div>
-                                <div class="data-point" style="left: 85%; height: 65%;" title="Week 6: 72 applications"></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="stage-stats">
+                    <span class="stat-label">Pass Through</span>
+                    <span class="stat-value">562 / 1,247</span>
                 </div>
             </div>
 
-            <!-- Department Performance -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h4>Hiring by Department</h4>
-                    <div class="chart-actions">
-                        <button class="chart-btn" onclick="toggleChartView('department')">View</button>
-                        <button class="chart-btn" onclick="exportChart('department')">Export</button>
+            <div class="data-summary-card stage-interviews">
+                <div class="stage-info">
+                    <div class="stage-icon"></div>
+                    <div class="stage-details">
+                        <h4>Interviews Scheduled</h4>
+                        <p class="stage-number">312</p>
+                        <p class="stage-percentage">25.0% of applications</p>
                     </div>
                 </div>
-                <div class="chart-content">
-                    <div class="pie-chart">
-                        <div class="pie-slice engineering" data-percentage="40" title="Engineering: 40%"></div>
-                        <div class="pie-slice design" data-percentage="25" title="Design: 25%"></div>
-                        <div class="pie-slice marketing" data-percentage="20" title="Marketing: 20%"></div>
-                        <div class="pie-slice sales" data-percentage="15" title="Sales: 15%"></div>
-                    </div>
-                    <div class="pie-legend">
-                        <div class="legend-item">
-                            <div class="legend-color engineering"></div>
-                            <span>Engineering (40%)</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color design"></div>
-                            <span>Design (25%)</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color marketing"></div>
-                            <span>Marketing (20%)</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color sales"></div>
-                            <span>Sales (15%)</span>
-                        </div>
-                    </div>
+                <div class="stage-stats">
+                    <span class="stat-label">Conversion</span>
+                    <span class="stat-value">55.5% from screening</span>
                 </div>
             </div>
 
-            <!-- Source Effectiveness -->
-            <div class="chart-card">
-                <div class="chart-header">
-                    <h4>Application Sources</h4>
-                    <div class="chart-actions">
-                        <button class="chart-btn" onclick="toggleChartView('sources')">View</button>
-                        <button class="chart-btn" onclick="exportChart('sources')">Export</button>
+            <div class="data-summary-card stage-offers">
+                <div class="stage-info">
+                    <div class="stage-icon"></div>
+                    <div class="stage-details">
+                        <h4>Offers Extended</h4>
+                        <p class="stage-number">187</p>
+                        <p class="stage-percentage">15.0% of applications</p>
                     </div>
                 </div>
-                <div class="chart-content">
-                    <div class="bar-chart">
-                        <div class="bar-item">
-                            <div class="bar-label">Company Website</div>
-                            <div class="bar-container">
-                                <div class="bar-fill" style="width: 85%;" data-value="425"></div>
-                                <div class="bar-value">425</div>
-                            </div>
-                        </div>
-                        <div class="bar-item">
-                            <div class="bar-label">LinkedIn</div>
-                            <div class="bar-container">
-                                <div class="bar-fill" style="width: 65%;" data-value="312"></div>
-                                <div class="bar-value">312</div>
-                            </div>
-                        </div>
-                        <div class="bar-item">
-                            <div class="bar-label">Indeed</div>
-                            <div class="bar-container">
-                                <div class="bar-fill" style="width: 45%;" data-value="187"></div>
-                                <div class="bar-value">187</div>
-                            </div>
-                        </div>
-                        <div class="bar-item">
-                            <div class="bar-label">Referrals</div>
-                            <div class="bar-container">
-                                <div class="bar-fill" style="width: 30%;" data-value="123"></div>
-                                <div class="bar-value">123</div>
-                            </div>
-                        </div>
+                <div class="stage-stats">
+                    <span class="stat-label">Offer Rate</span>
+                    <span class="stat-value">59.9% from interviews</span>
+                </div>
+            </div>
+
+            <div class="data-summary-card stage-hires">
+                <div class="stage-info">
+                    <div class="stage-icon"></div>
+                    <div class="stage-details">
+                        <h4>Successful Hires</h4>
+                        <p class="stage-number">89</p>
+                        <p class="stage-percentage">7.1% overall success</p>
                     </div>
                 </div>
+                <div class="stage-stats">
+                    <span class="stat-label">Acceptance</span>
+                    <span class="stat-value">47.6% offer acceptance</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Applications Timeline Data -->
+    <div class="data-section">
+        <div class="section-header">
+            <h3>Applications Over Time</h3>
+            <button class="btn btn-outline btn-sm" onclick="exportData('timeline')">Export Data</button>
+        </div>
+        <div class="table-container">
+            <table class="data-table timeline-table">
+                <thead>
+                    <tr>
+                        <th>Period</th>
+                        <th>Applications</th>
+                        <th>Change</th>
+                        <th>Screenings</th>
+                        <th>Interviews</th>
+                        <th>Offers</th>
+                        <th>Hires</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Week 6</strong></td>
+                        <td>72</td>
+                        <td><span class="trend-down">-31.4%</span></td>
+                        <td>32</td>
+                        <td>18</td>
+                        <td>11</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Week 5</strong></td>
+                        <td>105</td>
+                        <td><span class="trend-up">+50.0%</span></td>
+                        <td>47</td>
+                        <td>26</td>
+                        <td>16</td>
+                        <td>8</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Week 4</strong></td>
+                        <td>78</td>
+                        <td><span class="trend-down">-12.4%</span></td>
+                        <td>35</td>
+                        <td>19</td>
+                        <td>12</td>
+                        <td>6</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Week 3</strong></td>
+                        <td>89</td>
+                        <td><span class="trend-up">+30.9%</span></td>
+                        <td>40</td>
+                        <td>22</td>
+                        <td>14</td>
+                        <td>7</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Week 2</strong></td>
+                        <td>68</td>
+                        <td><span class="trend-up">+51.1%</span></td>
+                        <td>31</td>
+                        <td>17</td>
+                        <td>10</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Week 1</strong></td>
+                        <td>45</td>
+                        <td><span class="trend-neutral">--</span></td>
+                        <td>20</td>
+                        <td>11</td>
+                        <td>7</td>
+                        <td>3</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Department & Source Data Tables -->
+    <div class="tables-grid">
+        <!-- Department Hiring Breakdown -->
+        <div class="table-card">
+            <div class="table-header">
+                <h4>Hiring by Department</h4>
+                <button class="btn btn-outline btn-sm" onclick="exportData('department')">Export</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Department</th>
+                            <th>Applications</th>
+                            <th>Hires</th>
+                            <th>Success Rate</th>
+                            <th>% of Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="dept-name">
+                                    <span class="dept-color engineering"></span>
+                                    Engineering
+                                </div>
+                            </td>
+                            <td>498</td>
+                            <td>36</td>
+                            <td><span class="rate-good">7.2%</span></td>
+                            <td>40%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="dept-name">
+                                    <span class="dept-color design"></span>
+                                    Design
+                                </div>
+                            </td>
+                            <td>312</td>
+                            <td>22</td>
+                            <td><span class="rate-good">7.1%</span></td>
+                            <td>25%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="dept-name">
+                                    <span class="dept-color marketing"></span>
+                                    Marketing
+                                </div>
+                            </td>
+                            <td>249</td>
+                            <td>18</td>
+                            <td><span class="rate-good">7.2%</span></td>
+                            <td>20%</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="dept-name">
+                                    <span class="dept-color sales"></span>
+                                    Sales
+                                </div>
+                            </td>
+                            <td>188</td>
+                            <td>13</td>
+                            <td><span class="rate-average">6.9%</span></td>
+                            <td>15%</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td><strong>1,247</strong></td>
+                            <td><strong>89</strong></td>
+                            <td><strong>7.1%</strong></td>
+                            <td><strong>100%</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <!-- Application Sources -->
+        <div class="table-card">
+            <div class="table-header">
+                <h4>Application Sources</h4>
+                <button class="btn btn-outline btn-sm" onclick="exportData('sources')">Export</button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Source</th>
+                            <th>Applications</th>
+                            <th>Hires</th>
+                            <th>Success Rate</th>
+                            <th>% of Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Company Website</strong></td>
+                            <td>425</td>
+                            <td>32</td>
+                            <td><span class="rate-good">7.5%</span></td>
+                            <td>34.1%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>LinkedIn</strong></td>
+                            <td>312</td>
+                            <td>24</td>
+                            <td><span class="rate-excellent">7.7%</span></td>
+                            <td>25.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Indeed</strong></td>
+                            <td>187</td>
+                            <td>13</td>
+                            <td><span class="rate-average">7.0%</span></td>
+                            <td>15.0%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Referrals</strong></td>
+                            <td>123</td>
+                            <td>12</td>
+                            <td><span class="rate-excellent">9.8%</span></td>
+                            <td>9.9%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Other Sources</strong></td>
+                            <td>200</td>
+                            <td>8</td>
+                            <td><span class="rate-average">4.0%</span></td>
+                            <td>16.0%</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td><strong>Total</strong></td>
+                            <td><strong>1,247</strong></td>
+                            <td><strong>89</strong></td>
+                            <td><strong>7.1%</strong></td>
+                            <td><strong>100%</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
     </div>
@@ -575,228 +742,170 @@
     font-weight: bold;
 }
 
-.charts-section {
-    margin-bottom: 1.5rem;
-}
-
-.charts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 1.5rem;
-}
-
-.chart-card {
+/* Data Section Styles */
+.data-section {
     background: white;
     border: 1px solid #e9ecef;
     border-radius: 12px;
     padding: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
-.chart-header {
+.section-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid #f1f3f4;
+    border-bottom: 2px solid #f1f3f4;
 }
 
-.chart-header h4 {
+.section-header h3 {
     margin: 0;
     color: #2c3e50;
+    font-size: 1.25rem;
+    font-weight: 700;
 }
 
-.chart-actions {
-    display: flex;
-    gap: 0.5rem;
+.data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
 }
 
-.chart-btn {
-    padding: 0.5rem;
-    border: 1px solid #e9ecef;
-    border-radius: 4px;
-    background: white;
-    cursor: pointer;
-    font-size: 0.875rem;
-}
-
-.chart-content {
-    height: 300px;
-    position: relative;
-}
-
-/* Funnel Chart */
-.funnel-chart {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    padding: 1rem 0;
-}
-
-.funnel-stage {
-    background: linear-gradient(135deg, #4e31aa, #6c49d1);
-    color: white;
-    padding: 0.75rem;
-    margin: 0.25rem 0;
-    border-radius: 6px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-width: 120px;
+.data-summary-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 1.25rem;
     transition: all 0.3s ease;
 }
 
-.funnel-stage:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+.data-summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-.stage-label {
+.stage-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.stage-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.stage-details h4 {
+    margin: 0 0 0.5rem;
+    color: #495057;
+    font-size: 0.875rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.stage-value {
+.stage-number {
+    font-size: 2rem;
     font-weight: 700;
-    font-size: 1.125rem;
+    color: #2c3e50;
+    margin: 0.25rem 0;
+    line-height: 1;
 }
 
-/* Line Chart */
-.line-chart {
-    height: 100%;
-    position: relative;
-    background: linear-gradient(to bottom, #f8f9fa 0%, #e9ecef 100%);
-    border-radius: 6px;
-    padding: 1rem;
-}
-
-.chart-placeholder {
-    height: 100%;
-    position: relative;
-}
-
-.data-point {
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    background: #4e31aa;
-    border-radius: 50%;
-    border: 2px solid white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    cursor: pointer;
-    transform: translateX(-50%);
-    bottom: 0;
-}
-
-.data-point:hover {
-    background: #3d2688;
-    transform: translateX(-50%) scale(1.2);
-}
-
-/* Pie Chart */
-.pie-chart {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    background: conic-gradient(
-        #4e31aa 0% 40%,
-        #7b1fa2 40% 65%,
-        #388e3c 65% 85%,
-        #f57c00 85% 100%
-    );
-    margin: 0 auto 1rem;
-    position: relative;
-}
-
-.pie-chart::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 100px;
-    height: 100px;
-    background: white;
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-}
-
-.pie-legend {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
+.stage-percentage {
     font-size: 0.875rem;
+    color: #6c757d;
+    margin: 0.25rem 0 0;
 }
 
-.legend-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 2px;
-}
-
-.legend-color.engineering { background: #4e31aa; }
-.legend-color.design { background: #7b1fa2; }
-.legend-color.marketing { background: #388e3c; }
-.legend-color.sales { background: #f57c00; }
-
-/* Bar Chart */
-.bar-chart {
+.stage-stats {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1rem 0;
-}
-
-.bar-item {
-    display: flex;
+    justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #dee2e6;
 }
 
-.bar-label {
-    min-width: 120px;
-    font-size: 0.875rem;
+.stat-label {
+    font-size: 0.8125rem;
+    color: #6c757d;
     font-weight: 500;
-    color: #2c3e50;
 }
 
-.bar-container {
-    flex: 1;
-    height: 24px;
-    background: #f1f3f4;
-    border-radius: 12px;
-    position: relative;
-    overflow: hidden;
-}
-
-.bar-fill {
-    height: 100%;
-    background: linear-gradient(135deg, #4e31aa, #6c49d1);
-    border-radius: 12px;
-    transition: width 0.3s ease;
-    position: relative;
-}
-
-.bar-value {
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.75rem;
+.stat-value {
+    font-size: 0.8125rem;
+    color: #495057;
     font-weight: 600;
-    color: #2c3e50;
 }
+
+.stat-change {
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.stat-change.positive {
+    color: #28a745;
+}
+
+/* Timeline Table */
+.timeline-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.timeline-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.trend-up {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.trend-down {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.trend-neutral {
+    color: #6c757d;
+}
+
+/* Tables Grid */
+.tables-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Department Colors */
+.dept-name {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+
+.dept-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    display: inline-block;
+}
+
+.dept-color.engineering { background: #4e31aa; }
+.dept-color.design { background: #7b1fa2; }
+.dept-color.marketing { background: #388e3c; }
+.dept-color.sales { background: #f57c00; }
 
 .tables-section {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
     gap: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .table-card {
@@ -836,26 +945,15 @@
 .rate-average { color: #ffc107; font-weight: 600; }
 .rate-poor { color: #dc3545; font-weight: 600; }
 
-/* Icon styles - removed emojis */
-
-/* Chart button styling */
-.chart-btn {
-    padding: 0.4rem 0.8rem;
-    border: 1px solid #dee2e6;
-    border-radius: 6px;
-    background: white;
-    color: #495057;
-    font-size: 0.875rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
+/* Additional Table Styles */
+.data-table tfoot {
+    font-weight: 700;
+    background-color: #f8f9fa;
+    border-top: 2px solid #dee2e6;
 }
 
-.chart-btn:hover {
-    background: #4e31aa;
-    color: white;
-    border-color: #4e31aa;
-    box-shadow: 0 2px 4px rgba(78, 49, 170, 0.2);
+.data-table tfoot td {
+    padding: 1rem;
 }
 
 /* Responsive design */
@@ -868,7 +966,11 @@
         grid-template-columns: 1fr;
     }
     
-    .charts-grid {
+    .data-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tables-grid {
         grid-template-columns: 1fr;
     }
     
@@ -876,17 +978,30 @@
         grid-template-columns: 1fr;
     }
     
-    .chart-content {
-        height: 250px;
+    .data-summary-card {
+        padding: 1rem;
     }
     
-    .funnel-stage {
-        margin: 0.5rem 0;
+    .stage-icon {
+        font-size: 1.5rem;
     }
     
-    .bar-label {
-        min-width: 80px;
-        font-size: 0.75rem;
+    .stage-number {
+        font-size: 1.5rem;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .data-table {
+        font-size: 0.875rem;
+    }
+    
+    .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
     }
 }
 </style>
@@ -914,14 +1029,9 @@ function changeReportType(type) {
     // Implement report type switching
 }
 
-function toggleChartView(chartType) {
-    alert(`Toggling ${chartType} chart view...`);
-    // Implement chart view toggling
-}
-
-function exportChart(chartType) {
-    alert(`Exporting ${chartType} chart...`);
-    // Implement chart export
+function exportData(dataType) {
+    alert(`Exporting ${dataType} data as CSV...`);
+    // Implement data export functionality
 }
 
 function viewInterviewerDetails() {
@@ -940,28 +1050,17 @@ setInterval(() => {
     // Implement data refresh
 }, 300000);
 
-// Animate charts on load
+// Animate data cards on load
 document.addEventListener('DOMContentLoaded', function() {
-    // Animate funnel stages
-    document.querySelectorAll('.funnel-stage').forEach((stage, index) => {
+    // Animate summary cards
+    document.querySelectorAll('.data-summary-card').forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
         setTimeout(() => {
-            stage.style.opacity = '0';
-            stage.style.transform = 'translateX(-50px)';
-            stage.style.transition = 'all 0.5s ease';
-            setTimeout(() => {
-                stage.style.opacity = '1';
-                stage.style.transform = 'translateX(0)';
-            }, 100);
-        }, index * 200);
-    });
-    
-    // Animate bar fills
-    document.querySelectorAll('.bar-fill').forEach((bar, index) => {
-        const width = bar.style.width;
-        bar.style.width = '0%';
-        setTimeout(() => {
-            bar.style.width = width;
-        }, 500 + index * 100);
+            card.style.transition = 'all 0.5s ease';
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
     });
 
 // Sidebar toggle functionality
