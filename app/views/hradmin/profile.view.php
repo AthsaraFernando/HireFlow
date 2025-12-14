@@ -105,122 +105,318 @@
                     </div>
                 <?php endif; ?>
 
-                <div class="profile-container">
-                    <div class="profile-main">
-                        <!-- Profile Header -->
-                        <div class="profile-header">
-                            <div class="profile-avatar">
-                                <div class="avatar-image">
-                                    <?= substr($_SESSION['USER']['full_name'] ?? 'HR', 0, 2) ?>
+                <!-- Beautiful Profile Hero Banner -->
+                <div class="profile-hero-banner">
+                    <div class="hero-gradient"></div>
+                    <div class="hero-pattern"></div>
+                    <div class="hero-content">
+                        <div class="profile-avatar-section">
+                            <div class="avatar-wrapper">
+                                <div class="avatar-circle">
+                                    <div class="avatar-initials">
+                                        <?= substr($_SESSION['USER']['full_name'] ?? 'HR', 0, 2) ?>
+                                    </div>
+                                    <div class="avatar-status-indicator"></div>
                                 </div>
-                                <button class="avatar-change-btn">Change Photo</button>
+                                <button class="avatar-change-button" title="Change Profile Picture">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                                    </svg>
+                                </button>
                             </div>
-                            <div class="profile-info">
-                                <h2 class="profile-name"><?= $_SESSION['USER']['full_name'] ?? 'HR Administrator' ?></h2>
-                                <p class="profile-role">HR Administrator</p>
-                                <p class="profile-email"><?= $_SESSION['USER']['email'] ?? '' ?></p>
+                            <div class="profile-hero-info">
+                                <h1 class="hero-name"><?= $_SESSION['USER']['full_name'] ?? 'HR Administrator' ?></h1>
+                                <div class="hero-badges">
+                                    <span class="badge-role">
+                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                                        </svg>
+                                        HR Administrator
+                                    </span>
+                                    <span class="badge-verified">
+                                        <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                        </svg>
+                                        Verified
+                                    </span>
+                                </div>
+                                <p class="hero-email">
+                                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                                    </svg>
+                                    <?= $_SESSION['USER']['email'] ?? 'admin@hireflow.com' ?>
+                                </p>
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <!-- Profile Form -->
-                        <form method="POST" action="<?= ROOT ?>/hradmin/profile" class="profile-form">
-                            <div class="form-section">
-                                <h3 class="section-title">Personal Information</h3>
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label for="full_name" class="form-label">Full Name</label>
-                                        <input type="text" id="full_name" name="full_name" class="form-input" 
-                                               value="<?= $_SESSION['USER']['full_name'] ?? '' ?>" required>
+                <!-- Main Content Grid -->
+                <div class="beautiful-profile-grid">
+                    <!-- Left Column - Main Form -->
+                    <div class="profile-main-column">
+                        <form method="POST" action="<?= ROOT ?>/hradmin/profile" class="beautiful-profile-form">
+                            <!-- Personal Information Card -->
+                            <div class="profile-card modern-card">
+                                <div class="card-header-beautiful">
+                                    <div class="header-icon-wrapper">
+                                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20" class="header-icon">
+                                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                        </svg>
                                     </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="email" class="form-label">Email Address</label>
-                                        <input type="email" id="email" name="email" class="form-input" 
-                                               value="<?= $_SESSION['USER']['email'] ?? '' ?>" required>
+                                    <div class="header-text">
+                                        <h3 class="card-title-beautiful">Personal Information</h3>
+                                        <p class="card-subtitle-beautiful">Update your profile details</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body-beautiful">
+                                    <div class="input-row">
+                                        <div class="input-group-beautiful">
+                                            <label for="full_name" class="label-beautiful">
+                                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Full Name
+                                            </label>
+                                            <input type="text" id="full_name" name="full_name" class="input-beautiful" 
+                                                   value="<?= $_SESSION['USER']['full_name'] ?? '' ?>" 
+                                                   placeholder="Enter your full name" required>
+                                        </div>
+                                        
+                                        <div class="input-group-beautiful">
+                                            <label for="email" class="label-beautiful">
+                                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                                                </svg>
+                                                Email Address
+                                            </label>
+                                            <input type="email" id="email" name="email" class="input-beautiful" 
+                                                   value="<?= $_SESSION['USER']['email'] ?? '' ?>" 
+                                                   placeholder="your.email@hireflow.com" required>
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="phone" class="form-label">Phone Number</label>
-                                        <input type="tel" id="phone" name="phone" class="form-input" 
-                                               value="<?= $_SESSION['USER']['phone'] ?? '' ?>">
-                                    </div>
+                                    <div class="input-row">
+                                        <div class="input-group-beautiful">
+                                            <label for="phone" class="label-beautiful">
+                                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                                                </svg>
+                                                Phone Number
+                                            </label>
+                                            <input type="tel" id="phone" name="phone" class="input-beautiful" 
+                                                   value="<?= $_SESSION['USER']['phone'] ?? '' ?>" 
+                                                   placeholder="+1 (555) 000-0000">
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label for="department" class="form-label">Department</label>
-                                        <input type="text" id="department" name="department" class="form-input" 
-                                               value="Human Resources" readonly>
+                                        <div class="input-group-beautiful">
+                                            <label for="department" class="label-beautiful">
+                                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Department
+                                            </label>
+                                            <input type="text" id="department" name="department" class="input-beautiful input-readonly" 
+                                                   value="Human Resources" readonly>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="form-section">
-                                <h3 class="section-title">Security Settings</h3>
-                                <div class="form-grid">
-                                    <div class="form-group">
-                                        <label for="current_password" class="form-label">Current Password</label>
-                                        <input type="password" id="current_password" name="current_password" class="form-input">
-                                        <small class="form-hint">Leave blank to keep current password</small>
+                            <!-- Security Settings Card -->
+                            <div class="profile-card modern-card">
+                                <div class="card-header-beautiful">
+                                    <div class="header-icon-wrapper">
+                                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20" class="header-icon">
+                                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                        </svg>
                                     </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="new_password" class="form-label">New Password</label>
-                                        <input type="password" id="new_password" name="new_password" class="form-input">
-                                        <small class="form-hint">Minimum 8 characters with uppercase, lowercase, number and special character</small>
+                                    <div class="header-text">
+                                        <h3 class="card-title-beautiful">Security Settings</h3>
+                                        <p class="card-subtitle-beautiful">Manage your password</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="card-body-beautiful">
+                                    <div class="input-row-single">
+                                        <div class="input-group-beautiful">
+                                            <label for="current_password" class="label-beautiful">
+                                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Current Password
+                                            </label>
+                                            <input type="password" id="current_password" name="current_password" class="input-beautiful" 
+                                                   placeholder="Enter your current password">
+                                            <small class="input-hint">Leave blank to keep your current password</small>
+                                        </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="confirm_password" class="form-label">Confirm New Password</label>
-                                        <input type="password" id="confirm_password" name="confirm_password" class="form-input">
+                                    <div class="input-row">
+                                        <div class="input-group-beautiful">
+                                            <label for="new_password" class="label-beautiful">
+                                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/>
+                                                </svg>
+                                                New Password
+                                            </label>
+                                            <input type="password" id="new_password" name="new_password" class="input-beautiful" 
+                                                   placeholder="Enter new password">
+                                            <small class="input-hint">Min. 8 characters, uppercase, lowercase, number & symbol</small>
+                                        </div>
+
+                                        <div class="input-group-beautiful">
+                                            <label for="confirm_password" class="label-beautiful">
+                                                <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                                </svg>
+                                                Confirm Password
+                                            </label>
+                                            <input type="password" id="confirm_password" name="confirm_password" class="input-beautiful" 
+                                                   placeholder="Confirm new password">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">Update Profile</button>
-                                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+                            <!-- Form Actions -->
+                            <div class="form-actions-beautiful">
+                                <button type="button" class="btn-beautiful btn-secondary-beautiful" onclick="resetForm()">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Reset Changes
+                                </button>
+                                <button type="submit" class="btn-beautiful btn-primary-beautiful">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Save Changes
+                                </button>
                             </div>
                         </form>
                     </div>
 
-                    <!-- Profile Sidebar -->
-                    <div class="profile-sidebar">
-                        <div class="sidebar-card">
-                            <h4 class="card-title">Account Information</h4>
-                            <div class="info-list">
-                                <div class="info-item">
-                                    <span class="info-label">User ID</span>
-                                    <span class="info-value"><?= $_SESSION['USER']['id'] ?? 'HR001' ?></span>
+                    <!-- Right Column - Sidebar -->
+                    <div class="profile-sidebar-column">
+                        <!-- Account Info Card -->
+                        <div class="sidebar-card-beautiful modern-card">
+                            <div class="sidebar-card-header">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <h4 class="sidebar-card-title">Account Information</h4>
+                            </div>
+                            <div class="sidebar-card-body">
+                                <div class="info-item-beautiful">
+                                    <span class="info-label-beautiful">User ID</span>
+                                    <span class="info-value-beautiful"><?= $_SESSION['USER']['id'] ?? 'HR001' ?></span>
                                 </div>
-                                <div class="info-item">
-                                    <span class="info-label">Role</span>
-                                    <span class="info-value">HR Administrator</span>
+                                <div class="info-item-beautiful">
+                                    <span class="info-label-beautiful">Role</span>
+                                    <span class="badge-role-small">HR Administrator</span>
                                 </div>
-                                <div class="info-item">
-                                    <span class="info-label">Status</span>
-                                    <span class="status-badge status-active">Active</span>
+                                <div class="info-item-beautiful">
+                                    <span class="info-label-beautiful">Status</span>
+                                    <span class="badge-status-active">
+                                        <span class="status-pulse"></span>
+                                        Active
+                                    </span>
                                 </div>
-                                <div class="info-item">
-                                    <span class="info-label">Last Login</span>
-                                    <span class="info-value"><?= date('M j, Y g:i A') ?></span>
+                                <div class="info-item-beautiful">
+                                    <span class="info-label-beautiful">Member Since</span>
+                                    <span class="info-value-beautiful"><?= date('M Y') ?></span>
+                                </div>
+                                <div class="info-item-beautiful">
+                                    <span class="info-label-beautiful">Last Login</span>
+                                    <span class="info-value-beautiful"><?= date('M j, g:i A') ?></span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="sidebar-card">
-                            <h4 class="card-title">Quick Actions</h4>
-                            <div class="action-list">
-                                <a href="<?= ROOT ?>/hradmin/create-job" class="action-link">
-                                    <i class="icon-plus"></i>Create New Job Post
+                        <!-- Quick Actions Card -->
+                        <div class="sidebar-card-beautiful modern-card">
+                            <div class="sidebar-card-header">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/>
+                                </svg>
+                                <h4 class="sidebar-card-title">Quick Actions</h4>
+                            </div>
+                            <div class="quick-actions-beautiful">
+                                <a href="<?= ROOT ?>/hradmin/create-job" class="action-item-beautiful">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>Create Job Post</span>
                                 </a>
-                                <a href="<?= ROOT ?>/hradmin/applications" class="action-link">
-                                    <i class="icon-applications"></i>Review Applications
+                                <a href="<?= ROOT ?>/hradmin/applications" class="action-item-beautiful">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>Review Applications</span>
                                 </a>
-                                <a href="<?= ROOT ?>/hradmin/interview-schedule" class="action-link">
-                                    <i class="icon-calendar"></i>Schedule Interview
+                                <a href="<?= ROOT ?>/hradmin/interview-schedule" class="action-item-beautiful">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <span>Schedule Interview</span>
                                 </a>
-                                <a href="<?= ROOT ?>/hradmin/reports" class="action-link">
-                                    <i class="icon-reports"></i>View Reports
+                                <a href="<?= ROOT ?>/hradmin/reports" class="action-item-beautiful">
+                                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+                                    </svg>
+                                    <span>View Reports</span>
                                 </a>
+                            </div>
+                        </div>
+
+                        <!-- Activity Stats Card -->
+                        <div class="sidebar-card-beautiful modern-card">
+                            <div class="sidebar-card-header">
+                                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h.01a1 1 0 100-2H7zm2 1a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1zm4-4a1 1 0 100 2h.01a1 1 0 100-2H13zM9 9a1 1 0 011-1h.01a1 1 0 110 2H10a1 1 0 01-1-1zM7 8a1 1 0 000 2h.01a1 1 0 000-2H7z" clip-rule="evenodd"/>
+                                </svg>
+                                <h4 class="sidebar-card-title">Activity Summary</h4>
+                            </div>
+                            <div class="activity-stats-beautiful">
+                                <div class="stat-item-beautiful">
+                                    <div class="stat-icon-beautiful stat-blue">
+                                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="stat-details-beautiful">
+                                        <span class="stat-number-beautiful">24</span>
+                                        <span class="stat-label-beautiful">Jobs Posted</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item-beautiful">
+                                    <div class="stat-icon-beautiful stat-green">
+                                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/>
+                                        </svg>
+                                    </div>
+                                    <div class="stat-details-beautiful">
+                                        <span class="stat-number-beautiful">156</span>
+                                        <span class="stat-label-beautiful">Apps Reviewed</span>
+                                    </div>
+                                </div>
+                                <div class="stat-item-beautiful">
+                                    <div class="stat-icon-beautiful stat-purple">
+                                        <svg width="24" height="24" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </div>
+                                    <div class="stat-details-beautiful">
+                                        <span class="stat-number-beautiful">12</span>
+                                        <span class="stat-label-beautiful">Interviews</span>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
