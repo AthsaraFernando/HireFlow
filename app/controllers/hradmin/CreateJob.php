@@ -13,50 +13,26 @@ class CreateJob extends Controller
         $data['success'] = '';
         $data['page_title'] = 'Create New Job';
         
-        // Sample data for dropdowns
-        $data['departments'] = [
-            'Engineering',
-            'Marketing', 
-            'Sales',
-            'HR',
-            'Finance',
-            'Operations'
-        ];
+        // Fetch departments from database
+        $departmentModel = new Department();
+        $data['departments'] = $departmentModel->query("SELECT * FROM departments ORDER BY name ASC");
         
-        $data['locations'] = [
-            'New York, NY',
-            'San Francisco, CA',
-            'Los Angeles, CA',
-            'Chicago, IL',
-            'Remote',
-            'Hybrid'
-        ];
-        
-        $data['job_types'] = [
-            'Full-time',
-            'Part-time',
-            'Contract',
-            'Internship'
-        ];
-        
-        $data['experience_levels'] = [
-            'Entry Level',
-            'Mid Level',
-            'Senior Level',
-            'Executive Level'
-        ];
+        // Fetch recruitment managers (role_id = 3)
+        $userModel = new User();
+        $data['hiring_managers'] = $userModel->query("SELECT id, full_name FROM users WHERE role_id = 3 AND status = 'active' ORDER BY full_name ASC");
         
         // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate form data
-            $required_fields = ['job_title', 'department', 'location', 'employment_type', 'summary'];
+            $required_fields = ['job_title', 'department', 'location', 'employment_type', 'description', 'requirements'];
             
             $field_labels = [
                 'job_title' => 'Job title',
                 'department' => 'Department',
                 'location' => 'Location',
                 'employment_type' => 'Employment type',
-                'summary' => 'Job summary'
+                'description' => 'Description',
+                'requirements' => 'Requirements'
             ];
             
             foreach ($required_fields as $field) {
@@ -70,18 +46,25 @@ class CreateJob extends Controller
                 // Save to database
                 $jobPost = new JobPost();
                 
+                // Determine hr_id: use hiring_manager if selected, otherwise use current user
+                $hr_id = !empty($_POST['hiring_manager']) ? $_POST['hiring_manager'] : Auth::user_id();
+                
+                // Get department name from department_id
+                $departmentModel = new Department();
+                $department = $departmentModel->first(['id' => $_POST['department']]);
+                $department_name = $department ? $department['name'] : '';
+                
                 $jobData = [
                     'title' => $_POST['job_title'] ?? '',
-                    'department' => $_POST['department'] ?? '',
-                    'description' => $_POST['summary'] ?? '',
+                    'department_id' => $_POST['department'] ?? null,
+                    'department' => $department_name,
+                    'description' => $_POST['description'] ?? '',
                     'requirements' => $_POST['requirements'] ?? '',
-                    'responsibilities' => $_POST['responsibilities'] ?? '',
                     'salary_range' => $_POST['salary_range'] ?? '',
                     'location' => $_POST['location'] ?? '',
                     'employment_type' => $_POST['employment_type'] ?? '',
-                    'experience_level' => $_POST['experience_level'] ?? '',
                     'status' => $_POST['status'] ?? 'Draft',
-                    'hr_id' => Auth::user_id(),
+                    'hr_id' => $hr_id,
                     'deadline' => !empty($_POST['application_deadline']) ? $_POST['application_deadline'] : null
                 ];
                 
@@ -93,7 +76,14 @@ class CreateJob extends Controller
                     // Redirect to job posts list
                     redirect('hradmin/job-posts');
                 } else {
-                    $data['errors'][] = 'Failed to save job post. Please try again.';
+                    // Show actual database errors
+                    if (!empty($jobPost->errors)) {
+                        foreach ($jobPost->errors as $error) {
+                            $data['errors'][] = 'Database error: ' . $error;
+                        }
+                    } else {
+                        $data['errors'][] = 'Failed to save job post. Please try again.';
+                    }
                     $data['form_data'] = $_POST;
                 }
             } else {

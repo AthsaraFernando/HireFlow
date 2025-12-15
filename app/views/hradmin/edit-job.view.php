@@ -45,14 +45,15 @@
                         <label for="department" class="form-label">Department *</label>
                         <select id="department" name="department" class="form-select" required>
                             <option value="">Select Department</option>
-                            <?php $dept = strtolower($job['department'] ?? ''); ?>
-                            <option value="Engineering" <?= $dept == 'engineering' ? 'selected' : '' ?>>Engineering</option>
-                            <option value="Design" <?= $dept == 'design' ? 'selected' : '' ?>>Design</option>
-                            <option value="Marketing" <?= $dept == 'marketing' ? 'selected' : '' ?>>Marketing</option>
-                            <option value="Sales" <?= $dept == 'sales' ? 'selected' : '' ?>>Sales</option>
-                            <option value="HR" <?= $dept == 'hr' ? 'selected' : '' ?>>Human Resources</option>
-                            <option value="Finance" <?= $dept == 'finance' ? 'selected' : '' ?>>Finance</option>
-                            <option value="Operations" <?= $dept == 'operations' ? 'selected' : '' ?>>Operations</option>
+                            <?php if (!empty($departments)): ?>
+                                <?php foreach ($departments as $dept): ?>
+                                    <option value="<?= htmlspecialchars($dept['id']) ?>" <?= (isset($job['department_id']) && $job['department_id'] == $dept['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($dept['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>No departments found</option>
+                            <?php endif; ?>
                         </select>
                     </div>
 
@@ -65,19 +66,6 @@
                             <option value="Part-time" <?= $emp_type == 'part-time' ? 'selected' : '' ?>>Part-time</option>
                             <option value="Contract" <?= $emp_type == 'contract' ? 'selected' : '' ?>>Contract</option>
                             <option value="Internship" <?= $emp_type == 'internship' ? 'selected' : '' ?>>Internship</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="experience_level" class="form-label">Experience Level *</label>
-                        <select id="experience_level" name="experience_level" class="form-select" required>
-                            <option value="">Select Level</option>
-                            <?php $exp_level = strtolower($job['experience_level'] ?? ''); ?>
-                            <option value="Entry" <?= $exp_level == 'entry' ? 'selected' : '' ?>>Entry Level</option>
-                            <option value="Mid" <?= $exp_level == 'mid' ? 'selected' : '' ?>>Mid Level</option>
-                            <option value="Senior" <?= $exp_level == 'senior' ? 'selected' : '' ?>>Senior Level</option>
-                            <option value="Lead" <?= $exp_level == 'lead' ? 'selected' : '' ?>>Lead/Principal</option>
-                            <option value="Executive" <?= $exp_level == 'executive' ? 'selected' : '' ?>>Executive</option>
                         </select>
                     </div>
 
@@ -101,37 +89,15 @@
             <div class="form-section">
                 <h3 class="section-title">Job Description</h3>
                 <div class="form-group">
-                    <label for="summary" class="form-label">Job Summary *</label>
-                    <textarea id="summary" name="summary" class="form-textarea" rows="4" 
+                    <label for="description" class="form-label">Description *</label>
+                    <textarea id="description" name="description" class="form-textarea" rows="8" 
                               placeholder="Brief overview of the role and its importance to the company" required><?= htmlspecialchars($job['description'] ?? '') ?></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="responsibilities" class="form-label">Key Responsibilities *</label>
-                    <textarea id="responsibilities" name="responsibilities" class="form-textarea" rows="8" 
-                              placeholder="• List key responsibilities here" required><?= htmlspecialchars($job['responsibilities'] ?? '') ?></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="requirements" class="form-label">Requirements *</label>
                     <textarea id="requirements" name="requirements" class="form-textarea" rows="8" 
                               placeholder="• Education requirements" required><?= htmlspecialchars($job['requirements'] ?? '') ?></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="preferred_qualifications" class="form-label">Preferred Qualifications</label>
-                    <textarea id="preferred_qualifications" name="preferred_qualifications" class="form-textarea" rows="4" 
-                              placeholder="• Nice-to-have skills"><?= htmlspecialchars($job['preferred_qualifications'] ?? '') ?></textarea>
-                </div>
-            </div>
-
-            <!-- Benefits & Perks -->
-            <div class="form-section">
-                <h3 class="section-title">Benefits & Perks</h3>
-                <div class="form-group">
-                    <label for="benefits" class="form-label">Benefits Package</label>
-                    <textarea id="benefits" name="benefits" class="form-textarea" rows="6" 
-                              placeholder="• Health insurance"><?= htmlspecialchars($job['benefits'] ?? '') ?></textarea>
                 </div>
             </div>
 
@@ -156,19 +122,19 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="hiring_manager" class="form-label">Hiring Manager</label>
+                        <label for="hiring_manager" class="form-label">Hiring Manager (Recruitment Manager)</label>
                         <select id="hiring_manager" name="hiring_manager" class="form-select">
                             <option value="">Select Hiring Manager</option>
-                            <option value="1" <?= ($job['hiring_manager'] ?? '') == '1' ? 'selected' : '' ?>>John Smith</option>
-                            <option value="2" <?= ($job['hiring_manager'] ?? '') == '2' ? 'selected' : '' ?>>Sarah Johnson</option>
-                            <option value="3" <?= ($job['hiring_manager'] ?? '') == '3' ? 'selected' : '' ?>>Mike Wilson</option>
+                            <?php if (!empty($hiring_managers)): ?>
+                                <?php foreach ($hiring_managers as $manager): ?>
+                                    <option value="<?= htmlspecialchars($manager['id']) ?>" <?= (isset($job['hr_id']) && $job['hr_id'] == $manager['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($manager['full_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>No recruitment managers found</option>
+                            <?php endif; ?>
                         </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="openings" class="form-label">Number of Openings</label>
-                        <input type="number" id="openings" name="openings" class="form-input" 
-                               value="<?= $job['openings'] ?? '1' ?>" min="1" max="50">
                     </div>
                 </div>
             </div>

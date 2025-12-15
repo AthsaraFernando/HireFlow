@@ -115,36 +115,26 @@
                         <label for="department" class="form-label">Department *</label>
                         <select id="department" name="department" class="form-select" required>
                             <option value="">Select Department</option>
-                            <option value="engineering" <?= ($_POST['department'] ?? '') == 'engineering' ? 'selected' : '' ?>>Engineering</option>
-                            <option value="design" <?= ($_POST['department'] ?? '') == 'design' ? 'selected' : '' ?>>Design</option>
-                            <option value="marketing" <?= ($_POST['department'] ?? '') == 'marketing' ? 'selected' : '' ?>>Marketing</option>
-                            <option value="sales" <?= ($_POST['department'] ?? '') == 'sales' ? 'selected' : '' ?>>Sales</option>
-                            <option value="hr" <?= ($_POST['department'] ?? '') == 'hr' ? 'selected' : '' ?>>Human Resources</option>
-                            <option value="finance" <?= ($_POST['department'] ?? '') == 'finance' ? 'selected' : '' ?>>Finance</option>
-                            <option value="operations" <?= ($_POST['department'] ?? '') == 'operations' ? 'selected' : '' ?>>Operations</option>
+                            <?php if (!empty($departments)): ?>
+                                <?php foreach ($departments as $dept): ?>
+                                    <option value="<?= htmlspecialchars($dept['id']) ?>" data-name="<?= htmlspecialchars($dept['name']) ?>" <?= (isset($_POST['department']) && $_POST['department'] == $dept['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($dept['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>No departments found</option>
+                            <?php endif; ?>
                         </select>
                     </div>
-
+ 
                     <div class="form-group">
                         <label for="employment_type" class="form-label">Employment Type *</label>
                         <select id="employment_type" name="employment_type" class="form-select" required>
                             <option value="">Select Type</option>
-                            <option value="full-time" <?= ($_POST['employment_type'] ?? '') == 'full-time' ? 'selected' : '' ?>>Full-time</option>
-                            <option value="part-time" <?= ($_POST['employment_type'] ?? '') == 'part-time' ? 'selected' : '' ?>>Part-time</option>
-                            <option value="contract" <?= ($_POST['employment_type'] ?? '') == 'contract' ? 'selected' : '' ?>>Contract</option>
-                            <option value="internship" <?= ($_POST['employment_type'] ?? '') == 'internship' ? 'selected' : '' ?>>Internship</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="experience_level" class="form-label">Experience Level *</label>
-                        <select id="experience_level" name="experience_level" class="form-select" required>
-                            <option value="">Select Level</option>
-                            <option value="entry" <?= ($_POST['experience_level'] ?? '') == 'entry' ? 'selected' : '' ?>>Entry Level</option>
-                            <option value="mid" <?= ($_POST['experience_level'] ?? '') == 'mid' ? 'selected' : '' ?>>Mid Level</option>
-                            <option value="senior" <?= ($_POST['experience_level'] ?? '') == 'senior' ? 'selected' : '' ?>>Senior Level</option>
-                            <option value="lead" <?= ($_POST['experience_level'] ?? '') == 'lead' ? 'selected' : '' ?>>Lead/Principal</option>
-                            <option value="executive" <?= ($_POST['experience_level'] ?? '') == 'executive' ? 'selected' : '' ?>>Executive</option>
+                            <option value="Full-time" <?= ($_POST['employment_type'] ?? '') == 'Full-time' ? 'selected' : '' ?>>Full-time</option>
+                            <option value="Part-time" <?= ($_POST['employment_type'] ?? '') == 'Part-time' ? 'selected' : '' ?>>Part-time</option>
+                            <option value="Contract" <?= ($_POST['employment_type'] ?? '') == 'Contract' ? 'selected' : '' ?>>Contract</option>
+                            <option value="Internship" <?= ($_POST['employment_type'] ?? '') == 'Internship' ? 'selected' : '' ?>>Internship</option>
                         </select>
                     </div>
 
@@ -166,37 +156,15 @@
             <div class="form-section">
                 <h3 class="section-title">Job Description</h3>
                 <div class="form-group">
-                    <label for="summary" class="form-label">Job Summary *</label>
-                    <textarea id="summary" name="summary" class="form-textarea" rows="4" 
-                              placeholder="Brief overview of the role and its importance to the company" required><?= $_POST['summary'] ?? '' ?></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="responsibilities" class="form-label">Key Responsibilities *</label>
-                    <textarea id="responsibilities" name="responsibilities" class="form-textarea" rows="6" 
-                              placeholder="• List key responsibilities here&#10;• Use bullet points for clarity&#10;• Include main duties and expectations" required><?= $_POST['responsibilities'] ?? '' ?></textarea>
+                    <label for="description" class="form-label">Description *</label>
+                    <textarea id="description" name="description" class="form-textarea" rows="8" 
+                              placeholder="Brief overview of the role and its importance to the company" required><?= $_POST['description'] ?? '' ?></textarea>
                 </div>
 
                 <div class="form-group">
                     <label for="requirements" class="form-label">Requirements *</label>
-                    <textarea id="requirements" name="requirements" class="form-textarea" rows="6" 
+                    <textarea id="requirements" name="requirements" class="form-textarea" rows="8" 
                               placeholder="• Education requirements&#10;• Years of experience needed&#10;• Technical skills required&#10;• Soft skills preferred" required><?= $_POST['requirements'] ?? '' ?></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="preferred_qualifications" class="form-label">Preferred Qualifications</label>
-                    <textarea id="preferred_qualifications" name="preferred_qualifications" class="form-textarea" rows="4" 
-                              placeholder="• Nice-to-have skills&#10;• Additional certifications&#10;• Industry experience"><?= $_POST['preferred_qualifications'] ?? '' ?></textarea>
-                </div>
-            </div>
-
-            <!-- Benefits & Perks -->
-            <div class="form-section">
-                <h3 class="section-title">Benefits & Perks</h3>
-                <div class="form-group">
-                    <label for="benefits" class="form-label">Benefits Package</label>
-                    <textarea id="benefits" name="benefits" class="form-textarea" rows="4" 
-                              placeholder="• Health insurance&#10;• Retirement plans&#10;• Paid time off&#10;• Professional development opportunities"><?= $_POST['benefits'] ?? '' ?></textarea>
                 </div>
             </div>
 
@@ -213,26 +181,26 @@
                     <div class="form-group">
                         <label for="status" class="form-label">Status *</label>
                         <select id="status" name="status" class="form-select" required>
-                            <option value="draft" <?= ($_POST['status'] ?? 'draft') == 'draft' ? 'selected' : '' ?>>Draft</option>
-                            <option value="active" <?= ($_POST['status'] ?? '') == 'active' ? 'selected' : '' ?>>Active</option>
-                            <option value="paused" <?= ($_POST['status'] ?? '') == 'paused' ? 'selected' : '' ?>>Paused</option>
+                            <option value="Draft" <?= ($_POST['status'] ?? 'Draft') == 'Draft' ? 'selected' : '' ?>>Draft</option>
+                            <option value="Open" <?= ($_POST['status'] ?? '') == 'Open' ? 'selected' : '' ?>>Open</option>
+                            <option value="Closed" <?= ($_POST['status'] ?? '') == 'Closed' ? 'selected' : '' ?>>Closed</option>
                         </select>
                     </div>
 
                     <div class="form-group">
-                        <label for="hiring_manager" class="form-label">Hiring Manager</label>
+                        <label for="hiring_manager" class="form-label">Hiring Manager (Recruitment Manager)</label>
                         <select id="hiring_manager" name="hiring_manager" class="form-select">
                             <option value="">Select Hiring Manager</option>
-                            <option value="1" <?= ($_POST['hiring_manager'] ?? '') == '1' ? 'selected' : '' ?>>John Smith</option>
-                            <option value="2" <?= ($_POST['hiring_manager'] ?? '') == '2' ? 'selected' : '' ?>>Sarah Johnson</option>
-                            <option value="3" <?= ($_POST['hiring_manager'] ?? '') == '3' ? 'selected' : '' ?>>Mike Wilson</option>
+                            <?php if (!empty($hiring_managers)): ?>
+                                <?php foreach ($hiring_managers as $manager): ?>
+                                    <option value="<?= htmlspecialchars($manager['id']) ?>" <?= (isset($_POST['hiring_manager']) && $_POST['hiring_manager'] == $manager['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($manager['full_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>No recruitment managers found</option>
+                            <?php endif; ?>
                         </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="openings" class="form-label">Number of Openings</label>
-                        <input type="number" id="openings" name="openings" class="form-input" 
-                               value="<?= $_POST['openings'] ?? '1' ?>" min="1" max="50">
                     </div>
                 </div>
             </div>

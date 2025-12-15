@@ -31,56 +31,26 @@ class EditJob extends Controller
         
         $data['job'] = $job;
         
-        // Sample data for dropdowns
-        $data['departments'] = [
-            'Engineering',
-            'Marketing', 
-            'Sales',
-            'HR',
-            'Finance',
-            'Operations'
-        ];
+        // Fetch departments from database
+        $departmentModel = new Department();
+        $data['departments'] = $departmentModel->query("SELECT * FROM departments ORDER BY name ASC");
         
-        $data['locations'] = [
-            'New York, NY',
-            'San Francisco, CA',
-            'Los Angeles, CA',
-            'Chicago, IL',
-            'Remote',
-            'Hybrid'
-        ];
-        
-        $data['job_types'] = [
-            'Full-time',
-            'Part-time',
-            'Contract',
-            'Internship'
-        ];
-        
-        $data['experience_levels'] = [
-            'Entry Level',
-            'Mid Level',
-            'Senior Level',
-            'Executive Level'
-        ];
-        
-        $data['status_options'] = [
-            'Active',
-            'Inactive',
-            'Draft'
-        ];
+        // Fetch recruitment managers (role_id = 3)
+        $userModel = new User();
+        $data['hiring_managers'] = $userModel->query("SELECT id, full_name FROM users WHERE role_id = 3 AND status = 'active' ORDER BY full_name ASC");
         
         // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate form data
-            $required_fields = ['job_title', 'department', 'location', 'employment_type', 'summary'];
+            $required_fields = ['job_title', 'department', 'location', 'employment_type', 'description', 'requirements'];
             
             $field_labels = [
                 'job_title' => 'Job title',
                 'department' => 'Department',
                 'location' => 'Location',
                 'employment_type' => 'Employment type',
-                'summary' => 'Job summary'
+                'description' => 'Description',
+                'requirements' => 'Requirements'
             ];
             
             foreach ($required_fields as $field) {
@@ -92,19 +62,29 @@ class EditJob extends Controller
             
             if (empty($data['errors'])) {
                 // Update job in database
+                
+                // Get department name from department_id
+                $departmentModel = new Department();
+                $department = $departmentModel->first(['id' => $_POST['department']]);
+                $department_name = $department ? $department['name'] : '';
+                
                 $updateData = [
                     'title' => $_POST['job_title'] ?? '',
-                    'department' => $_POST['department'] ?? '',
-                    'description' => $_POST['summary'] ?? '',
+                    'department_id' => $_POST['department'] ?? null,
+                    'department' => $department_name,
+                    'description' => $_POST['description'] ?? '',
                     'requirements' => $_POST['requirements'] ?? '',
-                    'responsibilities' => $_POST['responsibilities'] ?? '',
                     'salary_range' => $_POST['salary_range'] ?? '',
                     'location' => $_POST['location'] ?? '',
                     'employment_type' => $_POST['employment_type'] ?? '',
-                    'experience_level' => $_POST['experience_level'] ?? '',
                     'status' => $_POST['status'] ?? 'Draft',
                     'deadline' => !empty($_POST['application_deadline']) ? $_POST['application_deadline'] : null
                 ];
+                
+                // Update hr_id if hiring_manager is provided
+                if (!empty($_POST['hiring_manager'])) {
+                    $updateData['hr_id'] = $_POST['hiring_manager'];
+                }
                 
                 if ($jobPost->update($id, $updateData)) {
                     $_SESSION['success_message'] = 'Job updated successfully!';
