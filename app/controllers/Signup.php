@@ -37,8 +37,7 @@ class Signup extends Controller
                 // Create user account
                 if ($user->createUser($userData)) {
                     // Log registration
-                    AccessLog::log('registration', 'New applicant account created: ' . $userData['email'], null);
-                    
+                    AccessLog::log('registration', 'New applicant account created: ' . $userData['email'], Auth::user_id());
                     // Redirect to login with success message
                     redirect('signin?registered=1');
                     return;
