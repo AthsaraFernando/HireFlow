@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS interviews (
 -- Insert sample interviews
 INSERT INTO interviews (application_id, interviewer_id, interview_type, scheduled_date, scheduled_time, duration_minutes, meeting_link, status) VALUES
 (1, 3, 'Video', '2025-09-05', '10:00:00', 60, 'https://meet.google.com/abc-def-ghi', 'Scheduled'),
-(4, 3, 'In-person', '2025-09-03', '14:00:00', 45, 'Conference Room A, 2nd Floor', 'Scheduled');
+(3, 3, 'In-person', '2025-09-03', '14:00:00', 45, 'Conference Room A, 2nd Floor', 'Scheduled');
 
 -- ====================================================================
 -- 6. FEEDBACK TABLE
