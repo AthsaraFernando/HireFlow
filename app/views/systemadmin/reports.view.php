@@ -1,38 +1,38 @@
 <?php
 // Sample report data - in real implementation this would come from database queries
-$system_stats = [
-    'total_users' => 127,
-    'active_sessions' => 15,
-    'total_jobs' => 45,
-    'total_applications' => 234,
-    'server_uptime' => '15 days, 6 hours',
-    'database_size' => '45.2 MB',
-    'storage_used' => '2.1 GB',
-    'avg_response_time' => '245ms'
-];
+// $system_stats = [
+//     // 'total_users' => 127,
+//     'active_sessions' => 15,
+//     // 'total_jobs' => 45,
+//     'total_applications' => 234,
+//     'server_uptime' => '15 days, 6 hours',
+//     // 'database_size' => '45.2 MB',
+//     'storage_used' => '2.1 GB',
+//     'avg_response_time' => '245ms'
+// ];
 
-$user_activity = [
-    ['date' => '2025-08-31', 'logins' => 24, 'registrations' => 3, 'applications' => 18],
-    ['date' => '2025-08-30', 'logins' => 31, 'registrations' => 5, 'applications' => 22],
-    ['date' => '2025-08-29', 'logins' => 28, 'registrations' => 2, 'applications' => 15],
-    ['date' => '2025-08-28', 'logins' => 35, 'registrations' => 7, 'applications' => 28],
-    ['date' => '2025-08-27', 'logins' => 29, 'registrations' => 4, 'applications' => 19]
-];
+// $user_activity = [
+//     ['date' => '2025-08-31', 'logins' => 24, 'registrations' => 3, 'applications' => 18],
+//     ['date' => '2025-08-30', 'logins' => 31, 'registrations' => 5, 'applications' => 22],
+//     ['date' => '2025-08-29', 'logins' => 28, 'registrations' => 2, 'applications' => 15],
+//     ['date' => '2025-08-28', 'logins' => 35, 'registrations' => 7, 'applications' => 28],
+//     ['date' => '2025-08-27', 'logins' => 29, 'registrations' => 4, 'applications' => 19]
+// ];
 
-$error_logs = [
-    ['time' => '2025-08-31 14:30:15', 'level' => 'WARNING', 'message' => 'High memory usage detected (85%)', 'source' => 'System Monitor'],
-    ['time' => '2025-08-31 12:45:22', 'level' => 'ERROR', 'message' => 'Failed to send email notification to user@example.com', 'source' => 'Email Service'],
-    ['time' => '2025-08-31 10:15:08', 'level' => 'INFO', 'message' => 'Database backup completed successfully', 'source' => 'Backup Service'],
-    ['time' => '2025-08-31 09:30:45', 'level' => 'WARNING', 'message' => 'Slow query detected: SELECT * FROM applications (2.3s)', 'source' => 'Database']
-];
+// $error_logs = [
+//     ['time' => '2025-08-31 14:30:15', 'level' => 'WARNING', 'message' => 'High memory usage detected (85%)', 'source' => 'System Monitor'],
+//     ['time' => '2025-08-31 12:45:22', 'level' => 'ERROR', 'message' => 'Failed to send email notification to user@example.com', 'source' => 'Email Service'],
+//     ['time' => '2025-08-31 10:15:08', 'level' => 'INFO', 'message' => 'Database backup completed successfully', 'source' => 'Backup Service'],
+//     ['time' => '2025-08-31 09:30:45', 'level' => 'WARNING', 'message' => 'Slow query detected: SELECT * FROM applications (2.3s)', 'source' => 'Database']
+// ];
 
-$popular_pages = [
-    ['page' => '/applicant/browse-jobs', 'views' => 1245, 'unique_visitors' => 892],
-    ['page' => '/applicant/dashboard', 'views' => 987, 'unique_visitors' => 654],
-    ['page' => '/signin', 'views' => 756, 'unique_visitors' => 523],
-    ['page' => '/hradmin/applications', 'views' => 432, 'unique_visitors' => 78],
-    ['page' => '/applicant/job-details', 'views' => 398, 'unique_visitors' => 289]
-];
+// $popular_pages = [
+//     ['page' => '/applicant/browse-jobs', 'views' => 1245, 'unique_visitors' => 892],
+//     ['page' => '/applicant/dashboard', 'views' => 987, 'unique_visitors' => 654],
+//     ['page' => '/signin', 'views' => 756, 'unique_visitors' => 523],
+//     ['page' => '/hradmin/applications', 'views' => 432, 'unique_visitors' => 78],
+//     ['page' => '/applicant/job-details', 'views' => 398, 'unique_visitors' => 289]
+// ];
 ?>
 
 <!DOCTYPE html>
@@ -49,6 +49,7 @@ $popular_pages = [
     <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/components/table.css">
     <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/components/alert.css">
     <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/systemadmin/dashboard.style.css">
+    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/systemadmin/system-admin.css">
     <link rel="icon" type="image/x-icon" href="<?= ROOT ?>/assets/images/logo.png">
 
     <style>
@@ -318,7 +319,7 @@ $popular_pages = [
                 </div>
 
                 <!-- Report Filters -->
-                <div class="reports-section">
+                <div style="display: none;" class="reports-section">
                     <h2 class="section-title">Report Filters</h2>
                     <div class="report-filters">
                         <div class="filter-grid">
@@ -328,9 +329,9 @@ $popular_pages = [
                                     <option value="today">Today</option>
                                     <option value="week" selected>Last 7 Days</option>
                                     <option value="month">Last 30 Days</option>
-                                    <option value="quarter">Last 3 Months</option>
+                                    <!-- <option value="quarter">Last 3 Months</option>
                                     <option value="year">Last Year</option>
-                                    <option value="custom">Custom Range</option>
+                                    <option value="custom">Custom Range</option> -->
                                 </select>
                             </div>
 
@@ -339,8 +340,8 @@ $popular_pages = [
                                 <select id="report_type" class="form-input">
                                     <option value="overview" selected>System Overview</option>
                                     <option value="users">User Activity</option>
-                                    <option value="performance">Performance</option>
-                                    <option value="security">Security</option>
+                                    <!-- <option value="performance">Performance</option> -->
+                                    <!-- <option value="security">Security</option> -->
                                     <option value="errors">Error Logs</option>
                                 </select>
                             </div>
@@ -368,55 +369,59 @@ $popular_pages = [
                     <h2 class="section-title">System Overview</h2>
                     <div class="stats-grid">
                         <div class="stat-card">
-                            <div class="stat-value"><?= number_format($system_stats['total_users']) ?></div>
+                            <div class="stat-value"><?= number_format($data['system_stats']['total_users']) ?></div>
                             <div class="stat-label">Total Users</div>
                         </div>
-                        <div class="stat-card">
+                        <!-- <div class="stat-card">
                             <div class="stat-value"><?= $system_stats['active_sessions'] ?></div>
                             <div class="stat-label">Active Sessions</div>
-                        </div>
+                        </div> -->
                         <div class="stat-card">
-                            <div class="stat-value"><?= $system_stats['total_jobs'] ?></div>
+                            <div class="stat-value"><?= $data['system_stats']['total_jobs'] ?></div>
                             <div class="stat-label">Job Postings</div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-value"><?= number_format($system_stats['total_applications']) ?></div>
+                            <div class="stat-value"><?= number_format($data['system_stats']['total_applications']) ?>
+                            </div>
                             <div class="stat-label">Applications</div>
                         </div>
-                        <div class="stat-card">
+                        <!-- <div class="stat-card">
                             <div class="stat-value"><?= $system_stats['server_uptime'] ?></div>
                             <div class="stat-label">Server Uptime</div>
-                        </div>
+                        </div> -->
                         <div class="stat-card">
-                            <div class="stat-value"><?= $system_stats['database_size'] ?></div>
+                            <div class="stat-value"><?= $data['system_stats']['database_size'] ?></div>
                             <div class="stat-label">Database Size</div>
                         </div>
                         <div class="stat-card">
+                            <div class="stat-value"><?= $data['system_stats']['total_interviews'] ?></div>
+                            <div class="stat-label">Total Interviews</div>
+                        </div>
+                        <!-- <div class="stat-card">
                             <div class="stat-value"><?= $system_stats['storage_used'] ?></div>
                             <div class="stat-label">Storage Used</div>
-                        </div>
-                        <div class="stat-card">
+                        </div> -->
+                        <!-- <div class="stat-card">
                             <div class="stat-value"><?= $system_stats['avg_response_time'] ?></div>
                             <div class="stat-label">Avg Response Time</div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
                 <!-- User Activity Chart -->
-                <!-- <div class="reports-section">
+                <div class="reports-section">
                     <h2 class="section-title"> User Activity Trends</h2>
                     <div class="export-buttons">
                         <button class="btn btn-outline-primary" onclick="exportChart('user_activity')">
-                             Export Chart
+                            Export Chart
                         </button>
                         <button class="btn btn-outline-secondary" onclick="downloadData('user_activity')">
-                             Download Data
+                            Download Data
                         </button>
                     </div>
                     <div class="chart-container">
                         <div class="chart-placeholder">
-                             Interactive chart would be rendered here<br>
-                            <small>Integration with Chart.js or similar library for production</small>
+                            <canvas id="myChart" width="400" height="200"></canvas>
                         </div>
                     </div>
 
@@ -430,17 +435,18 @@ $popular_pages = [
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($user_activity as $activity): ?>
+                            <?php logger($data) ?>
+                            <?php foreach ($data['user_activity'] as $activity): ?>
                                 <tr>
-                                    <td><?= date('M d, Y', strtotime($activity['date'])) ?></td>
+                                    <td><?= date('M d, Y', strtotime($activity['log_date'])) ?></td>
                                     <td><?= $activity['logins'] ?></td>
                                     <td><?= $activity['registrations'] ?></td>
-                                    <td><?= $activity['applications'] ?></td>
+                                    <td><?= $activity['applications_submitted'] ?></td>
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
                     </table>
-                </div> -->
+                </div>
 
                 <!-- System Performance -->
                 <!-- <div class="reports-section">
@@ -503,9 +509,15 @@ $popular_pages = [
                 </div> -->
 
                 <!-- Error Logs -->
-                <!-- <div class="reports-section">
-                    <h2 class="section-title"> Recent System Events</h2>
-                    <table class="reports-table">
+                <div class="reports-section">
+                    <h2 class="section-title">Department Job Posting Overview</h2>
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            <canvas id="myChart2" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- <table class="reports-table">
                         <thead>
                             <tr>
                                 <th>Time</th>
@@ -528,8 +540,18 @@ $popular_pages = [
                                 </tr>
                             <?php endforeach; ?>
                         </tbody>
-                    </table>
-                </div> -->
+                    </table> -->
+                </div>
+
+                <!-- Interview Progress -->
+                <div class="reports-section">
+                    <h2 class="section-title">Interviewing Progress</h2>
+                    <div class="chart-container">
+                        <div class="chart-placeholder">
+                            <canvas id="myChart3" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Popular Pages -->
                 <!-- <div class="reports-section">
@@ -561,22 +583,22 @@ $popular_pages = [
                     <h2 class="section-title"> Quick Actions</h2>
                     <div class="quick-actions">
                         <a href="#" class="action-button" onclick="scheduleReport()">
-                             Schedule Automated Reports
+                            Schedule Automated Reports
                         </a>
                         <a href="#" class="action-button" onclick="clearCache()">
-                             Clear System Cache
+                            Clear System Cache
                         </a>
                         <a href="#" class="action-button" onclick="optimizeDatabase()">
-                             Optimize Database
+                            Optimize Database
                         </a>
                         <a href="#" class="action-button" onclick="exportAllData()">
-                             Export All System Data
+                            Export All System Data
                         </a>
                         <a href="<?= ROOT ?>/systemadmin/accesslogs" class="action-button">
-                             View Detailed Logs
+                            View Detailed Logs
                         </a>
                         <a href="#" class="action-button" onclick="systemHealthCheck()">
-                             Run Health Check
+                            Run Health Check
                         </a>
                     </div>
                 </div>
@@ -594,19 +616,121 @@ $popular_pages = [
                 ?>
 
             <script src="<?= ROOT ?>/assets/js/main.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script>
                 function generateReport() {
                     const dateRange = document.getElementById('date_range').value;
                     const reportType = document.getElementById('report_type').value;
                     const exportFormat = document.getElementById('export_format').value;
 
-                    showToast(`Generating ${reportType} report for ${dateRange} in ${exportFormat} format...`, 'info');
+                    console.log(`${dateRange}/${reportType}/${exportFormat}`);
+
+
+
+                    // showToast(`Generating ${reportType} report for ${dateRange} in ${exportFormat} format...`, 'info');
 
                     // Simulate report generation
-                    setTimeout(() => {
-                        showToast('Report generated successfully! Check your downloads.', 'success');
-                    }, 3000);
+                    // setTimeout(() => {
+                    //     showToast('Report generated successfully! Check your downloads.', 'success');
+                    // }, 3000);
                 }
+
+
+                let userChart; // global variable
+
+                function userActivityChart() {
+                    const stats = <?= json_encode($data['user_activity']); ?>;
+                    const labels = stats.map(row => row.log_date);
+                    const logins = stats.map(row => row.logins);
+                    const registrations = stats.map(row => row.registrations);
+                    const applications = stats.map(row => row.applications_submitted);
+
+                    const ctx = document.getElementById('myChart').getContext('2d');
+
+                    userChart = new Chart(ctx, {   // store in global variable
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Logins', data: logins, borderWidth: 2 },
+                                { label: 'Registrations', data: registrations, borderWidth: 2 },
+                                { label: 'Applications Submitted', data: applications, borderWidth: 2 }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 }
+                                }
+                            }
+                        }
+                    });
+                }
+                userActivityChart();
+
+                function jobPostStatChart() {
+                    const stats = <?= json_encode($data['jobpost_stats']); ?>;
+                    const labels = stats.map(row => row.department_name);
+                    const count = stats.map(row => row.job_count);
+
+                    const ctx = document.getElementById('myChart2').getContext('2d');
+
+                    userChart = new Chart(ctx, {   // store in global variable
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Number of jobs', data: count, borderWidth: 2 },
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 }
+                                }
+                            }
+                        }
+                    });
+                }
+                jobPostStatChart()
+
+
+                function interviewStatChart() {
+                    const stats = <?= json_encode($data['interview_stats']); ?>;
+                    const labels = stats.map(row => row.updated_at);
+                    const completed = stats.map(row => row.completed);
+                    const scheduled = stats.map(row => row.scheduled);
+
+                    const ctx = document.getElementById('myChart3').getContext('2d');
+
+                    userChart = new Chart(ctx, {   // store in global variable
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Completed', data: completed, borderWidth: 2 },
+                                { label: 'Scheduled', data: scheduled, borderWidth: 2 },
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 }
+                                }
+                            }
+                        }
+                    });
+                }
+                interviewStatChart()
+
+
+
 
                 function exportChart(chartType) {
                     showToast(`Exporting ${chartType} chart...`, 'info');
@@ -614,7 +738,14 @@ $popular_pages = [
                 }
 
                 function downloadData(dataType) {
-                    showToast(`Downloading ${dataType} data...`, 'info');
+                    // showToast(`Downloading ${dataType} data...`, 'info');
+                    if (!userChart) return;
+                    const url = userChart.toBase64Image();
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'user_activity_chart.png';
+                    a.click();
+
                     // In real implementation, this would download CSV/JSON data
                 }
 
