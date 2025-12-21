@@ -57,10 +57,10 @@ class Interview
                   LEFT JOIN users u ON i.interviewer_id = u.id
                   WHERE a.applicant_id = ?
                   ORDER BY i.scheduled_date ASC, i.scheduled_time ASC";
-        
+
         return $this->query($query, [$user_id]);
     }
-    
+
     public function getUpcomingInterviews($user_id)
     {
         $query = "SELECT i.*, 
@@ -77,10 +77,10 @@ class Interview
                   AND i.status = 'Scheduled'
                   ORDER BY i.scheduled_date ASC, i.scheduled_time ASC
                   LIMIT 5";
-        
+
         return $this->query($query, [$user_id]);
     }
-    
+
     public function getInterviewCount($user_id)
     {
         $query = "SELECT COUNT(*) as total_interviews,
@@ -89,13 +89,13 @@ class Interview
                   FROM interviews i 
                   JOIN applications a ON i.application_id = a.id
                   WHERE a.applicant_id = ?";
-        
+
         return $this->get_row($query, [$user_id]);
     }
 
-    
+
     //Get all interviews for recruitment manager with candidate and job details
-    
+
     public function getInterviewsForRecruitment()
     {
         $query = "SELECT 
@@ -122,7 +122,7 @@ class Interview
                   LEFT JOIN users interviewer ON i.interviewer_id = interviewer.id
                   LEFT JOIN roles r ON interviewer.role_id = r.id
                   ORDER BY i.scheduled_date DESC, i.scheduled_time DESC";
-        
+
         return $this->query($query);
     }
 
@@ -147,7 +147,7 @@ class Interview
                   LEFT JOIN roles r ON interviewer.role_id = r.id
                   WHERE i.id = ?
                   LIMIT 1";
-        
+
         return $this->get_row($query, [$id]);
     }
 
@@ -219,8 +219,30 @@ class Interview
                       AND i.status IN ('Pending', 'Scheduled')
                   )
                   ORDER BY a.applied_at DESC";
-        
+
         return $this->query($query);
+    }
+
+    public function getTotalInterviews()
+    {
+        $query = "SELECT COUNT(*) AS total FROM {$this->table} WHERE status ='Completed' ";
+        $result = $this->query($query);
+        return $result ? (int) $result[0]['total'] : 0;
+
+    }
+
+    public function getInterviewStats()
+    {
+        $query = "SELECT 
+        DATE(updated_at) AS updated_at,
+        SUM(status = 'Completed') AS completed,
+        SUM(status = 'Scheduled') AS scheduled
+        FROM {$this->table}
+        GROUP BY updated_at
+        ORDER BY updated_at ASC";
+
+        $result = $this->query($query);
+        return $result ? $result : 0;
     }
 }
 ?>
