@@ -5,7 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
-    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/systemadmin/dashboard.style.css">
+
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/main.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/button.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/card.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/input.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/table.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/alert.css">
+
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/systemadmin/dashboard.style.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/systemadmin/system-admin.css">
+
     <link rel="icon" type="image/x-icon" href="<?= ROOT ?>/assets/images/logo.png">
 </head>
 
@@ -124,6 +134,46 @@
             </div>
 
             <div class="dashboard-sections">
+
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Recent Activities</h2>
+                        <a href="<?= ROOT ?>/systemadmin/accesslogs" class="section-link">View All</a>
+                    </div>
+                    <!-- <div class="activity-list"> -->
+                    <?php if (!empty($recent_logins)): ?>
+                        <?php //  logger($recent_logins) ?>
+                        <div class="table-container">
+                            <table class="data-table activity-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Activity</th>
+                                        <th>At</th>
+                                        <th>User Email</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($recent_logins as $recent_login): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($recent_login['id']) ?></td>
+                                            <td><?= htmlspecialchars($recent_login['details']) ?></td>
+                                            <td><?= htmlspecialchars($recent_login['created_at']) ?></td>
+                                            <td><?= htmlspecialchars($recent_login['email']) ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php else: ?>
+                        <div class="empty-state">
+                            <p>No recent activities to display</p>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- </div> -->
+                </div>
+
                 <div class="dashboard-section">
                     <div class="section-header">
                         <h2 class="section-title">Quick Actions</h2>
@@ -131,6 +181,7 @@
                     <div class="quick-actions">
                         <a href="<?= ROOT ?>/systemadmin/usermanage" class="action-card">
                             <div class="action-icon">
+                                👤
                             </div>
                             <div class="action-content">
                                 <h3>Add New User</h3>
@@ -140,6 +191,7 @@
 
                         <a href="<?= ROOT ?>/systemadmin/reports" class="action-card">
                             <div class="action-icon">
+                                📄
                             </div>
                             <div class="action-content">
                                 <h3>View Reports</h3>
@@ -149,6 +201,7 @@
 
                         <a href="<?= ROOT ?>/systemadmin/accesslogs" class="action-card">
                             <div class="action-icon">
+                                🪪
                             </div>
                             <div class="action-content">
                                 <h3>Security Logs</h3>
@@ -158,34 +211,8 @@
                     </div>
                 </div>
 
-                <div class="dashboard-section">
-                    <div class="section-header">
-                        <h2 class="section-title">Recent Activities</h2>
-                        <a href="<?= ROOT ?>/systemadmin/logs" class="section-link">View All</a>
-                    </div>
-                    <div class="activity-list">
-
-                        <?php if (!empty($recent_logins)): ?>
-                            <?php foreach ($recent_logins as $recent_login): ?>
-                                <div class="activity-item">
-                                    <div class="activity-icon"></div>
-                                    <div class="activity-content">
-                                        <p class="activity-text"><?= htmlspecialchars($recent_login['id']) ?>
-                                            (<?= htmlspecialchars($recent_login['details']) ?>)</p>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <div class="empty-state">
-                                <p>No recent activities to display</p>
-                            </div>
-                        <?php endif; ?>
-
-                    </div>
-                </div>
-
                 <!-- System Status -->
-                <div class="dashboard-section">
+                <!-- <div class="dashboard-section">
                     <div class="section-header">
                         <h2 class="section-title">System Status</h2>
                     </div>
@@ -214,7 +241,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>

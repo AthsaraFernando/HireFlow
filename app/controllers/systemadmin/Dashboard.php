@@ -43,7 +43,7 @@ class Dashboard extends Controller
         $data['applicants'] = is_array($applicants) ? count($applicants) : 0;
         
         // Recent activity
-        $data['recent_logins'] = $accessLog->getAllActivityWithUsers(10);
+        $data['recent_logins'] = $accessLog->getAllActivityWithUsers(15);
         
         $failedLogins = $accessLog->getFailedLogins(24);
         $data['failed_logins_today'] = is_array($failedLogins) ? count($failedLogins) : 0;
