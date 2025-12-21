@@ -6,6 +6,7 @@ class AccessLog
     protected $table = 'access_logs';
     protected $allowedColumns = [
         'user_id',
+        'user_role',
         'action',
         'details',
         'ip_address',
@@ -22,6 +23,7 @@ class AccessLog
 
         $data = [
             'user_id' => $userId ?? Auth::user_id(),
+            'user_role' => Auth::user_role(),
             'action' => $action,
             'details' => $details,
             'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
@@ -116,5 +118,30 @@ class AccessLog
         $failedAttempts = $result ? $result[0]['failed_attempts'] : 0;
 
         return $failedAttempts >= $maxAttempts;
+    }
+
+
+    public function countAction($action)
+    {
+        $query = "SELECT COUNT(*) AS total FROM {$this->table} WHERE action = '$action'";
+        $result = $this->query($query);
+        // logger($result);
+        return $result ? (int) $result[0]['total'] : 0;
+    }
+
+    public function getUserTrendStats()
+    {
+        $query = "SELECT
+        DATE(created_at) AS log_date,
+        SUM(action = 'login') AS logins,
+        SUM(action = 'registration') AS registrations,
+        SUM(action = 'application_submit') AS applications_submitted
+        FROM {$this->table}
+        GROUP BY DATE(created_at)
+        ORDER BY log_date ASC";
+
+        $result = $this->query($query);
+        return $result ? $result : 0;
+
     }
 }
