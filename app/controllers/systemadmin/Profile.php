@@ -33,11 +33,11 @@ class Profile extends Controller {
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 $errors[] = "Invalid email format";
             }
-
+            
             // Check if email is already taken by another user
             if (!empty($data['email'])) {
                 $existing = $user->first(['email' => $data['email']]);
-                if ($existing && $existing->id != $_SESSION['USER']['id']) {
+                if ($existing && $existing['id'] != $data['id']) {
                     $errors[] = "Email is already in use by another account";
                 }
             }
