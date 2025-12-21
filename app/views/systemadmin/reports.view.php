@@ -412,9 +412,9 @@
                 <div class="reports-section">
                     <h2 class="section-title"> User Activity Trends</h2>
                     <div class="export-buttons">
-                        <button class="btn btn-outline-primary" onclick="exportChart('user_activity')">
+                        <!-- <button class="btn btn-outline-primary" onclick="exportChart('user_activity')">
                             Export Chart
-                        </button>
+                        </button> -->
                         <button class="btn btn-outline-secondary" onclick="downloadData('user_activity')">
                             Download Data
                         </button>
@@ -435,7 +435,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php logger($data) ?>
                             <?php foreach ($data['user_activity'] as $activity): ?>
                                 <tr>
                                     <td><?= date('M d, Y', strtotime($activity['log_date'])) ?></td>
@@ -511,6 +510,14 @@
                 <!-- Error Logs -->
                 <div class="reports-section">
                     <h2 class="section-title">Department Job Posting Overview</h2>
+                    <div class="export-buttons">
+                        <!-- <button class="btn btn-outline-primary" onclick="exportChart('user_activity')">
+                            Export Chart
+                        </button> -->
+                        <button class="btn btn-outline-secondary" onclick="downloadData('job_posting_overview')">
+                            Download Data
+                        </button>
+                    </div>
                     <div class="chart-container">
                         <div class="chart-placeholder">
                             <canvas id="myChart2" width="400" height="200"></canvas>
@@ -546,6 +553,14 @@
                 <!-- Interview Progress -->
                 <div class="reports-section">
                     <h2 class="section-title">Interviewing Progress</h2>
+                    <div class="export-buttons">
+                        <!-- <button class="btn btn-outline-primary" onclick="exportChart('user_activity')">
+                            Export Chart
+                        </button> -->
+                        <button class="btn btn-outline-secondary" onclick="downloadData('interviewing_progress')">
+                            Download Data
+                        </button>
+                    </div>
                     <div class="chart-container">
                         <div class="chart-placeholder">
                             <canvas id="myChart3" width="400" height="200"></canvas>
@@ -579,7 +594,7 @@
                 </div> -->
 
                 <!-- Quick Actions -->
-                <div class="reports-section">
+                <!-- <div class="reports-section">
                     <h2 class="section-title"> Quick Actions</h2>
                     <div class="quick-actions">
                         <a href="#" class="action-button" onclick="scheduleReport()">
@@ -601,7 +616,7 @@
                             Run Health Check
                         </a>
                     </div>
-                </div>
+                </div> -->
 
                 <div class="text-center mt-4">
                     <a href="<?= ROOT ?>/systemadmin/dashboard" class="btn btn-outline-secondary">
@@ -636,7 +651,9 @@
                 }
 
 
-                let userChart; // global variable
+                let userChart1; // global variable
+                let userChart2;
+                let userChart3;
 
                 function userActivityChart() {
                     const stats = <?= json_encode($data['user_activity']); ?>;
@@ -647,7 +664,7 @@
 
                     const ctx = document.getElementById('myChart').getContext('2d');
 
-                    userChart = new Chart(ctx, {   // store in global variable
+                    userChart1 = new Chart(ctx, {   // store in global variable
                         type: 'line',
                         data: {
                             labels: labels,
@@ -677,7 +694,7 @@
 
                     const ctx = document.getElementById('myChart2').getContext('2d');
 
-                    userChart = new Chart(ctx, {   // store in global variable
+                    userChart2 = new Chart(ctx, {   // store in global variable
                         type: 'bar',
                         data: {
                             labels: labels,
@@ -707,7 +724,7 @@
 
                     const ctx = document.getElementById('myChart3').getContext('2d');
 
-                    userChart = new Chart(ctx, {   // store in global variable
+                    userChart3 = new Chart(ctx, {   // store in global variable
                         type: 'bar',
                         data: {
                             labels: labels,
@@ -739,12 +756,32 @@
 
                 function downloadData(dataType) {
                     // showToast(`Downloading ${dataType} data...`, 'info');
-                    if (!userChart) return;
-                    const url = userChart.toBase64Image();
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'user_activity_chart.png';
-                    a.click();
+                    if (!userChart1 || !userChart2 || !userChart3) return;
+                    switch (dataType) {
+                        case 'user_activity':
+                            const url1 = userChart1.toBase64Image();
+                            const a1 = document.createElement('a');
+                            a1.href = url1;
+                            a1.download = 'user_activity.png';
+                            a1.click();
+                            break;
+                        case 'job_posting_overview':
+                            const url2 = userChart2.toBase64Image();
+                            const a2 = document.createElement('a');
+                            a2.href = url2;
+                            a2.download = 'job_posting_overview.png';
+                            a2.click();
+                            break;
+                        case 'interviewing_progress':
+                            const url3 = userChart3.toBase64Image();
+                            const a3 = document.createElement('a');
+                            a3.href = url3;
+                            a3.download = 'interviewing_progress.png';
+                            a3.click();
+                            break;
+                        default:
+                            console.log('Unknown data type:', dataType);
+                    }
 
                     // In real implementation, this would download CSV/JSON data
                 }
