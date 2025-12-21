@@ -462,10 +462,11 @@
                         <label>Filter by User:</label>
                         <select class="filter-select" id="userFilter">
                             <option value="">All Users</option>
-                            <option value="system_admin">System Admins</option>
-                            <option value="hr_admin">HR Admins</option>
-                            <option value="recruitment_manager">Recruitment Managers</option>
-                            <option value="applicant">Applicants</option>
+                            <option value="">All Users</option>
+                            <option value="System Admin">System Admin</option>
+                            <option value="HR Admin">HR Admin</option>
+                            <option value="Recruitment Manager">Recruitment Manager</option>
+                            <option value="Applicant">Applicant</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -494,6 +495,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>User ID</th>
+                                <th>User Role</th>
                                 <th>IP Address</th>
                                 <th>Action</th>
                                 <th>Details</th>
@@ -502,11 +504,20 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <?php
+                            $roles = [
+                                1 => 'System Admin',
+                                2 => 'HR Admin',
+                                3 => 'Recruitment Manager',
+                                4 => 'Applicant'
+                            ];
+                            ?>
                             <?php if (!empty($logs)): ?>
                                 <?php foreach ($logs as $log): ?>
                                     <tr>
                                         <td><?= $log['id'] ?></td>
                                         <td><?= $log['user_id'] ?></td>
+                                        <td><?= $roles[$log['user_role']] ?? 'Unknown' ?></td>
                                         <td><?= $log['ip_address'] ?></td>
                                         <td><?= $log['action'] ?></td>
                                         <td><?= $log['details'] ?></td>
@@ -765,12 +776,13 @@
                         }
 
                         const cells = row.querySelectorAll('td');
-                        const createdAt = cells[6]?.textContent.trim() || '';
                         const userId = cells[1]?.textContent.trim() || '';
-                        const ipAddress = cells[2]?.textContent.trim() || '';
-                        const action = cells[3]?.textContent.trim().toLowerCase() || '';
-                        const details = cells[4]?.textContent.trim().toLowerCase() || '';
-                        const userAgent = cells[5]?.textContent.trim().toLowerCase() || '';
+                        const userRole = cells[2]?.textContent.trim() || '';
+                        const ipAddress = cells[3]?.textContent.trim() || '';
+                        const action = cells[4]?.textContent.trim().toLowerCase() || '';
+                        const details = cells[5]?.textContent.trim().toLowerCase() || '';
+                        const userAgent = cells[6]?.textContent.trim().toLowerCase() || '';
+                        const createdAt = cells[7]?.textContent.trim() || '';
 
                         let shouldShow = true;
 
@@ -793,6 +805,11 @@
 
                         // Action filter
                         if (actionFilter && !action.includes(actionFilter.toLowerCase())) {
+                            shouldShow = false;
+                        }
+
+                        // User filter
+                        if (userFilter && userRole.toLowerCase() !== userFilter.toLowerCase()) {
                             shouldShow = false;
                         }
 
