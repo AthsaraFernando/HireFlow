@@ -478,8 +478,8 @@
                             <option value="failed_login">Failed Login</option>
                             <option value="password_change">Password Change</option>
                             <option value="profile_update">Profile Update</option>
-                            <option value="data_access">Data Access</option>
-                            <option value="admin_action">Admin Action</option>
+                            <!-- <option value="data_access">Data Access</option>
+                            <option value="admin_action">Admin Action</option> -->
                         </select>
                     </div>
                     <div class="filter-actions">

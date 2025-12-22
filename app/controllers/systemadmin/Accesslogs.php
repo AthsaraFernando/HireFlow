@@ -11,52 +11,52 @@ class Accesslogs extends Controller
         $accessLog = new AccessLog();
 
         // Get filter parameters
-        $action = $_GET['action'] ?? '';
-        $userId = $_GET['user_id'] ?? '';
-        $dateFrom = $_GET['date_from'] ?? '';
-        $dateTo = $_GET['date_to'] ?? '';
-        $limit = (int) ($_GET['limit'] ?? 50);
+        // $action = $_GET['action'] ?? '';
+        // $userId = $_GET['user_id'] ?? '';
+        // $dateFrom = $_GET['date_from'] ?? '';
+        // $dateTo = $_GET['date_to'] ?? '';
+        // $limit = (int) ($_GET['limit'] ?? 50);
 
         // Build query conditions
-        $conditions = [];
-        $params = [];
+        // $conditions = [];
+        // $params = [];
 
-        if (!empty($action)) {
-            $conditions[] = "al.action = ?";
-            $params[] = $action;
-        }
+        // if (!empty($action)) {
+        //     $conditions[] = "al.action = ?";
+        //     $params[] = $action;
+        // }
 
-        if (!empty($userId)) {
-            $conditions[] = "al.user_id = ?";
-            $params[] = $userId;
-        }
+        // if (!empty($userId)) {
+        //     $conditions[] = "al.user_id = ?";
+        //     $params[] = $userId;
+        // }
 
-        if (!empty($dateFrom)) {
-            $conditions[] = "DATE(al.created_at) >= ?";
-            $params[] = $dateFrom;
-        }
+        // if (!empty($dateFrom)) {
+        //     $conditions[] = "DATE(al.created_at) >= ?";
+        //     $params[] = $dateFrom;
+        // }
 
-        if (!empty($dateTo)) {
-            $conditions[] = "DATE(al.created_at) <= ?";
-            $params[] = $dateTo;
-        }
+        // if (!empty($dateTo)) {
+        //     $conditions[] = "DATE(al.created_at) <= ?";
+        //     $params[] = $dateTo;
+        // }
 
         // Build query
-        $whereClause = '';
-        if (!empty($conditions)) {
-            $whereClause = 'WHERE ' . implode(' AND ', $conditions);
-        }
+        // $whereClause = '';
+        // if (!empty($conditions)) {
+        //     $whereClause = 'WHERE ' . implode(' AND ', $conditions);
+        // }
 
-        $query = "SELECT al.*, u.full_name, u.email, r.role_name 
-                  FROM access_logs al 
-                  LEFT JOIN users u ON al.user_id = u.id 
-                  LEFT JOIN roles r ON u.role_id = r.id 
-                  $whereClause
-                  ORDER BY al.created_at DESC 
-                  LIMIT " . (int) $limit;
+        // $query = "SELECT al.*, u.full_name, u.email, r.role_name 
+        //           FROM access_logs al 
+        //           LEFT JOIN users u ON al.user_id = u.id 
+        //           LEFT JOIN roles r ON u.role_id = r.id 
+        //           $whereClause
+        //           ORDER BY al.created_at DESC 
+        //           LIMIT " . (int) $limit;
 
         // Get filtered logs
-        $data['logs'] = $accessLog->query($query, $params) ?: [];
+        // $data['logs'] = $accessLog->query($query, data: $params) ?: [];
 
         // Get summary statistics
         $data['total_logs'] = $this->getTotalLogs($accessLog);
@@ -69,15 +69,15 @@ class Accesslogs extends Controller
         $data['users'] = $this->getAllUsers();
 
         // Current filter values
-        $data['current_filters'] = [
-            'action' => $action,
-            'user_id' => $userId,
-            'date_from' => $dateFrom,
-            'date_to' => $dateTo,
-            'limit' => $limit
-        ];
+        // $data['current_filters'] = [
+        //     'action' => $action,
+        //     'user_id' => $userId,
+        //     'date_from' => $dateFrom,
+        //     'date_to' => $dateTo,
+        //     'limit' => $limit
+        // ];
 
-        $data['logs'] =  $this->getAllLogs($accessLog);
+        $data['logs'] = $this->getAllLogs($accessLog);
         $data['view'] = 'accesslogs';
         $this->view('systemadmin', $data);
     }
