@@ -191,18 +191,18 @@ class User
 
     public function resetPassword($token, $newPassword)
     {
-        $user = $this->first([
-            'password_reset_token' => $token,
-            'password_reset_expires >' => date('Y-m-d H:i:s')
-        ], []);
+        // $user = $this->first([
+        //     'password_reset_token' => $token,
+        //     'password_reset_expires >' => date('Y-m-d H:i:s')
+        // ], []);
 
-        if ($user) {
+        if ($_SESSION['USER_ID']) {
             $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-            $this->update($user['id'], [
+            $this->update($_SESSION['USER_ID'] , [
                 'password' => $hashedPassword,
-                'password_reset_token' => null,
-                'password_reset_expires' => null,
-                'updated_at' => date('Y-m-d H:i:s')
+                // 'password_reset_token' => null,
+                // 'password_reset_expires' => null,
+                // 'updated_at' => date('Y-m-d H:i:s')
             ]);
             return true;
         }
