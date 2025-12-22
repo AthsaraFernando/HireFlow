@@ -470,10 +470,10 @@
                         <label>Filter by Role:</label>
                         <select class="filter-select" id="roleFilter">
                             <option value="">All Roles</option>
-                            <option value="system_admin">System Admin</option>
-                            <option value="hr_admin">HR Admin</option>
-                            <option value="recruitment_manager">Recruitment Manager</option>
-                            <option value="applicant">Applicant</option>
+                            <option value="System Admin">System Admin</option>
+                            <option value="HR Admin">HR Admin</option>
+                            <option value="Recruitment Manager">Recruitment Manager</option>
+                            <option value="Applicant">Applicant</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -482,7 +482,7 @@
                             <option value="">All Status</option>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
-                            <option value="suspended">Suspended</option>
+                            <!-- <option value="suspended">Suspended</option> -->
                         </select>
                     </div>
                     <div class="filter-actions">
@@ -1091,14 +1091,14 @@
                     const searchTerm = document.getElementById('userSearch').value.toLowerCase();
                     const roleFilter = document.getElementById('roleFilter').value;
                     const statusFilter = document.getElementById('statusFilter').value;
-
+                    
                     // Filter table rows based on criteria
                     const rows = document.querySelectorAll('tbody tr');
                     rows.forEach(row => {
-                        const name = row.querySelector('.user-name').textContent.toLowerCase();
-                        const email = row.cells[3].textContent.toLowerCase();
-                        const role = row.querySelector('.role-badge').textContent.toLowerCase();
-                        const status = row.querySelector('.status-badge').textContent.toLowerCase();
+                        const name = row.cells[1].textContent.toLowerCase();
+                        const email = row.cells[2].textContent.toLowerCase();
+                        const role = row.cells[3].textContent.toLowerCase();
+                        const status = row.cells[4].textContent.toLowerCase();
 
                         const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
                         const matchesRole = !roleFilter || role.includes(roleFilter.toLowerCase());
