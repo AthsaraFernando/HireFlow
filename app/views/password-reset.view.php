@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,28 +10,31 @@
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/input.css">
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/button.css">
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/alert.css">
+    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/systemadmin/system-admin.css">
 </head>
+
 <body>
     <div class="auth-container">
         <div class="auth-card">
             <div class="auth-header">
                 <img src="<?= ROOT ?>/assets/images/logo.png" alt="HireFlow" class="logo">
                 <h1>Reset Password</h1>
-                <p class="text-muted">Enter your email address and we'll send you instructions to reset your password.</p>
+                <p class="text-muted">Enter your email address and we'll send you a link to reset your password.
+                </p>
             </div>
 
             <div class="auth-form">
                 <?php if (!empty($success)): ?>
-                    <div class="alert alert-success">
+                    <div class="alert alert-success msg-container">
                         <?= esc($success) ?>
-                        
+
                         <?php if (!empty($debug_token)): ?>
-                            <hr>
-                            <strong>Development Mode:</strong><br>
-                            Reset Token: <code><?= esc($debug_token) ?></code><br>
+                             <hr>
+                         <!--   Reset Token: <code><?= esc($debug_token) ?></code><br> -->
                             Reset Link: <a href="<?= esc($debug_link) ?>" target="_blank">Click Here to Reset</a>
                         <?php endif; ?>
                     </div>
+
                 <?php endif; ?>
 
                 <?php if (!empty($errors['general'])): ?>
@@ -41,18 +45,12 @@
 
                 <form method="POST" action="">
                     <?= csrf_token_input() ?>
-                    
+
                     <div class="form-group">
                         <label for="email">Email Address</label>
-                        <input 
-                            type="email" 
-                            id="email" 
-                            name="email" 
+                        <input type="email" id="email" name="email"
                             class="form-control <?= !empty($errors['email']) ? 'is-invalid' : '' ?>"
-                            value="<?= esc($_POST['email'] ?? '') ?>"
-                            placeholder="Enter your email address"
-                            required
-                        >
+                            value="<?= esc($_POST['email'] ?? '') ?>" placeholder="Enter your email address" required>
                         <?php if (!empty($errors['email'])): ?>
                             <div class="invalid-feedback">
                                 <?= esc($errors['email']) ?>
@@ -86,9 +84,9 @@
         .auth-card {
             background: white;
             border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
-            max-width: 400px;
+            max-width: 600px;
             overflow: hidden;
         }
 
@@ -118,6 +116,8 @@
 
         .auth-form {
             padding: 30px;
+            display: flex;
+            flex-direction: column;
         }
 
         .form-group {
@@ -168,6 +168,12 @@
             font-family: monospace;
             font-size: 12px;
         }
+
+        .msg-container {
+            display: flex;
+            flex-direction: column;
+        }
     </style>
 </body>
+
 </html>

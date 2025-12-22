@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,9 @@
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/input.css">
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/button.css">
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/alert.css">
+    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/systemadmin/system-admin.css">
 </head>
+
 <body>
     <div class="auth-container">
         <div class="auth-card">
@@ -29,37 +32,28 @@
                 <form method="POST" action="">
                     <?= csrf_token_input() ?>
                     <input type="hidden" name="token" value="<?= esc($token) ?>">
-                    
+
                     <div class="form-group">
                         <label for="password">New Password</label>
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password" 
+                        <input type="password" id="password" name="password"
                             class="form-control <?= !empty($errors['password']) ? 'is-invalid' : '' ?>"
-                            placeholder="Enter new password"
-                            required
-                        >
+                            placeholder="Enter new password" required>
                         <?php if (!empty($errors['password'])): ?>
                             <div class="invalid-feedback">
                                 <?= esc($errors['password']) ?>
                             </div>
                         <?php endif; ?>
                         <small class="form-text text-muted">
-                            Password must be at least 8 characters with uppercase, lowercase, number, and special character.
+                            Password must be at least 8 characters with uppercase, lowercase, number, and special
+                            character.
                         </small>
                     </div>
 
                     <div class="form-group">
                         <label for="confirm_password">Confirm New Password</label>
-                        <input 
-                            type="password" 
-                            id="confirm_password" 
-                            name="confirm_password" 
+                        <input type="password" id="confirm_password" name="confirm_password"
                             class="form-control <?= !empty($errors['confirm_password']) ? 'is-invalid' : '' ?>"
-                            placeholder="Confirm new password"
-                            required
-                        >
+                            placeholder="Confirm new password" required>
                         <?php if (!empty($errors['confirm_password'])): ?>
                             <div class="invalid-feedback">
                                 <?= esc($errors['confirm_password']) ?>
@@ -92,7 +86,7 @@
         .auth-card {
             background: white;
             border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 400px;
             overflow: hidden;
@@ -178,10 +172,10 @@
         const passwordInput = document.getElementById('password');
         const confirmInput = document.getElementById('confirm_password');
 
-        passwordInput.addEventListener('input', function() {
+        passwordInput.addEventListener('input', function () {
             const password = this.value;
             const isStrong = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
-            
+
             if (password.length > 0) {
                 if (isStrong) {
                     this.style.borderColor = '#28a745';
@@ -193,10 +187,10 @@
             }
         });
 
-        confirmInput.addEventListener('input', function() {
+        confirmInput.addEventListener('input', function () {
             const password = passwordInput.value;
             const confirm = this.value;
-            
+
             if (confirm.length > 0) {
                 if (password === confirm) {
                     this.style.borderColor = '#28a745';
@@ -209,4 +203,5 @@
         });
     </script>
 </body>
+
 </html>
