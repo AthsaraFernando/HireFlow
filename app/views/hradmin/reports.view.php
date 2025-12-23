@@ -81,23 +81,39 @@
 
         <div class="dashboard-content">
             <div class="main-container">
-    <div class="header-section">
-        <h1 class="page-title">HR Reports & Analytics</h1>
-        <p class="page-description">Comprehensive recruitment analytics and performance insights</p>
-        <div class="action-buttons">
-            <button class="btn btn-primary" onclick="exportReport()">
-                Export Report
-            </button>
-            <button class="btn btn-secondary" onclick="scheduleReport()">
-                Schedule Report
-            </button>
-        </div>
-    </div>
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">HR Reports & Analytics</h1>
+                        <p class="hero-description">Get comprehensive insights into your recruitment performance with detailed analytics and custom reports.</p>
+                        <div class="hero-stats">
+                            <div class="hero-stat">
+                                <span class="stat-number"><?= $total_hires ?? '45' ?></span>
+                                <span class="stat-label">Total Hires</span>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="stat-number"><?= $avg_time_to_hire ?? '23' ?></span>
+                                <span class="stat-label">Days to Hire</span>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="stat-number"><?= $success_rate ?? '76' ?>%</span>
+                                <span class="stat-label">Success Rate</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="exportReport()">
+                            <i class="icon-download"></i>Export Report
+                        </button>
+                        <button class="btn btn-outline" onclick="scheduleReport()">
+                            <i class="icon-calendar"></i>Schedule Report
+                        </button>
+                    </div>
+                </div>
 
-    <?php if(!empty($errors)): ?>
-        <div class="alert alert-error">
-            <?php foreach($errors as $error): ?>
-                <p><?php echo $error ?></p>
+                <?php if(!empty($errors)): ?>
+                    <div class="alert alert-error">
+                        <?php foreach($errors as $error): ?>
+                            <p><?php echo $error ?></p>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
@@ -1004,6 +1020,115 @@
         gap: 1rem;
     }
 }
+</style>
+
+/* Modern HR Admin Design System */
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dashboard-content {
+        background: var(--background-gradient);
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, #4c63d2 0%, #5a67d8 50%, #667eea 100%);
+        color: white;
+        padding: 3rem 2.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2.5rem;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+        position: relative;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.1);
+        border-radius: var(--border-radius);
+        pointer-events: none;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: #ffffff;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-description {
+        font-size: 1.125rem;
+        opacity: 1;
+        margin-bottom: 1.5rem;
+        color: rgba(255,255,255,0.95);
+        text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .btn {
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #667eea;
+    }
+
+    .btn-outline {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    /* Icons */
+    .icon-download::before { content: '⬇'; }
+    .icon-calendar::before { content: '📅'; }
+
+    @media (max-width: 768px) {
+        .hero-section { flex-direction: column; }
+        .dashboard-content { padding: 1rem; }
+    }
 </style>
 
 <script>

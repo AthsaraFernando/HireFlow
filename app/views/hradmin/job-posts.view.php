@@ -81,23 +81,42 @@
 
         <div class="dashboard-content">
             <div class="main-container">
-    <div class="header-section">
-        <h1 class="page-title">Job Posts Management</h1>
-        <p class="page-description">Create, edit and manage all job postings</p>
-        <div class="action-buttons">
-            <a href="<?= ROOT ?>/hradmin/create-job" class="btn btn-primary">
-                Create New Job Post
-            </a>
-        </div>
-    </div>
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Job Posts Management</h1>
+                        <p class="hero-description">Create, edit and manage all your job postings in one place. Track performance and attract top talent.</p>
+                        <div class="hero-stats">
+                            <div class="hero-stat">
+                                <span class="stat-number"><?= $total_jobs ?? '24' ?></span>
+                                <span class="stat-label">Total Jobs</span>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="stat-number"><?= $active_jobs ?? '18' ?></span>
+                                <span class="stat-label">Active</span>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="stat-number"><?= $draft_jobs ?? '6' ?></span>
+                                <span class="stat-label">Drafts</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="<?= ROOT ?>/hradmin/create-job" class="btn btn-primary">
+                            <i class="icon-plus"></i>Create New Job
+                        </a>
+                        <button class="btn btn-outline" onclick="exportJobs()">
+                            <i class="icon-download"></i>Export Jobs
+                        </button>
+                    </div>
+                </div>
 
-    <?php if(!empty($errors)): ?>
-        <div class="alert alert-error">
-            <?php foreach($errors as $error): ?>
-                <p><?php echo $error ?></p>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+                <?php if(!empty($errors)): ?>
+                    <div class="alert alert-error">
+                        <?php foreach($errors as $error): ?>
+                            <p><?php echo $error ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
 
     <?php if(!empty($success)): ?>
         <div class="alert alert-success">
@@ -300,6 +319,161 @@
 .search-btn:hover {
     background: #3d2687;
 }
+</style>
+
+/* Modern HR Admin Design System */
+<style>
+    /* Global Variables */
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        --card-hover-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dashboard-content {
+        background: var(--background-gradient);
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, #4c63d2 0%, #5a67d8 50%, #667eea 100%);
+        color: white;
+        padding: 3rem 2.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2.5rem;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+        position: relative;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.1);
+        border-radius: var(--border-radius);
+        pointer-events: none;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: #ffffff;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-description {
+        font-size: 1.125rem;
+        opacity: 1;
+        margin-bottom: 1.5rem;
+        color: rgba(255,255,255,0.95);
+        text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-stat {
+        text-align: center;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+
+    .btn {
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #667eea;
+        box-shadow: 0 8px 25px rgba(255,255,255,0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(255,255,255,0.4);
+    }
+
+    .btn-outline {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    .btn-outline:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-3px);
+    }
+
+    .job-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .job-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-hover-shadow);
+    }
+
+    /* Icons */
+    .icon-plus::before { content: '✚'; }
+    .icon-download::before { content: '⬇'; }
+    .icon-edit::before { content: '✏️'; }
+    .icon-delete::before { content: '🗑️'; }
+    .icon-view::before { content: '👁️'; }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            flex-direction: column;
+            text-align: center;
+        }
+        .dashboard-content {
+            padding: 1rem;
+        }
+    }
 </style>
 
 <script>

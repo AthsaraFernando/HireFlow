@@ -808,47 +808,46 @@
 
         .candidate-title {
             color: #6c757d;
-            font-size: 1rem;
-            margin-bottom: 1rem;
-            font-weight: 500;
+            font-size: 0.875rem;
+            font-style: italic;
         }
 
         .candidate-details {
             display: flex;
-            gap: 1.5rem;
             flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.875rem;
             margin-bottom: 1rem;
         }
 
         .detail-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: #495057;
-            font-size: 0.9rem;
+            gap: 0.25rem;
+            color: #6c757d;
         }
 
         .candidate-skills {
             display: flex;
-            gap: 0.5rem;
             flex-wrap: wrap;
-            margin-bottom: 1rem;
+            gap: 0.5rem;
         }
 
         .skill-tag {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
             padding: 0.25rem 0.75rem;
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 500;
+            color: #495057;
         }
 
         .candidate-meta {
             display: flex;
             align-items: center;
             gap: 1rem;
-            flex-wrap: wrap;
+            font-size: 0.875rem;
         }
 
         .status-badge {
@@ -912,6 +911,9 @@
 
         .application-info {
             flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
         }
 
         .application-header {
@@ -929,10 +931,9 @@
         }
 
         .job-position {
-            color: #667eea;
             font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 1rem;
+            color: #4e31aa;
+            font-size: 0.875rem;
         }
 
         .application-details {
@@ -947,308 +948,6 @@
             align-items: center;
             gap: 1rem;
             flex-wrap: wrap;
-        }
-
-        .match-score {
-            font-weight: 600;
-            color: #28a745;
-            font-size: 0.9rem;
-        }
-
-        /* Button Styling */
-        .btn-icon {
-            padding: 0.5rem;
-            border: none;
-            background: rgba(78, 49, 170, 0.1);
-            color: #4e31aa;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-icon:hover {
-            background: #4e31aa;
-            color: white;
-            transform: scale(1.1);
-        }
-
-        .candidate-actions, .application-actions {
-            display: flex;
-            gap: 0.5rem;
-        }
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .candidate-card {
-            display: flex;
-            gap: 1rem;
-            padding: 1.5rem;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            transition: all 0.2s;
-        }
-
-        .candidate-card:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-color: #4e31aa;
-        }
-
-        .candidate-avatar .avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-
-        .candidate-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .candidate-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-
-        .candidate-name {
-            margin: 0;
-            color: #2c3e50;
-            font-size: 1.125rem;
-        }
-
-        .candidate-actions {
-            display: flex;
-            gap: 0.25rem;
-        }
-
-        .btn-icon {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border: 1px solid #e9ecef;
-            border-radius: 6px;
-            background: white;
-            color: #6c757d;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-icon:hover {
-            background: #f8f9fa;
-            color: #495057;
-        }
-
-        .btn-icon.favorited {
-            color: #dc3545;
-            border-color: #dc3545;
-        }
-
-        .candidate-title {
-            color: #6c757d;
-            font-size: 0.875rem;
-            font-style: italic;
-        }
-
-        .candidate-details {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .detail-item {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            color: #6c757d;
-        }
-
-        .candidate-skills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .skill-tag {
-            padding: 0.25rem 0.75rem;
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            color: #495057;
-        }
-
-        .candidate-meta {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            font-size: 0.875rem;
-        }
-
-        .last-activity {
-            color: #6c757d;
-        }
-
-        .candidates-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-        }
-
-        /* Tab Styles */
-        .tab-container {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            margin-bottom: 1.5rem;
-            overflow: hidden;
-        }
-
-        .tab-nav {
-            display: flex;
-            border-bottom: 1px solid #e9ecef;
-            background: #f8f9fa;
-        }
-
-        .tab-btn {
-            flex: 1;
-            padding: 1rem 1.5rem;
-            border: none;
-            background: none;
-            cursor: pointer;
-            font-weight: 500;
-            color: #6c757d;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .tab-btn:hover {
-            background: #e9ecef;
-            color: #495057;
-        }
-
-        .tab-btn.active {
-            background: white;
-            color: #4e31aa;
-            border-bottom: 2px solid #4e31aa;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 1.5rem;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Application Filters */
-        .application-filters {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .filter-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            align-items: end;
-        }
-
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .filter-select {
-            padding: 0.75rem;
-            border: 1px solid #ced4da;
-            border-radius: 6px;
-            font-size: 0.875rem;
-        }
-
-        /* Applications Section */
-        .applications-section {
-            background: white;
-            border: 1px solid #e9ecef;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .applications-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid #e9ecef;
-        }
-
-        .applications-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .applications-actions {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .applications-list {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .application-card {
-            display: flex;
-            gap: 1rem;
-            padding: 1.5rem;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            transition: all 0.2s;
-            align-items: flex-start;
-        }
-
-        .application-card:hover {
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            border-color: #4e31aa;
-        }
-
-        .application-checkbox {
-            padding-top: 0.5rem;
-        }
-
-        .application-info {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .job-position {
-            font-weight: 600;
-            color: #4e31aa;
-            font-size: 0.875rem;
         }
 
         .match-score {

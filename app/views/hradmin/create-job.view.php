@@ -81,15 +81,27 @@
 
         <div class="dashboard-content">
             <div class="main-container">
-    <div class="header-section">
-        <h1 class="page-title">Create Job Post</h1>
-        <p class="page-description">Create a new job posting to attract candidates</p>
-        <div class="action-buttons">
-            <a href="<?= ROOT ?>/hradmin/job-posts" class="btn btn-secondary">
-                <i class="icon-back"></i>Back to Job Posts
-            </a>
-        </div>
-    </div>
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Create Job Post</h1>
+                        <p class="hero-description">Attract top talent with a compelling job posting. Fill out the details below to get started.</p>
+                        <div class="breadcrumb">
+                            <a href="<?= ROOT ?>/hradmin/dashboard" class="breadcrumb-link">Dashboard</a>
+                            <span class="breadcrumb-separator">/</span>
+                            <a href="<?= ROOT ?>/hradmin/job-posts" class="breadcrumb-link">Job Posts</a>
+                            <span class="breadcrumb-separator">/</span>
+                            <span class="breadcrumb-current">Create New</span>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="<?= ROOT ?>/hradmin/job-posts" class="btn btn-outline">
+                            <i class="icon-arrow-left"></i>Back to Jobs
+                        </a>
+                        <button type="submit" form="job-form" class="btn btn-primary">
+                            <i class="icon-save"></i>Publish Job
+                        </button>
+                    </div>
+                </div>
 
     <?php if(!empty($errors)): ?>
         <div class="alert alert-error">
@@ -395,21 +407,5 @@ document.querySelector('.sidebar-toggle').addEventListener('click', function (e)
         e.target.textContent = ">";
     }
 });
-
-document.addEventListener('DOMContentLoaded', function () {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    navLinks.forEach(link => {
-        if (link.getAttribute('href').includes(currentPath)) {
-            navLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-        }
-    });
-});
-</script>
-
-        </div>
-    </div>
 
 <?php $this->view('components/footer') ?>
