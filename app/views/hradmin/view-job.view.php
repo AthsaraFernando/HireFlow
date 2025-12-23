@@ -11,7 +11,7 @@
             <a href="<?= ROOT ?>/hradmin/edit-job/<?= $job['id'] ?? '1' ?>" class="btn btn-primary">
                 <i class="icon-edit"></i>Edit Job
             </a>
-            <a href="<?= ROOT ?>/hradmin/applications?job=<?= $job['id'] ?? '1' ?>" class="btn btn-outline">
+            <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications&job=<?= $job['id'] ?? '1' ?>" class="btn btn-outline">
                 <i class="icon-applications"></i>View Applications (<?= $job['applications_count'] ?? '23' ?>)
             </a>
         </div>
@@ -170,25 +170,25 @@
                         <div class="applicant-name">John Smith</div>
                         <div class="applicant-details">2 hours ago • 5 years experience</div>
                     </div>
-                    <a href="<?= ROOT ?>/hradmin/applications/view/1" class="view-btn">View Application</a>
+                    <a href="<?= ROOT ?>/hradmin/applicant-database/viewApplication/1" class="view-btn">View Application</a>
                 </div>
                 <div class="application-preview-item">
                     <div class="applicant-summary">
                         <div class="applicant-name">Sarah Johnson</div>
                         <div class="applicant-details">5 hours ago • 7 years experience</div>
                     </div>
-                    <a href="<?= ROOT ?>/hradmin/applications/view/2" class="view-btn">View Application</a>
+                    <a href="<?= ROOT ?>/hradmin/applicant-database/viewApplication/2" class="view-btn">View Application</a>
                 </div>
                 <div class="application-preview-item">
                     <div class="applicant-summary">
                         <div class="applicant-name">Mike Wilson</div>
                         <div class="applicant-details">1 day ago • 4 years experience</div>
                     </div>
-                    <a href="<?= ROOT ?>/hradmin/applications/view/3" class="view-btn">View Application</a>
+                    <a href="<?= ROOT ?>/hradmin/applicant-database/viewApplication/3" class="view-btn">View Application</a>
                 </div>
             </div>
             <div class="section-footer">
-                <a href="<?= ROOT ?>/hradmin/applications?job=<?= $job['id'] ?? '1' ?>" class="view-all-applications">View All Applications (<?= $job['applications_count'] ?? '23' ?>)</a>
+                <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications&job=<?= $job['id'] ?? '1' ?>" class="view-all-applications">View All Applications (<?= $job['applications_count'] ?? '23' ?>)</a>
             </div>
         </div>
 

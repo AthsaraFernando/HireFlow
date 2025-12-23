@@ -25,8 +25,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/applications" class="nav-link">
-                        <span class="nav-text">Applications</span>
+                    <a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link">
+                        <span class="nav-text">Applicants & Applications</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -88,7 +88,7 @@
             <button class="btn btn-primary" onclick="scheduleNewInterview()">
                 Schedule Interview
             </button>
-            <a href="<?= ROOT ?>/hradmin/applications" class="btn btn-secondary">
+            <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications" class="btn btn-secondary">
                 View Applications
             </a>
         </div>

@@ -25,8 +25,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/applications" class="nav-link">
-                        <span class="nav-text">Applications</span>
+                    <a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link">
+                        <span class="nav-text">Applicants & Applications</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -130,7 +130,7 @@
             <a href="<?= ROOT ?>/hradmin/create-job" class="btn btn-primary">
                 Create Job Post
             </a>
-            <a href="<?= ROOT ?>/hradmin/applications" class="btn btn-secondary">
+            <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications" class="btn btn-secondary">
                 Review Applications
             </a>
             <a href="<?= ROOT ?>/hradmin/interview-schedule" class="btn btn-secondary">
@@ -148,7 +148,7 @@
         <div class="dashboard-card">
             <div class="card-header">
                 <h3>Recent Applications</h3>
-                <a href="<?= ROOT ?>/hradmin/applications" class="view-all-link">View All</a>
+                <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications" class="view-all-link">View All</a>
             </div>
             <div class="card-content">
                 <?php if(isset($recent_applications) && !empty($recent_applications)): ?>

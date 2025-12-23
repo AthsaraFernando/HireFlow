@@ -9,7 +9,7 @@ class ViewApplication extends Controller
         
         if (!$id) {
             // Redirect to applications if no ID provided
-            header('Location: /HireFlow/public/hradmin/applications');
+            header('Location: /HireFlow/public/hradmin/applicant-database?tab=applications');
             exit;
         }
         

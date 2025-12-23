@@ -25,13 +25,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/applications" class="nav-link">
-                        <span class="nav-text">Applications</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link">
-                        <span class="nav-text">Applicant Database</span>
+                        <span class="nav-text">Applicants & Applications</span>
                     </a>
                 </li>
                 <li class="nav-item">

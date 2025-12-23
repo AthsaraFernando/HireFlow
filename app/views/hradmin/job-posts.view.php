@@ -25,13 +25,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/applications" class="nav-link">
-                        <span class="nav-text">Applications</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link">
-                        <span class="nav-text">Applicant Database</span>
+                        <span class="nav-text">Applicants & Applications</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -173,7 +168,7 @@
                             <td><?= date('M d, Y', strtotime($job['created_date'])) ?></td>
                             <td>
                                 <span class="application-count"><?= $job['applications'] ?></span>
-                                <a href="<?= ROOT ?>/hradmin/applications?job=<?= $job['id'] ?>" class="view-applications">View</a>
+                                <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications&job=<?= $job['id'] ?>" class="view-applications">View</a>
                             </td>
                             <td><span class="status-badge <?= strtolower($job['status']) ?>"><?= htmlspecialchars($job['status']) ?></span></td>
                             <td>
