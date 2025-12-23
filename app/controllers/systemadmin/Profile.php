@@ -1,7 +1,9 @@
 <?php
-class Profile extends Controller {
+class Profile extends Controller
+{
 
-    public function index() {
+    public function index()
+    {
         // Ensure user is logged in and is a system admin
         Auth::requireLogin();
         Auth::requireRole(1); // System Admin role_id = 1
@@ -33,7 +35,8 @@ class Profile extends Controller {
             } elseif (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
                 $errors[] = "Invalid email format";
             }
-            
+
+
             // Check if email is already taken by another user
             if (!empty($data['email'])) {
                 $existing = $user->first(['email' => $data['email']]);
@@ -77,30 +80,46 @@ class Profile extends Controller {
                     'updated_at' => date('Y-m-d H:i:s')
                 ];
 
+                // Handle profile picture upload
+                if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
+                    $uploadResult = $this->handleProfileImageUpload($_FILES['profile_picture']);
+                    if ($uploadResult['success']) {
+                        $updateData['profile_picture'] = $uploadResult['filename'];
+                    } else {
+                        $errors[] = $uploadResult['error'];
+                    }
+                }
+
                 // Add password to update if changing
                 if (!empty($data['new_password'])) {
                     $updateData['password'] = password_hash($data['new_password'], PASSWORD_DEFAULT);
                 }
 
-                // Update user record
-                if ($user->update($_SESSION['USER']['id'], $updateData)) {
-                    // Update session data
-                    $_SESSION['USER']['full_name'] = $data['full_name'];
-                    $_SESSION['USER']['email'] = $data['email'];
-                    $_SESSION['USER']['phone'] = $data['phone'];
-                    $_SESSION['USER']['address'] = $data['address'];
+                if (empty($errors)) {
+                    // Update user record
+                    if ($user->update($_SESSION['USER']['id'], $updateData)) {
+                        // Update session data
+                        $_SESSION['USER']['full_name'] = $data['full_name'];
+                        $_SESSION['USER']['email'] = $data['email'];
+                        $_SESSION['USER']['phone'] = $data['phone'];
+                        $_SESSION['USER']['address'] = $data['address'];
 
-                    // Log the profile update
-                    $this->logActivity($_SESSION['USER']['id'], 'Profile Updated', 'System Admin profile information updated');
+                        if (isset($updateData['profile_picture'])) {
+                            $_SESSION['USER']['profile_picture'] = $updateData['profile_picture'];
+                        }
 
-                    $success = "Profile updated successfully!";
-                    
-                    // Clear password fields after successful update
-                    $_POST['current_password'] = '';
-                    $_POST['new_password'] = '';
-                    $_POST['confirm_password'] = '';
-                } else {
-                    $errors[] = "Failed to update profile. Please try again.";
+                        // Log the profile update
+                        $this->logActivity($_SESSION['USER']['id'], 'Profile Updated', 'System Admin profile information updated');
+
+                        $success = "Profile updated successfully!";
+
+                        // Clear password fields after successful update
+                        $_POST['current_password'] = '';
+                        $_POST['new_password'] = '';
+                        $_POST['confirm_password'] = '';
+                    } else {
+                        $errors[] = "Failed to update profile. Please try again.";
+                    }
                 }
             }
         }
@@ -115,7 +134,8 @@ class Profile extends Controller {
     /**
      * Log user activity for security audit
      */
-    private function logActivity($userId, $action, $details = '') {
+    private function logActivity($userId, $action, $details = '')
+    {
         try {
             $accessLog = new AccessLog();
             $accessLog->insert([
@@ -135,24 +155,53 @@ class Profile extends Controller {
     /**
      * Handle avatar/profile picture upload (future enhancement)
      */
-    public function uploadAvatar() {
-        Auth::requireLogin();
-        Auth::requireRole(1);
+    private function handleProfileImageUpload($file)
+    {
+        $uploadDir = '../public/assets/images/profiles/';
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['avatar'])) {
-            // TODO: Implement avatar upload functionality
-            // This would handle file validation, resizing, and storage
-            
-            header('Content-Type: application/json');
-            echo json_encode(['success' => false, 'message' => 'Avatar upload not yet implemented']);
-            exit;
+        // Create directory if it doesn't exist
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        // Validate file type
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $fileType = $file['type'];
+
+        if (!in_array($fileType, $allowedTypes)) {
+            return ['success' => false, 'error' => 'Only JPEG, PNG, and GIF images are allowed.'];
+        }
+
+        // Validate file size (2MB max)
+        $maxSize = 2 * 1024 * 1024; // 2MB
+        if ($file['size'] > $maxSize) {
+            return ['success' => false, 'error' => 'File size must be less than 2MB.'];
+        }
+
+        // Generate unique filename
+        $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
+        $filename = 'profile_' . Auth::user_id() . '_' . time() . '.' . $extension;
+        $uploadPath = $uploadDir . $filename;
+
+        // Move uploaded file
+        if (move_uploaded_file($file['tmp_name'], $uploadPath)) {
+            // Delete old profile image if it exists
+            $oldImage = Auth::user()['profile_picture'] ?? '';
+            if ($oldImage && $oldImage !== 'default-avatar.png' && file_exists($uploadDir . $oldImage)) {
+                unlink($uploadDir . $oldImage);
+            }
+
+            return ['success' => true, 'filename' => $filename];
+        } else {
+            return ['success' => false, 'error' => 'Failed to upload image. Please try again.'];
         }
     }
 
     /**
      * Get user activity logs for profile page
      */
-    public function getActivityLogs() {
+    public function getActivityLogs()
+    {
         Auth::requireLogin();
         Auth::requireRole(1);
 
@@ -167,7 +216,8 @@ class Profile extends Controller {
     /**
      * Download user data (GDPR compliance)
      */
-    public function downloadData() {
+    public function downloadData()
+    {
         Auth::requireLogin();
         Auth::requireRole(1);
 
@@ -177,12 +227,12 @@ class Profile extends Controller {
         if ($userData) {
             // Remove sensitive data
             unset($userData->password);
-            
+
             $filename = 'user_data_' . $_SESSION['USER']['id'] . '_' . date('Y-m-d') . '.json';
-            
+
             header('Content-Type: application/json');
             header('Content-Disposition: attachment; filename="' . $filename . '"');
-            
+
             echo json_encode($userData, JSON_PRETTY_PRINT);
             exit;
         }
@@ -191,7 +241,8 @@ class Profile extends Controller {
     /**
      * Check if email is available (AJAX endpoint)
      */
-    public function checkEmail() {
+    public function checkEmail()
+    {
         Auth::requireLogin();
         Auth::requireRole(1);
 
