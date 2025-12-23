@@ -55,7 +55,8 @@ class Usermanage extends Controller
         }
 
         // Get all users with role information
-        $data['users'] = $this->getUsersWithRoles();
+        // $data['users'] = $this->getUsersWithRoles();
+        $data['users'] = $user->getUsersWithRoles();
         $data['roles'] = $role->findAll();
         $data['csrf_token'] = Auth::generateCSRFToken();
 
@@ -228,17 +229,6 @@ class Usermanage extends Controller
         } else {
             $data['errors']['general'] = "Failed to update user status";
         }
-    }
-
-    private function getUsersWithRoles()
-    {
-        $user = new User();
-        $query = "SELECT u.*, r.role_name 
-                  FROM users u 
-                  LEFT JOIN roles r ON u.role_id = r.id 
-                  ORDER BY u.created_at DESC";
-
-        return $user->query($query) ?: [];
     }
 
     public function create()

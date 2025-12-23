@@ -198,7 +198,7 @@ class User
 
         if ($_SESSION['USER_ID']) {
             $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-            $this->update($_SESSION['USER_ID'] , [
+            $this->update($_SESSION['USER_ID'], [
                 'password' => $hashedPassword,
                 // 'password_reset_token' => null,
                 // 'password_reset_expires' => null,
@@ -267,6 +267,16 @@ class User
         $query = "SELECT COUNT(*) AS total FROM {$this->table}";
         $result = $this->query($query);
         return $result ? (int) $result[0]['total'] : 0;
+    }
+
+    public function getUsersWithRoles()
+    {
+        $query = "SELECT u.*, r.role_name 
+                  FROM users u 
+                  LEFT JOIN roles r ON u.role_id = r.id 
+                  ORDER BY u.created_at DESC";
+
+        return $this->query($query) ?: [];
     }
 
 }

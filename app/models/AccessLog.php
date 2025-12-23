@@ -144,4 +144,52 @@ class AccessLog
         return $result ? $result : 0;
 
     }
+
+    public function getTotalLogs()
+    {
+        $result = $this->query("SELECT COUNT(*) as total FROM access_logs");
+        return $result ? $result[0]['total'] : 0;
+    }
+
+
+    public function getUniqueActions()
+    {
+        $result = $this->query("SELECT DISTINCT action FROM access_logs ORDER BY action");
+        return $result ? array_column($result, 'action') : [];
+    }
+
+    public function getAllUsers()
+    {
+        $user = new User();
+        return $user->query("SELECT id, full_name, email FROM users ORDER BY full_name") ?: [];
+    }
+
+    public function getAllLogs()
+    {
+        $result = $this->query("SELECT * FROM access_logs");
+        return $result ? $result : [];
+    }
+
+
+    public function getUniqueUsersToday()
+    {
+        $result = $this->query("SELECT COUNT(DISTINCT user_id) as unique_users 
+                                   FROM access_logs 
+                                   WHERE DATE(created_at) = CURDATE() 
+                                   AND user_id IS NOT NULL");
+        return $result ? $result[0]['unique_users'] : 0;
+    }
+
+    public function getBlockedIPs()
+    {
+        // Get IPs with more than 5 failed login attempts in the last hour
+        $result = $this->query("SELECT ip_address, COUNT(*) as attempts 
+                                   FROM access_logs 
+                                   WHERE action = 'failed_login' 
+                                   AND created_at >= DATE_SUB(NOW(), INTERVAL 1 HOUR)
+                                   GROUP BY ip_address 
+                                   HAVING attempts >= 5");
+        return $result ?: [];
+    }
+
 }
