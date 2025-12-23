@@ -112,16 +112,16 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="department" class="form-label">Department *</label>
-                        <select id="department" name="department" class="form-select" required>
+                        <label for="department_id" class="form-label">Department *</label>
+                        <select id="department_id" name="department_id" class="form-select" required>
                             <option value="">Select Department</option>
-                            <option value="engineering" <?= ($_POST['department'] ?? '') == 'engineering' ? 'selected' : '' ?>>Engineering</option>
-                            <option value="design" <?= ($_POST['department'] ?? '') == 'design' ? 'selected' : '' ?>>Design</option>
-                            <option value="marketing" <?= ($_POST['department'] ?? '') == 'marketing' ? 'selected' : '' ?>>Marketing</option>
-                            <option value="sales" <?= ($_POST['department'] ?? '') == 'sales' ? 'selected' : '' ?>>Sales</option>
-                            <option value="hr" <?= ($_POST['department'] ?? '') == 'hr' ? 'selected' : '' ?>>Human Resources</option>
-                            <option value="finance" <?= ($_POST['department'] ?? '') == 'finance' ? 'selected' : '' ?>>Finance</option>
-                            <option value="operations" <?= ($_POST['department'] ?? '') == 'operations' ? 'selected' : '' ?>>Operations</option>
+                            <?php if (!empty($departments)): ?>
+                                <?php foreach ($departments as $dept): ?>
+                                    <option value="<?= $dept['id'] ?>" <?= ($_POST['department_id'] ?? '') == $dept['id'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($dept['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
 
@@ -129,10 +129,10 @@
                         <label for="employment_type" class="form-label">Employment Type *</label>
                         <select id="employment_type" name="employment_type" class="form-select" required>
                             <option value="">Select Type</option>
-                            <option value="full-time" <?= ($_POST['employment_type'] ?? '') == 'full-time' ? 'selected' : '' ?>>Full-time</option>
-                            <option value="part-time" <?= ($_POST['employment_type'] ?? '') == 'part-time' ? 'selected' : '' ?>>Part-time</option>
-                            <option value="contract" <?= ($_POST['employment_type'] ?? '') == 'contract' ? 'selected' : '' ?>>Contract</option>
-                            <option value="internship" <?= ($_POST['employment_type'] ?? '') == 'internship' ? 'selected' : '' ?>>Internship</option>
+                            <option value="Full-time" <?= ($_POST['employment_type'] ?? '') == 'Full-time' ? 'selected' : '' ?>>Full-time</option>
+                            <option value="Part-time" <?= ($_POST['employment_type'] ?? '') == 'Part-time' ? 'selected' : '' ?>>Part-time</option>
+                            <option value="Contract" <?= ($_POST['employment_type'] ?? '') == 'Contract' ? 'selected' : '' ?>>Contract</option>
+                            <option value="Internship" <?= ($_POST['employment_type'] ?? '') == 'Internship' ? 'selected' : '' ?>>Internship</option>
                         </select>
                     </div>
 
@@ -213,9 +213,9 @@
                     <div class="form-group">
                         <label for="status" class="form-label">Status *</label>
                         <select id="status" name="status" class="form-select" required>
-                            <option value="draft" <?= ($_POST['status'] ?? 'draft') == 'draft' ? 'selected' : '' ?>>Draft</option>
-                            <option value="active" <?= ($_POST['status'] ?? '') == 'active' ? 'selected' : '' ?>>Active</option>
-                            <option value="paused" <?= ($_POST['status'] ?? '') == 'paused' ? 'selected' : '' ?>>Paused</option>
+                            <option value="Draft" <?= ($_POST['status'] ?? 'Draft') == 'Draft' ? 'selected' : '' ?>>Draft</option>
+                            <option value="Open" <?= ($_POST['status'] ?? '') == 'Open' ? 'selected' : '' ?>>Open</option>
+                            <option value="Closed" <?= ($_POST['status'] ?? '') == 'Closed' ? 'selected' : '' ?>>Closed</option>
                         </select>
                     </div>
 

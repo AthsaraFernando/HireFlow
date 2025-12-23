@@ -31,15 +31,19 @@ class EditJob extends Controller
         
         $data['job'] = $job;
         
-        // Sample data for dropdowns
-        $data['departments'] = [
-            'Engineering',
-            'Marketing', 
-            'Sales',
-            'HR',
-            'Finance',
-            'Operations'
-        ];
+        // Fetch departments from database
+        $departmentModel = new Department();
+        $data['departments'] = $departmentModel->findAll();
+        
+        // Sample data for dropdowns (commented out)
+        // $data['departments'] = [
+        //     'Engineering',
+        //     'Marketing', 
+        //     'Sales',
+        //     'HR',
+        //     'Finance',
+        //     'Operations'
+        // ];
         
         $data['locations'] = [
             'New York, NY',
@@ -73,11 +77,11 @@ class EditJob extends Controller
         // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate form data
-            $required_fields = ['job_title', 'department', 'location', 'employment_type', 'summary'];
+            $required_fields = ['job_title', 'department_id', 'location', 'employment_type', 'summary'];
             
             $field_labels = [
                 'job_title' => 'Job title',
-                'department' => 'Department',
+                'department_id' => 'Department',
                 'location' => 'Location',
                 'employment_type' => 'Employment type',
                 'summary' => 'Job summary'
@@ -94,7 +98,7 @@ class EditJob extends Controller
                 // Update job in database
                 $updateData = [
                     'title' => $_POST['job_title'] ?? '',
-                    'department' => $_POST['department'] ?? '',
+                    'department_id' => $_POST['department_id'] ?? '',
                     'description' => $_POST['summary'] ?? '',
                     'requirements' => $_POST['requirements'] ?? '',
                     'responsibilities' => $_POST['responsibilities'] ?? '',

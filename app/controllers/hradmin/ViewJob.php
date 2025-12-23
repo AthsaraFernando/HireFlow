@@ -32,6 +32,15 @@ class ViewJob extends Controller
         $creator = $user->first(['id' => $job['hr_id']], []);
         $job['created_by'] = $creator ? $creator['full_name'] : 'Unknown';
         
+        // Get department information if department_id exists
+        if (!empty($job['department_id'])) {
+            $departmentModel = new Department();
+            $department = $departmentModel->first(['id' => $job['department_id']], []);
+            if ($department) {
+                $job['department'] = $department['name'];
+            }
+        }
+        
         // Get application statistics
         $application = new Application();
         $allApplications = $application->where(['job_id' => $id], []);

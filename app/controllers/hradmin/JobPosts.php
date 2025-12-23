@@ -22,14 +22,30 @@ class JobPosts extends Controller
         $jobPost = new JobPost();
         $jobs = $jobPost->getAllJobs();
         
+        // Get department model for lookups
+        $departmentModel = new Department();
+        $departments = $departmentModel->findAll();
+        $deptMap = [];
+        foreach ($departments as $dept) {
+            $deptMap[$dept['id']] = $dept['name'];
+        }
+        
         // Format data for the view
         $data['job_posts'] = [];
         if ($jobs) {
             foreach ($jobs as $job) {
+                // Get department name from map if department_id exists
+                $deptName = 'N/A';
+                if (!empty($job['department_id']) && isset($deptMap[$job['department_id']])) {
+                    $deptName = $deptMap[$job['department_id']];
+                } elseif (!empty($job['department'])) {
+                    $deptName = $job['department'];
+                }
+                
                 $data['job_posts'][] = [
                     'id' => $job['id'],
                     'title' => $job['title'],
-                    'department' => $job['department'] ?? 'N/A',
+                    'department' => $deptName,
                     'location' => $job['location'],
                     'type' => $job['employment_type'],
                     'status' => $job['status'],

@@ -7,21 +7,29 @@ class CreateJob extends Controller
         // Require HR Admin role (role_id = 2)
         Auth::requireRole(2);
         
+        // Prevent caching of this page
+        header("Cache-Control: no-cache, no-store, must-revalidate");
+        header("Pragma: no-cache");
+        header("Expires: 0");
 
         $data = [];
         $data['errors'] = [];
         $data['success'] = '';
         $data['page_title'] = 'Create New Job';
         
-        // Sample data for dropdowns
-        $data['departments'] = [
-            'Engineering',
-            'Marketing', 
-            'Sales',
-            'HR',
-            'Finance',
-            'Operations'
-        ];
+        // Fetch departments from database
+        $departmentModel = new Department();
+        $data['departments'] = $departmentModel->findAll();
+        
+        // Sample data for dropdowns (keeping other dropdowns)
+        // $data['departments'] = [
+        //     'Engineering',
+        //     'Marketing', 
+        //     'Sales',
+        //     'HR',
+        //     'Finance',
+        //     'Operations'
+        // ];
         
         $data['locations'] = [
             'New York, NY',
@@ -49,11 +57,11 @@ class CreateJob extends Controller
         // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Validate form data
-            $required_fields = ['job_title', 'department', 'location', 'employment_type', 'summary'];
+            $required_fields = ['job_title', 'department_id', 'location', 'employment_type', 'summary'];
             
             $field_labels = [
                 'job_title' => 'Job title',
-                'department' => 'Department',
+                'department_id' => 'Department',
                 'location' => 'Location',
                 'employment_type' => 'Employment type',
                 'summary' => 'Job summary'
@@ -72,7 +80,7 @@ class CreateJob extends Controller
                 
                 $jobData = [
                     'title' => $_POST['job_title'] ?? '',
-                    'department' => $_POST['department'] ?? '',
+                    'department_id' => $_POST['department_id'] ?? '',
                     'description' => $_POST['summary'] ?? '',
                     'requirements' => $_POST['requirements'] ?? '',
                     'responsibilities' => $_POST['responsibilities'] ?? '',
@@ -81,9 +89,13 @@ class CreateJob extends Controller
                     'employment_type' => $_POST['employment_type'] ?? '',
                     'experience_level' => $_POST['experience_level'] ?? '',
                     'status' => $_POST['status'] ?? 'Draft',
+                    'posted_by' => Auth::user_id(),
                     'hr_id' => Auth::user_id(),
                     'deadline' => !empty($_POST['application_deadline']) ? $_POST['application_deadline'] : null
                 ];
+                
+                // Debug: Log the data being inserted (remove this after debugging)
+                error_log("Job Post Data: " . print_r($jobData, true));
                 
                 // Use model insert directly (skip validate since we already checked required fields)
                 $insertId = $jobPost->insert($jobData);
@@ -93,7 +105,14 @@ class CreateJob extends Controller
                     // Redirect to job posts list
                     redirect('hradmin/job-posts');
                 } else {
-                    $data['errors'][] = 'Failed to save job post. Please try again.';
+                    // Show actual database errors for debugging
+                    if (!empty($jobPost->errors)) {
+                        foreach ($jobPost->errors as $error) {
+                            $data['errors'][] = 'Database error: ' . $error;
+                        }
+                    } else {
+                        $data['errors'][] = 'Failed to save job post. Please try again.';
+                    }
                     $data['form_data'] = $_POST;
                 }
             } else {

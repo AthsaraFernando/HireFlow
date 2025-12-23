@@ -178,10 +178,10 @@
                             <td><span class="status-badge <?= strtolower($job['status']) ?>"><?= htmlspecialchars($job['status']) ?></span></td>
                             <td>
                                 <div class="action-buttons">
-                                    <a href="<?= ROOT ?>/hradmin/job-posts/viewJob/<?= $job['id'] ?>" class="action-btn view-btn" title="View">
+                                    <a href="<?= ROOT ?>/hradmin/view-job/<?= $job['id'] ?>" class="action-btn view-btn" title="View">
                                         View
                                     </a>
-                                    <a href="<?= ROOT ?>/hradmin/job-posts/edit/<?= $job['id'] ?>" class="action-btn edit-btn" title="Edit">
+                                    <a href="<?= ROOT ?>/hradmin/edit-job/<?= $job['id'] ?>" class="action-btn edit-btn" title="Edit">
                                         Edit
                                     </a>
                                     <button class="action-btn delete-btn" title="Delete" onclick="confirmDelete(<?= $job['id'] ?>)">

@@ -29,7 +29,7 @@
     <?php endif; ?>
 
     <div class="form-container">
-        <form method="POST" action="<?= ROOT ?>/hradmin/jobposts/edit/<?= $job['id'] ?? '1' ?>" class="job-form">
+        <form method="POST" action="<?= ROOT ?>/hradmin/edit-job/<?= $job['id'] ?? '1' ?>" class="job-form">
             <!-- Basic Information -->
             <div class="form-section">
                 <h3 class="section-title">Basic Information</h3>
@@ -42,17 +42,16 @@
                     </div>
                     
                     <div class="form-group">
-                        <label for="department" class="form-label">Department *</label>
-                        <select id="department" name="department" class="form-select" required>
+                        <label for="department_id" class="form-label">Department *</label>
+                        <select id="department_id" name="department_id" class="form-select" required>
                             <option value="">Select Department</option>
-                            <?php $dept = strtolower($job['department'] ?? ''); ?>
-                            <option value="Engineering" <?= $dept == 'engineering' ? 'selected' : '' ?>>Engineering</option>
-                            <option value="Design" <?= $dept == 'design' ? 'selected' : '' ?>>Design</option>
-                            <option value="Marketing" <?= $dept == 'marketing' ? 'selected' : '' ?>>Marketing</option>
-                            <option value="Sales" <?= $dept == 'sales' ? 'selected' : '' ?>>Sales</option>
-                            <option value="HR" <?= $dept == 'hr' ? 'selected' : '' ?>>Human Resources</option>
-                            <option value="Finance" <?= $dept == 'finance' ? 'selected' : '' ?>>Finance</option>
-                            <option value="Operations" <?= $dept == 'operations' ? 'selected' : '' ?>>Operations</option>
+                            <?php if (!empty($departments)): ?>
+                                <?php foreach ($departments as $dept): ?>
+                                    <option value="<?= $dept['id'] ?>" <?= ($job['department_id'] ?? '') == $dept['id'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($dept['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
 
@@ -60,11 +59,10 @@
                         <label for="employment_type" class="form-label">Employment Type *</label>
                         <select id="employment_type" name="employment_type" class="form-select" required>
                             <option value="">Select Type</option>
-                            <?php $emp_type = strtolower($job['employment_type'] ?? ''); ?>
-                            <option value="Full-time" <?= $emp_type == 'full-time' ? 'selected' : '' ?>>Full-time</option>
-                            <option value="Part-time" <?= $emp_type == 'part-time' ? 'selected' : '' ?>>Part-time</option>
-                            <option value="Contract" <?= $emp_type == 'contract' ? 'selected' : '' ?>>Contract</option>
-                            <option value="Internship" <?= $emp_type == 'internship' ? 'selected' : '' ?>>Internship</option>
+                            <option value="Full-time" <?= ($job['employment_type'] ?? '') == 'Full-time' ? 'selected' : '' ?>>Full-time</option>
+                            <option value="Part-time" <?= ($job['employment_type'] ?? '') == 'Part-time' ? 'selected' : '' ?>>Part-time</option>
+                            <option value="Contract" <?= ($job['employment_type'] ?? '') == 'Contract' ? 'selected' : '' ?>>Contract</option>
+                            <option value="Internship" <?= ($job['employment_type'] ?? '') == 'Internship' ? 'selected' : '' ?>>Internship</option>
                         </select>
                     </div>
 
