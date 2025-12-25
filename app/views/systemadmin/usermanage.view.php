@@ -536,11 +536,11 @@
                                         <td>USR-<?= str_pad($user['id'], 3, '0', STR_PAD_LEFT) ?></td>
                                         <td>
                                             <div class="user-info">
-                                                <div class="user-avatar"><?= $initials ?></div>
+                                                <!-- <div class="user-avatar"><?= $initials ?></div> -->
                                                 <div>
                                                     <div class="user-name"><?= htmlspecialchars($user['full_name']) ?></div>
-                                                    <div class="user-meta">
-                                                    </div>
+                                                    <!-- <div class="user-meta">
+                                                    </div> -->
                                                 </div>
                                             </div>
                                         </td>
@@ -805,7 +805,7 @@
                             alert('Failed to load user data: ' + error.message);
                         });
                 }
-   
+
                 function updateUser(userId) {
                     const form = document.getElementById('userForm');
                     const formData = new FormData();
@@ -1048,8 +1048,56 @@
                 }
 
                 function exportUsers() {
-                    // Export users to CSV
-                    // showToast('Export started. Download will begin shortly.', 'info');
+                    const tableRows = document.querySelectorAll('.data-table tbody tr');
+                    const visibleRows = Array.from(tableRows).filter(row => {
+                        return row.style.display !== 'none' && !row.querySelector('td[colspan]');
+                    });
+
+                    if (visibleRows.length === 0) {
+                        showToast('No users to export', 'warning');
+                        return;
+                    }
+
+                    const csvRows = [];
+                    const headers = ['User ID', 'Name', 'Email', 'Role', 'Status', 'Last Login', 'Created At'];
+                    csvRows.push(headers.join(','));
+
+                    const escapeCsv = (value) => {
+                        const text = (value || '').toString().replace(/"/g, '""');
+                        return `"${text}"`;
+                    };
+
+                    visibleRows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        const rowData = [
+                            cells[0]?.textContent.trim() || '',
+                            cells[1]?.textContent.trim() || '',
+                            cells[2]?.textContent.trim() || '',
+                            cells[3]?.textContent.trim() || '',
+                            cells[4]?.textContent.trim() || '',
+                            cells[5]?.textContent.trim() || '',
+                            cells[6]?.textContent.trim() || ''
+                        ].map(escapeCsv);
+
+                        csvRows.push(rowData.join(','));
+                    });
+
+                    const csvString = csvRows.join('\n');
+
+                    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+
+                    link.href = url;
+                    link.download = `users_${new Date().toISOString().split('T')[0]}.csv`;
+
+                    document.body.appendChild(link);
+                    link.click();
+
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 100);
                 }
 
                 // Search and filter functionality
@@ -1102,7 +1150,7 @@
                         row.style.display = '';
                     });
 
-                    showToast('Filters cleared', 'info');
+                    // showToast('Filters cleared', 'info');
                 }
 
                 // Select all functionality
