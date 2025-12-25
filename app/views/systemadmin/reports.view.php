@@ -1,40 +1,3 @@
-<?php
-// Sample report data - in real implementation this would come from database queries
-// $system_stats = [
-//     // 'total_users' => 127,
-//     'active_sessions' => 15,
-//     // 'total_jobs' => 45,
-//     'total_applications' => 234,
-//     'server_uptime' => '15 days, 6 hours',
-//     // 'database_size' => '45.2 MB',
-//     'storage_used' => '2.1 GB',
-//     'avg_response_time' => '245ms'
-// ];
-
-// $user_activity = [
-//     ['date' => '2025-08-31', 'logins' => 24, 'registrations' => 3, 'applications' => 18],
-//     ['date' => '2025-08-30', 'logins' => 31, 'registrations' => 5, 'applications' => 22],
-//     ['date' => '2025-08-29', 'logins' => 28, 'registrations' => 2, 'applications' => 15],
-//     ['date' => '2025-08-28', 'logins' => 35, 'registrations' => 7, 'applications' => 28],
-//     ['date' => '2025-08-27', 'logins' => 29, 'registrations' => 4, 'applications' => 19]
-// ];
-
-// $error_logs = [
-//     ['time' => '2025-08-31 14:30:15', 'level' => 'WARNING', 'message' => 'High memory usage detected (85%)', 'source' => 'System Monitor'],
-//     ['time' => '2025-08-31 12:45:22', 'level' => 'ERROR', 'message' => 'Failed to send email notification to user@example.com', 'source' => 'Email Service'],
-//     ['time' => '2025-08-31 10:15:08', 'level' => 'INFO', 'message' => 'Database backup completed successfully', 'source' => 'Backup Service'],
-//     ['time' => '2025-08-31 09:30:45', 'level' => 'WARNING', 'message' => 'Slow query detected: SELECT * FROM applications (2.3s)', 'source' => 'Database']
-// ];
-
-// $popular_pages = [
-//     ['page' => '/applicant/browse-jobs', 'views' => 1245, 'unique_visitors' => 892],
-//     ['page' => '/applicant/dashboard', 'views' => 987, 'unique_visitors' => 654],
-//     ['page' => '/signin', 'views' => 756, 'unique_visitors' => 523],
-//     ['page' => '/hradmin/applications', 'views' => 432, 'unique_visitors' => 78],
-//     ['page' => '/applicant/job-details', 'views' => 398, 'unique_visitors' => 289]
-// ];
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -329,9 +292,6 @@
                                     <option value="today">Today</option>
                                     <option value="week" selected>Last 7 Days</option>
                                     <option value="month">Last 30 Days</option>
-                                    <!-- <option value="quarter">Last 3 Months</option>
-                                    <option value="year">Last Year</option>
-                                    <option value="custom">Custom Range</option> -->
                                 </select>
                             </div>
 
@@ -340,8 +300,6 @@
                                 <select id="report_type" class="form-input">
                                     <option value="overview" selected>System Overview</option>
                                     <option value="users">User Activity</option>
-                                    <!-- <option value="performance">Performance</option> -->
-                                    <!-- <option value="security">Security</option> -->
                                     <option value="errors">Error Logs</option>
                                 </select>
                             </div>
@@ -372,10 +330,6 @@
                             <div class="stat-value"><?= number_format($data['system_stats']['total_users']) ?></div>
                             <div class="stat-label">Total Users</div>
                         </div>
-                        <!-- <div class="stat-card">
-                            <div class="stat-value"><?= $system_stats['active_sessions'] ?></div>
-                            <div class="stat-label">Active Sessions</div>
-                        </div> -->
                         <div class="stat-card">
                             <div class="stat-value"><?= $data['system_stats']['total_jobs'] ?></div>
                             <div class="stat-label">Job Postings</div>
@@ -385,10 +339,6 @@
                             </div>
                             <div class="stat-label">Applications</div>
                         </div>
-                        <!-- <div class="stat-card">
-                            <div class="stat-value"><?= $system_stats['server_uptime'] ?></div>
-                            <div class="stat-label">Server Uptime</div>
-                        </div> -->
                         <div class="stat-card">
                             <div class="stat-value"><?= $data['system_stats']['database_size'] ?></div>
                             <div class="stat-label">Database Size</div>
@@ -397,14 +347,6 @@
                             <div class="stat-value"><?= $data['system_stats']['total_interviews'] ?></div>
                             <div class="stat-label">Total Interviews</div>
                         </div>
-                        <!-- <div class="stat-card">
-                            <div class="stat-value"><?= $system_stats['storage_used'] ?></div>
-                            <div class="stat-label">Storage Used</div>
-                        </div> -->
-                        <!-- <div class="stat-card">
-                            <div class="stat-value"><?= $system_stats['avg_response_time'] ?></div>
-                            <div class="stat-label">Avg Response Time</div>
-                        </div> -->
                     </div>
                 </div>
 
@@ -412,9 +354,6 @@
                 <div class="reports-section">
                     <h2 class="section-title"> User Activity Trends</h2>
                     <div class="export-buttons">
-                        <!-- <button class="btn btn-outline-primary" onclick="exportChart('user_activity')">
-                            Export Chart
-                        </button> -->
                         <button class="btn btn-outline-secondary" onclick="downloadData('user_activity')">
                             Download Data
                         </button>
@@ -447,73 +386,10 @@
                     </table>
                 </div>
 
-                <!-- System Performance -->
-                <!-- <div class="reports-section">
-                    <h2 class="section-title"> System Performance</h2>
-                    <div class="form-grid">
-                        <div>
-                            <h4>Server Resources</h4>
-                            <div>
-                                <label>CPU Usage</label>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 45%;"></div>
-                                </div>
-                                <small>45% (Normal)</small>
-                            </div>
-
-                            <div>
-                                <label>Memory Usage</label>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 68%;"></div>
-                                </div>
-                                <small>68% (Moderate)</small>
-                            </div>
-
-                            <div>
-                                <label>Disk Usage</label>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 32%;"></div>
-                                </div>
-                                <small>32% (Low)</small>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4>Database Performance</h4>
-                            <div>
-                                <label>Query Performance</label>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 85%;"></div>
-                                </div>
-                                <small>Avg: 245ms (Good)</small>
-                            </div>
-
-                            <div>
-                                <label>Connection Pool</label>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 24%;"></div>
-                                </div>
-                                <small>6/25 connections used</small>
-                            </div>
-
-                            <div>
-                                <label>Cache Hit Rate</label>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: 92%;"></div>
-                                </div>
-                                <small>92% (Excellent)</small>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
-
-                <!-- Error Logs -->
                 <div class="reports-section">
                     <h2 class="section-title">Department Job Posting Overview</h2>
                     <div class="export-buttons">
-                        <!-- <button class="btn btn-outline-primary" onclick="exportChart('user_activity')">
-                            Export Chart
-                        </button> -->
+
                         <button class="btn btn-outline-secondary" onclick="downloadData('job_posting_overview')">
                             Download Data
                         </button>
@@ -523,40 +399,13 @@
                             <canvas id="myChart2" width="400" height="200"></canvas>
                         </div>
                     </div>
-
-                    <!-- <table class="reports-table">
-                        <thead>
-                            <tr>
-                                <th>Time</th>
-                                <th>Level</th>
-                                <th>Message</th>
-                                <th>Source</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($error_logs as $log): ?>
-                                <tr>
-                                    <td><?= date('M d, H:i:s', strtotime($log['time'])) ?></td>
-                                    <td>
-                                        <span class="log-level level-<?= strtolower($log['level']) ?>">
-                                            <?= $log['level'] ?>
-                                        </span>
-                                    </td>
-                                    <td><?= htmlspecialchars($log['message']) ?></td>
-                                    <td><?= htmlspecialchars($log['source']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table> -->
                 </div>
 
                 <!-- Interview Progress -->
                 <div class="reports-section">
                     <h2 class="section-title">Interviewing Progress</h2>
                     <div class="export-buttons">
-                        <!-- <button class="btn btn-outline-primary" onclick="exportChart('user_activity')">
-                            Export Chart
-                        </button> -->
+
                         <button class="btn btn-outline-secondary" onclick="downloadData('interviewing_progress')">
                             Download Data
                         </button>
@@ -568,56 +417,6 @@
                     </div>
                 </div>
 
-                <!-- Popular Pages -->
-                <!-- <div class="reports-section">
-                    <h2 class="section-title"> Popular Pages</h2>
-                    <table class="reports-table">
-                        <thead>
-                            <tr>
-                                <th>Page</th>
-                                <th>Total Views</th>
-                                <th>Unique Visitors</th>
-                                <th>Conversion Rate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($popular_pages as $page): ?>
-                                <tr>
-                                    <td><code><?= htmlspecialchars($page['page']) ?></code></td>
-                                    <td><?= number_format($page['views']) ?></td>
-                                    <td><?= number_format($page['unique_visitors']) ?></td>
-                                    <td><?= round(($page['unique_visitors'] / $page['views']) * 100, 1) ?>%</td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div> -->
-
-                <!-- Quick Actions -->
-                <!-- <div class="reports-section">
-                    <h2 class="section-title"> Quick Actions</h2>
-                    <div class="quick-actions">
-                        <a href="#" class="action-button" onclick="scheduleReport()">
-                            Schedule Automated Reports
-                        </a>
-                        <a href="#" class="action-button" onclick="clearCache()">
-                            Clear System Cache
-                        </a>
-                        <a href="#" class="action-button" onclick="optimizeDatabase()">
-                            Optimize Database
-                        </a>
-                        <a href="#" class="action-button" onclick="exportAllData()">
-                            Export All System Data
-                        </a>
-                        <a href="<?= ROOT ?>/systemadmin/accesslogs" class="action-button">
-                            View Detailed Logs
-                        </a>
-                        <a href="#" class="action-button" onclick="systemHealthCheck()">
-                            Run Health Check
-                        </a>
-                    </div>
-                </div> -->
-
                 <div class="text-center mt-4">
                     <a href="<?= ROOT ?>/systemadmin/dashboard" class="btn btn-outline-secondary">
                         ← Back to Dashboard
@@ -625,10 +424,7 @@
                 </div>
             </div>
 
-            <?php  // include '../views/components/footer.view.php'; 
-            $this->view('components/footer')
-
-                ?>
+            <?php $this->view('components/footer') ?>
 
             <script src="<?= ROOT ?>/assets/js/main.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -637,21 +433,10 @@
                     const dateRange = document.getElementById('date_range').value;
                     const reportType = document.getElementById('report_type').value;
                     const exportFormat = document.getElementById('export_format').value;
-
-                    console.log(`${dateRange}/${reportType}/${exportFormat}`);
-
-
-
-                    // showToast(`Generating ${reportType} report for ${dateRange} in ${exportFormat} format...`, 'info');
-
-                    // Simulate report generation
-                    // setTimeout(() => {
-                    //     showToast('Report generated successfully! Check your downloads.', 'success');
-                    // }, 3000);
                 }
 
 
-                let userChart1; // global variable
+                let userChart1;
                 let userChart2;
                 let userChart3;
 
@@ -786,43 +571,6 @@
                     // In real implementation, this would download CSV/JSON data
                 }
 
-                function scheduleReport() {
-                    showToast('Report scheduling feature coming soon', 'info');
-                    // In real implementation, this would open a scheduling modal
-                }
-
-                function clearCache() {
-                    if (confirm('Clear all system cache? This may temporarily slow down the system.')) {
-                        showToast('System cache cleared successfully', 'success');
-                        // In real implementation, this would clear cache
-                    }
-                }
-
-                function optimizeDatabase() {
-                    if (confirm('Optimize database tables? This may take a few minutes.')) {
-                        showToast('Database optimization started...', 'info');
-                        // In real implementation, this would optimize database
-                        setTimeout(() => {
-                            showToast('Database optimization completed', 'success');
-                        }, 5000);
-                    }
-                }
-
-                function exportAllData() {
-                    if (confirm('Export all system data? This may take several minutes.')) {
-                        showToast('Data export started. You will receive an email when complete.', 'info');
-                        // In real implementation, this would start background export
-                    }
-                }
-
-                function systemHealthCheck() {
-                    showToast('Running system health check...', 'info');
-                    // In real implementation, this would run comprehensive health check
-                    setTimeout(() => {
-                        showToast('System health check completed. All systems operational.', 'success');
-                    }, 3000);
-                }
-
                 function showToast(message, type) {
                     const toast = document.createElement('div');
                     toast.className = `alert alert-${type}`;
@@ -846,7 +594,6 @@
 
                 // Auto-refresh data every 30 seconds
                 setInterval(() => {
-                    // In real implementation, this would fetch fresh data
                     console.log('Refreshing report data...');
                 }, 30000);
 

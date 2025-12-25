@@ -131,9 +131,7 @@ class Profile extends Controller
         ]);
     }
 
-    /**
-     * Log user activity for security audit
-     */
+    
     private function logActivity($userId, $action, $details = '')
     {
         try {
@@ -152,9 +150,7 @@ class Profile extends Controller
         }
     }
 
-    /**
-     * Handle avatar/profile picture upload (future enhancement)
-     */
+    
     private function handleProfileImageUpload($file)
     {
         $uploadDir = '../public/assets/images/profiles/';
@@ -197,25 +193,21 @@ class Profile extends Controller
         }
     }
 
-    /**
-     * Get user activity logs for profile page
-     */
+  
     public function getActivityLogs()
     {
         Auth::requireLogin();
         Auth::requireRole(1);
 
         $accessLog = new AccessLog();
-        $logs = $accessLog->where(['user_id' => $_SESSION['USER']['id']], 'created_at DESC', 10);
+        $logs = $accessLog->where(['user_id' => $_SESSION['USER']['id']], 'created_at DESC');
 
         header('Content-Type: application/json');
         echo json_encode($logs);
         exit;
     }
 
-    /**
-     * Download user data (GDPR compliance)
-     */
+ 
     public function downloadData()
     {
         Auth::requireLogin();
@@ -238,9 +230,7 @@ class Profile extends Controller
         }
     }
 
-    /**
-     * Check if email is available (AJAX endpoint)
-     */
+    
     public function checkEmail()
     {
         Auth::requireLogin();

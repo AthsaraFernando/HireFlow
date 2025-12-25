@@ -14,9 +14,7 @@ class AccessLog
         'created_at'
     ];
 
-    /**
-     * Log user activity
-     */
+   
     public static function log($action, $details = '', $userId = null)
     {
         $accessLog = new self();
@@ -34,22 +32,16 @@ class AccessLog
         $accessLog->insert($data);
     }
 
-    /**
-     * Get recent activity for user
-     */
+
     public function getUserActivity($userId, $limit = 10)
     {
-        // return $this->where(['user_id' => $userId], 'created_at desc', $limit);
         return $this->where(['user_id' => $userId], 'created_at desc');
 
     }
 
-    /**
-     * Get all activity with user details
-     */
+   
     public function getAllActivityWithUsers($limit = 50)
     {
-        // Convert limit to integer to avoid SQL syntax errors
         $limit = (int) $limit;
 
         $query = "SELECT al.*, u.full_name, u.email, r.role_name 
@@ -62,12 +54,9 @@ class AccessLog
         return $this->query($query, []);
     }
 
-    /**
-     * Get failed login attempts
-     */
+   
     public function getFailedLogins($timeframe = 24)
     {
-        // Convert timeframe to integer
         $timeframe = (int) $timeframe;
 
         $query = "SELECT * FROM access_logs 
@@ -76,7 +65,6 @@ class AccessLog
                   ORDER BY created_at DESC";
 
         $result = $this->query($query, []);
-        // Always return an array (even if query fails or returns nothing)
         if (is_array($result)) {
             return $result;
         }
@@ -84,12 +72,9 @@ class AccessLog
         return [];
     }
 
-    /**
-     * Count login attempts from IP
-     */
+  
     public function countLoginAttempts($ipAddress, $timeframe = 1)
     {
-        // Convert timeframe to integer
         $timeframe = (int) $timeframe;
 
         $query = "SELECT COUNT(*) as attempts FROM access_logs 
@@ -101,12 +86,9 @@ class AccessLog
         return $result ? $result[0]['attempts'] : 0;
     }
 
-    /**
-     * Check if IP is blocked due to too many failed attempts
-     */
+  
     public function isIPBlocked($ipAddress, $maxAttempts = 5, $timeframe = 1)
     {
-        // Convert timeframe to integer
         $timeframe = (int) $timeframe;
 
         $query = "SELECT COUNT(*) as failed_attempts FROM access_logs 
@@ -125,7 +107,6 @@ class AccessLog
     {
         $query = "SELECT COUNT(*) AS total FROM {$this->table} WHERE action = '$action'";
         $result = $this->query($query);
-        // logger($result);
         return $result ? (int) $result[0]['total'] : 0;
     }
 
@@ -182,7 +163,6 @@ class AccessLog
 
     public function getBlockedIPs()
     {
-        // Get IPs with more than 5 failed login attempts in the last hour
         $result = $this->query("SELECT ip_address, COUNT(*) as attempts 
                                    FROM access_logs 
                                    WHERE action = 'failed_login' 

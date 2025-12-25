@@ -1,9 +1,6 @@
 <?php $this->view('components/header') ?>
 
 <style>
-    /* Page Controls Styling - Full Width */
-
-    /* Page Header inside Controls */
     .page-header {
         padding: 25px 25px 20px 25px;
         border-bottom: 1px solid #e5e7eb;
@@ -25,7 +22,6 @@
         color: rgba(255, 255, 255, 0.9);
     }
 
-    /* Statistics Cards */
     .controls-stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -188,7 +184,6 @@
         color: #0369a1;
     }
 
-    /* Table Container inside Page Controls */
     .page-controls .table-container {
         margin: 20px 25px 0 25px;
         border-radius: 8px;
@@ -204,7 +199,6 @@
         margin: 20px 25px 25px 25px;
     }
 
-    /* Proper full width within content area */
     .dashboard-content {
         padding: 20px;
         width: 100%;
@@ -232,7 +226,6 @@
         color: #6b7280;
     }
 
-    /* Icon Styles */
     .icon-search::before {
         content: "🔍";
     }
@@ -251,7 +244,6 @@
 
 
 
-    /* Responsive Design */
     @media (max-width: 768px) {
         .page-header {
             padding: 20px 20px 15px 20px;
@@ -407,22 +399,18 @@
                     <div class="metric-card">
                         <div class="metric-value"><?= number_format($total_logs ?? 0) ?></div>
                         <div class="metric-label">Total Logins Today</div>
-                        <!-- <div class="metric-change positive">+15% from yesterday</div> -->
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= number_format($unique_users_today ?? 0) ?></div>
                         <div class="metric-label">Unique Users</div>
-                        <!-- <div class="metric-change positive">+8 new users</div> -->
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= number_format($failed_logins_today ?? 0) ?></div>
                         <div class="metric-label">Failed Attempts</div>
-                        <!-- <div class="metric-change negative">+4 from yesterday</div> -->
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= count($blocked_ips ?? []) ?></div>
                         <div class="metric-label">Suspicious Activities</div>
-                        <!-- <div class="metric-change warning">Requires attention</div> -->
                     </div>
                 </div>
 
@@ -432,22 +420,17 @@
                             <input type="text" placeholder="Search by user, IP address, or action..."
                                 class="search-input" id="logSearch">
                             <button class="search-btn" onclick="searchLogs()">
-                                <!-- <i class="icon-search"></i> -->Search
+                                Search
                             </button>
                         </div>
                     </div>
                     <div class="controls-right">
                         <button class="btn btn-primary" onclick="exportLogs()">
-                            <!-- <i class="icon-download"></i> -->
                             Export Logs
                         </button>
                         <button class="btn btn-secondary" onclick="refreshLogs()">
-                            <!-- <i class="icon-refresh"></i> -->
                             Refresh
                         </button>
-                        <!-- <button class="btn btn-warning" onclick="clearOldLogs()">
-                    <i class="icon-trash"></i>Clear Old
-                </button> -->
                     </div>
                 </div>
 
@@ -478,8 +461,6 @@
                             <option value="failed_login">Failed Login</option>
                             <option value="password_change">Password Change</option>
                             <option value="profile_update">Profile Update</option>
-                            <!-- <option value="data_access">Data Access</option>
-                            <option value="admin_action">Admin Action</option> -->
                         </select>
                     </div>
                     <div class="filter-actions">
@@ -532,149 +513,6 @@
                                     </td>
                                 </tr>
                             <?php endif; ?>
-                            <!-- <tr>
-                                <td>2024-01-15 14:32:15</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">JD</div>
-                                        <div>
-                                            <div class="user-name">John Doe</div>
-                                            <div class="user-email">john.doe@company.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge system-admin">System Admin</span></td>
-                                <td><span class="action-badge login">Login</span></td>
-                                <td>192.168.1.100</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">Chrome 120.0
-                                    (Windows)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(1)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:30:22</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">MS</div>
-                                        <div>
-                                            <div class="user-name">Mary Smith</div>
-                                            <div class="user-email">mary.smith@company.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge hr-admin">HR Admin</span></td>
-                                <td><span class="action-badge data-access">Data Access</span></td>
-                                <td>192.168.1.105</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36">Chrome
-                                    120.0 (macOS)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(2)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:28:45</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">UK</div>
-                                        <div>
-                                            <div class="user-name">Unknown User</div>
-                                            <div class="user-email">test@suspicious.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge unknown">Unknown</span></td>
-                                <td><span class="action-badge failed-login">Failed Login</span></td>
-                                <td>203.145.67.89</td>
-                                <td class="user-agent" title="Bot/Crawler attempting access">Suspicious Bot Activity
-                                </td>
-                                <td><span class="status-badge error">Failed</span></td>
-                                <td>
-                                    <button class="btn-icon warning" onclick="viewLogDetails(3)" title="View Details">
-                                        <i class="icon-warning"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:25:12</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">RJ</div>
-                                        <div>
-                                            <div class="user-name">Robert Johnson</div>
-                                            <div class="user-email">robert.johnson@company.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge recruitment-manager">Recruitment Manager</span></td>
-                                <td><span class="action-badge profile-update">Profile Update</span></td>
-                                <td>192.168.1.112</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">Edge 120.0
-                                    (Windows)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(4)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:20:33</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">LD</div>
-                                        <div>
-                                            <div class="user-name">Lisa Davis</div>
-                                            <div class="user-email">lisa.davis@email.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge applicant">Applicant</span></td>
-                                <td><span class="action-badge login">Login</span></td>
-                                <td>203.123.45.67</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15">
-                                    Safari (iOS)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(5)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:18:15</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">JD</div>
-                                        <div>
-                                            <div class="user-name">John Doe</div>
-                                            <div class="user-email">john.doe@company.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge system-admin">System Admin</span></td>
-                                <td><span class="action-badge admin-action">Admin Action</span></td>
-                                <td>192.168.1.100</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">Chrome 120.0
-                                    (Windows)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(6)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr> -->
                         </tbody>
                     </table>
                 </div>
@@ -690,61 +528,6 @@
                         <button class="pagination-btn">...</button>
                         <button class="pagination-btn">475</button>
                         <button class="pagination-btn">Next</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Log Details Modal -->
-            <div id="logDetailsModal" class="modal">
-                <div class="modal-content large">
-                    <div class="modal-header">
-                        <h2>Access Log Details</h2>
-                        <span class="close" onclick="closeLogDetailsModal()">&times;</span>
-                    </div>
-                    <div class="modal-body">
-                        <div class="log-detail-grid">
-                            <div class="detail-item">
-                                <label>Timestamp:</label>
-                                <span id="detailTimestamp">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>User:</label>
-                                <span id="detailUser">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Role:</label>
-                                <span id="detailRole">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Action:</label>
-                                <span id="detailAction">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>IP Address:</label>
-                                <span id="detailIP">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Location:</label>
-                                <span id="detailLocation">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>User Agent:</label>
-                                <span id="detailUserAgent">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Session ID:</label>
-                                <span id="detailSession">-</span>
-                            </div>
-                            <div class="detail-item full-width">
-                                <label>Additional Details:</label>
-                                <div id="detailAdditional">-</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="closeLogDetailsModal()">Close</button>
-                        <button type="button" class="btn btn-warning" onclick="flagSuspicious()">Flag as
-                            Suspicious</button>
                     </div>
                 </div>
             </div>
@@ -902,12 +685,10 @@
                         row.style.display = '';
                     });
 
-                    // Reload the page to fetch fresh data from server
                     setTimeout(() => {
                         window.location.reload();
                     }, 500);
                     showToast('Logs refreshed', 'success');
-                    // In real implementation, this would reload the log data
                 }
 
                 function exportLogs() {
@@ -971,71 +752,6 @@
                 function clearOldLogs() {
                     if (confirm('Are you sure you want to clear logs older than 90 days? This action cannot be undone.')) {
                         showToast('Old logs cleared successfully', 'success');
-                        // In real implementation, this would make an AJAX call to delete old logs
-                    }
-                }
-
-                function viewLogDetails(logId) {
-                    // Sample data - in real implementation, this would fetch from database
-                    const logData = {
-                        1: {
-                            timestamp: '2024-01-15 14:32:15',
-                            user: 'John Doe (john.doe@company.com)',
-                            role: 'System Admin',
-                            action: 'Login',
-                            ip: '192.168.1.100',
-                            location: 'New York, NY, USA',
-                            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                            session: 'sess_abc123def456',
-                            additional: 'Successful login from corporate network. No security concerns detected.'
-                        },
-                        2: {
-                            timestamp: '2024-01-15 14:30:22',
-                            user: 'Mary Smith (mary.smith@company.com)',
-                            role: 'HR Admin',
-                            action: 'Data Access',
-                            ip: '192.168.1.105',
-                            location: 'New York, NY, USA',
-                            userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                            session: 'sess_xyz789ghi012',
-                            additional: 'Accessed candidate database. Viewed 15 candidate profiles during this session.'
-                        },
-                        3: {
-                            timestamp: '2024-01-15 14:28:45',
-                            user: 'Unknown User (test@suspicious.com)',
-                            role: 'Unknown',
-                            action: 'Failed Login',
-                            ip: '203.145.67.89',
-                            location: 'Unknown (VPN/Proxy)',
-                            userAgent: 'python-requests/2.28.1',
-                            session: 'N/A',
-                            additional: 'SECURITY ALERT: Multiple failed login attempts detected. IP address flagged as suspicious. Possible bot/automated attack.'
-                        }
-                    };
-
-                    const data = logData[logId] || logData[1];
-
-                    document.getElementById('detailTimestamp').textContent = data.timestamp;
-                    document.getElementById('detailUser').textContent = data.user;
-                    document.getElementById('detailRole').textContent = data.role;
-                    document.getElementById('detailAction').textContent = data.action;
-                    document.getElementById('detailIP').textContent = data.ip;
-                    document.getElementById('detailLocation').textContent = data.location;
-                    document.getElementById('detailUserAgent').textContent = data.userAgent;
-                    document.getElementById('detailSession').textContent = data.session;
-                    document.getElementById('detailAdditional').textContent = data.additional;
-
-                    document.getElementById('logDetailsModal').style.display = 'block';
-                }
-
-                function closeLogDetailsModal() {
-                    document.getElementById('logDetailsModal').style.display = 'none';
-                }
-
-                function flagSuspicious() {
-                    if (confirm('Are you sure you want to flag this activity as suspicious?')) {
-                        showToast('Activity flagged as suspicious. Security team has been notified.', 'warning');
-                        closeLogDetailsModal();
                     }
                 }
 

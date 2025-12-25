@@ -90,7 +90,7 @@
         <div class="dashboard-content">
             <?php if (!($is_system_admin ?? false)): ?>
                 <div class="alert alert-info mb-4">
-                    <h4>👁️ Viewing as <?= htmlspecialchars($user_role_name ?? 'Unknown Role') ?></h4>
+                    <h4> Viewing as <?= htmlspecialchars($user_role_name ?? 'Unknown Role') ?></h4>
                     <p>You are viewing the System Admin dashboard with limited permissions. Some features may be restricted
                         or hidden based on your role.</p>
                 </div>
@@ -151,6 +151,8 @@
                                         <th>Activity</th>
                                         <th>At</th>
                                         <th>User Email</th>
+                                        <th>Full Name</th>
+                                        <th>Role</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -160,6 +162,8 @@
                                             <td><?= htmlspecialchars($recent_login['details']) ?></td>
                                             <td><?= htmlspecialchars($recent_login['created_at']) ?></td>
                                             <td><?= htmlspecialchars($recent_login['email']) ?></td>
+                                            <td><?= htmlspecialchars($recent_login['full_name']) ?></td>
+                                            <td><?= htmlspecialchars($recent_login['role_name']) ?></td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -170,8 +174,6 @@
                             <p>No recent activities to display</p>
                         </div>
                     <?php endif; ?>
-
-                    <!-- </div> -->
                 </div>
 
                 <div class="dashboard-section">
@@ -210,38 +212,7 @@
                         </a>
                     </div>
                 </div>
-
-                <!-- System Status -->
-                <!-- <div class="dashboard-section">
-                    <div class="section-header">
-                        <h2 class="section-title">System Status</h2>
-                    </div>
-                    <div class="status-grid">
-                        <div class="status-item status-online">
-                            <div class="status-indicator"></div>
-                            <div class="status-content">
-                                <h4>Database</h4>
-                                <p>Online</p>
-                            </div>
-                        </div>
-
-                        <div class="status-item status-online">
-                            <div class="status-indicator"></div>
-                            <div class="status-content">
-                                <h4>Email Service</h4>
-                                <p>Operational</p>
-                            </div>
-                        </div>
-
-                        <div class="status-item status-online">
-                            <div class="status-indicator"></div>
-                            <div class="status-content">
-                                <h4>File Storage</h4>
-                                <p>Available</p>
-                            </div>
-                        </div>
-                    </div>
-                </div> -->
+                
             </div>
         </div>
     </div>

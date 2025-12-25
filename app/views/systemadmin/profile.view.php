@@ -86,7 +86,7 @@
             <div class="profile-content">
                 <form method="POST" action="<?= ROOT ?>/systemadmin/profile" class="profile-form"
                     enctype="multipart/form-data">
-                    <!-- Profile Header Card -->
+                    
                     <?php
                     $defaultProfileImage = 'default-avatar.jpg';
                     $profileImage = $defaultProfileImage;
@@ -264,7 +264,6 @@
     </div>
 
     <style>
-        /* Profile-specific styles */
         .profile-content {
             padding: 0;
         }

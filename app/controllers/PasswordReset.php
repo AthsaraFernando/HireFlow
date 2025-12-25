@@ -25,7 +25,6 @@ class PasswordReset extends Controller
                 $token = $user->generatePasswordResetToken($email);
 
                 if ($token) {
-                    // In a real application, you would send an email here
                     // For now, we'll just show a success message
                     $data['success'] = "If an account with that email exists, you will receive password reset link.";
 

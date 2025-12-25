@@ -55,7 +55,6 @@ class Usermanage extends Controller
         }
 
         // Get all users with role information
-        // $data['users'] = $this->getUsersWithRoles();
         $data['users'] = $user->getUsersWithRoles();
         $data['roles'] = $role->findAll();
         $data['csrf_token'] = Auth::generateCSRFToken();
@@ -66,7 +65,6 @@ class Usermanage extends Controller
 
     private function handleCreateUser(&$data, $user)
     {
-        // logger($data);
         // Validate input
         $requiredFields = ['full_name', 'email', 'password', 'role_id'];
         foreach ($requiredFields as $field) {

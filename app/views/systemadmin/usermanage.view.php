@@ -455,12 +455,9 @@
                                 <!-- <i class="icon-plus"></i> -->
                                 Add Staff User
                             </button>
-                            <!-- <button class="btn btn-secondary" onclick="exportUsers()">
-                                <i class="icon-download"></i>Export
-                            </button> -->
-                            <!-- <button class="btn btn-outline" onclick="openBulkActionsModal()">
-                                <i class="icon-edit"></i>Bulk Actions
-                            </button> -->
+                            <button class="btn btn-secondary" onclick="exportUsers()">
+                                Export
+                            </button>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -482,7 +479,6 @@
                             <option value="">All Status</option>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
-                            <!-- <option value="suspended">Suspended</option> -->
                         </select>
                     </div>
                     <div class="filter-actions">
@@ -510,7 +506,6 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <!-- <th><input type="checkbox" id="selectAll"></th> -->
                                 <th>User ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
@@ -533,15 +528,11 @@
                                     }
                                     $initials = substr($initials, 0, 2);
 
-                                    // Format role badge class
-                                    // $roleClass = str_replace(' ', '-', strtolower($user['role_name'] ?? 'unknown'));
-                            
                                     // Format dates
                                     $lastLogin = $user['last_login'] ? date('M j, Y g:i A', strtotime($user['last_login'])) : 'Never';
                                     $createdDate = date('M j, Y', strtotime($user['created_at']));
                                     ?>
                                     <tr data-user-id="<?= $user['id'] ?>">
-                                        <!-- <td><input type="checkbox" class="user-checkbox" value="<?= $user['id'] ?>"></td> -->
                                         <td>USR-<?= str_pad($user['id'], 3, '0', STR_PAD_LEFT) ?></td>
                                         <td>
                                             <div class="user-info">
@@ -549,7 +540,6 @@
                                                 <div>
                                                     <div class="user-name"><?= htmlspecialchars($user['full_name']) ?></div>
                                                     <div class="user-meta">
-                                                        <? // = htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?>
                                                     </div>
                                                 </div>
                                             </div>
@@ -628,13 +618,6 @@
                         <span class="close" onclick="closeUserModal()">&times;</span>
                     </div>
                     <div class="modal-body">
-                        <!-- <div class="info-box mb-3">
-                            <p class="text-muted small">
-                                <strong>Account Creation Policy:</strong> Only create HR Admin and Recruitment Manager
-                                accounts here.
-                                Applicants register themselves through the public signup page.
-                            </p>
-                        </div> -->
                         <form id="userForm">
                             <div class="form-row">
                                 <div class="form-group">
@@ -667,8 +650,7 @@
                                         <option value="hr_admin">HR Admin</option>
                                         <option value="recruitment_manager">Recruitment Manager</option>
                                     </select>
-                                    <!-- <small class="form-text">Applicant accounts are created through public
-                                        registration</small> -->
+
                                 </div>
                                 <div class="form-group">
                                     <label for="status">Status</label>
@@ -691,12 +673,7 @@
                                 <input type="password" id="confirmPassword" name="confirmPassword" required>
                             </div>
 
-                            <!-- <div class="form-group">
-                                <label>
-                                    <input type="checkbox" id="sendWelcome" name="sendWelcome" checked>
-                                    Send welcome email to user
-                                </label>
-                            </div> -->
+
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -828,6 +805,7 @@
                             alert('Failed to load user data: ' + error.message);
                         });
                 }
+   
                 function updateUser(userId) {
                     const form = document.getElementById('userForm');
                     const formData = new FormData();
@@ -1071,7 +1049,7 @@
 
                 function exportUsers() {
                     // Export users to CSV
-                    showToast('Export started. Download will begin shortly.', 'info');
+                    // showToast('Export started. Download will begin shortly.', 'info');
                 }
 
                 // Search and filter functionality
@@ -1091,7 +1069,7 @@
                     const searchTerm = document.getElementById('userSearch').value.toLowerCase();
                     const roleFilter = document.getElementById('roleFilter').value;
                     const statusFilter = document.getElementById('statusFilter').value;
-                    
+
                     // Filter table rows based on criteria
                     const rows = document.querySelectorAll('tbody tr');
                     rows.forEach(row => {
