@@ -707,7 +707,7 @@
                     const csvRows = [];
 
                     // Add header row
-                    const headers = ['ID', 'User ID', 'IP Address', 'Action', 'Details', 'User Agent', 'Created At'];
+                    const headers = ['ID', 'User ID', 'User Role', 'IP Address', 'Action', 'Details', 'User Agent', 'Created At'];
                     csvRows.push(headers.join(','));
 
                     // Add data rows
@@ -718,9 +718,10 @@
                             cells[1]?.textContent.trim() || '',
                             cells[2]?.textContent.trim() || '',
                             cells[3]?.textContent.trim() || '',
-                            `"${(cells[4]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in details
-                            `"${(cells[5]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in user agent
-                            cells[6]?.textContent.trim() || ''
+                            cells[4]?.textContent.trim() || '',
+                            `"${(cells[5]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in details
+                            `"${(cells[6]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in user agent
+                            cells[7]?.textContent.trim() || ''
                         ];
                         csvRows.push(rowData.join(','));
                     });
