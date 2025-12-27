@@ -233,13 +233,17 @@ class Interview
 
     public function getInterviewStats()
     {
-        $query = "SELECT 
-        DATE(updated_at) AS updated_at,
-        SUM(status = 'Completed') AS completed,
-        SUM(status = 'Scheduled') AS scheduled
-        FROM {$this->table}
-        GROUP BY updated_at
-        ORDER BY updated_at ASC";
+        $query = "SELECT
+                    scheduled_date,
+                        COUNT(*) AS scheduledCount
+                    FROM
+                        interviews
+                    WHERE
+                        status = 'Scheduled'
+                    GROUP BY
+                        scheduled_date
+                    ORDER BY
+                        scheduled_date ASC";
 
         $result = $this->query($query);
         return $result ? $result : 0;

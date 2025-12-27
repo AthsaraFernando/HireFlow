@@ -279,4 +279,12 @@ class User
         return $this->query($query) ?: [];
     }
 
+    public function getUserStatus()
+    {
+        $query = "SELECT status, COUNT(*) AS statusCount
+                  FROM users
+                  GROUP BY status";
+        return $this->query(query: $query) ?: [];
+    }
+
 }

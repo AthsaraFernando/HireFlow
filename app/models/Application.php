@@ -170,4 +170,13 @@ class Application
         $result = $this->query($query);
         return $result ? (int) $result[0]['total'] : 0;
     }
+
+    public function jobDemandStat()
+    {
+        $query = "SELECT jp.title, COUNT(*) AS applicationCount
+                  FROM applications a
+                  JOIN job_posts jp ON a.job_id = jp.id
+                  GROUP BY jp.title";
+        return $this->query(query: $query) ?: [];
+    }
 }
