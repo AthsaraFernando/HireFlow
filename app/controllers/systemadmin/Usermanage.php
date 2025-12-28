@@ -199,9 +199,17 @@ class Usermanage extends Controller
         if ($user->delete($userId)) {
             AccessLog::log('user_deleted', 'Deleted user: ' . ($userData['email'] ?? 'Unknown'));
             $data['success'] = "User deleted successfully!";
+            echo json_encode([
+                'success' => true
+            ]);
+            exit;
         } else {
-            logger($userData);
+            // logger($userData);
             $data['errors']['general'] = "Failed to delete user";
+            echo json_encode([
+                'success' => false
+            ]);
+            exit;
         }
     }
 

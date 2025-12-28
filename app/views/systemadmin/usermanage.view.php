@@ -1004,14 +1004,20 @@
                             method: 'POST',
                             body: formData
                         })
-                            .then(response => response.text())
+                            .then(response => response.json())
                             .then(data => {
-                                showToast('User deleted successfully!', 'success');
-                                setTimeout(() => {
-                                    location.reload();
-                                }, 1000);
+                                if (data.success) {
+                                    showToast('User deleted successfully!', 'success');
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 1000);
+                                }
+                                else {
+                                    showToast('User deletion unsuccessful!', 'error');
+                                }
                             })
                             .catch(error => {
+                                console.log(error);
                                 console.error('Error:', error);
                                 showToast('Failed to delete user', 'error');
                             });
