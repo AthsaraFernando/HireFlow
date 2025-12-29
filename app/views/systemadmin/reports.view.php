@@ -26,7 +26,8 @@
             background: white;
             border-radius: 10px;
             padding: 25px;
-            margin-bottom: 25px;
+            margin-bottom: 10px;
+            margin-top: 10px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
@@ -203,6 +204,13 @@
             border-color: #3498db;
             background: #f8f9fa;
         }
+
+        .parent-chart-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 25px;
+        }
     </style>
 </head>
 
@@ -350,72 +358,136 @@
                     </div>
                 </div>
 
-                <!-- User Activity Chart -->
-                <div class="reports-section">
-                    <h2 class="section-title"> User Activity Trends</h2>
-                    <div class="export-buttons">
-                        <button class="btn btn-outline-secondary" onclick="downloadData('user_activity')">
-                            Download Data
-                        </button>
-                    </div>
-                    <div class="chart-container">
-                        <div class="chart-placeholder">
-                            <canvas id="myChart" width="400" height="200"></canvas>
+                <div class="parent-chart-container">
+                    <!-- User Activity Chart -->
+                    <div class="reports-section">
+                        <h2 class="section-title"> User Activity Trends</h2>
+                        <div class="export-buttons">
+                            <button class="btn btn-outline-secondary" onclick="downloadData('user_activity')">
+                                Download Data
+                            </button>
                         </div>
-                    </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <canvas id="myChart" width="400" height="200"></canvas>
+                            </div>
+                        </div>
 
-                    <table class="reports-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Logins</th>
-                                <th>New Registrations</th>
-                                <th>Applications Submitted</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($data['user_activity'] as $activity): ?>
+                        <!-- <table class="reports-table">
+                            <thead>
                                 <tr>
-                                    <td><?= date('M d, Y', strtotime($activity['log_date'])) ?></td>
-                                    <td><?= $activity['logins'] ?></td>
-                                    <td><?= $activity['registrations'] ?></td>
-                                    <td><?= $activity['applications_submitted'] ?></td>
+                                    <th>Date</th>
+                                    <th>Logins</th>
+                                    <th>New Registrations</th>
+                                    <th>Applications Submitted</th>
                                 </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="reports-section">
-                    <h2 class="section-title">Department Job Posting Overview</h2>
-                    <div class="export-buttons">
-
-                        <button class="btn btn-outline-secondary" onclick="downloadData('job_posting_overview')">
-                            Download Data
-                        </button>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($data['user_activity'] as $activity): ?>
+                                    <tr>
+                                        <td><?= date('M d, Y', strtotime($activity['log_date'])) ?></td>
+                                        <td><?= $activity['logins'] ?></td>
+                                        <td><?= $activity['registrations'] ?></td>
+                                        <td><?= $activity['applications_submitted'] ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table> -->
                     </div>
-                    <div class="chart-container">
-                        <div class="chart-placeholder">
-                            <canvas id="myChart2" width="400" height="200"></canvas>
+
+                    <div class="reports-section">
+                        <h2 class="section-title">Department Job Posting Overview</h2>
+                        <div class="export-buttons">
+
+                            <button class="btn btn-outline-secondary" onclick="downloadData('job_posting_overview')">
+                                Download Data
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <canvas id="myChart2" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Interview Progress -->
+                    <div class="reports-section">
+                        <h2 class="section-title">Interviewing Progress</h2>
+                        <div class="export-buttons">
+
+                            <button class="btn btn-outline-secondary" onclick="downloadData('interviewing_progress')">
+                                Download Data
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <canvas id="myChart3" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reports-section">
+                        <h2 class="section-title">User Status Overview</h2>
+                        <div class="export-buttons">
+
+                            <button class="btn btn-outline-secondary" onclick="downloadData('user_status')">
+                                Download Data
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <canvas id="myChart4" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reports-section">
+                        <h2 class="section-title">Job Demand Stats</h2>
+                        <div class="export-buttons">
+
+                            <button class="btn btn-outline-secondary" onclick="downloadData('job_demand')">
+                                Download Data
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <canvas id="myChart5" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reports-section">
+                        <h2 class="section-title">Report 3</h2>
+                        <div class="export-buttons">
+
+                            <button class="btn btn-outline-secondary" onclick="downloadData('')">
+                                Download Data
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <canvas id="myChart6" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reports-section">
+                        <h2 class="section-title">Report 4</h2>
+                        <div class="export-buttons">
+
+                            <button class="btn btn-outline-secondary" onclick="downloadData('')">
+                                Download Data
+                            </button>
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <canvas id="myChart7" width="400" height="200"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Interview Progress -->
-                <div class="reports-section">
-                    <h2 class="section-title">Interviewing Progress</h2>
-                    <div class="export-buttons">
-
-                        <button class="btn btn-outline-secondary" onclick="downloadData('interviewing_progress')">
-                            Download Data
-                        </button>
-                    </div>
-                    <div class="chart-container">
-                        <div class="chart-placeholder">
-                            <canvas id="myChart3" width="400" height="200"></canvas>
-                        </div>
-                    </div>
-                </div>
 
                 <div class="text-center mt-4">
                     <a href="<?= ROOT ?>/systemadmin/dashboard" class="btn btn-outline-secondary">
@@ -439,6 +511,8 @@
                 let userChart1;
                 let userChart2;
                 let userChart3;
+                let userChart4;
+                let userChart5;
 
                 function userActivityChart() {
                     const stats = <?= json_encode($data['user_activity']); ?>;
@@ -503,9 +577,9 @@
 
                 function interviewStatChart() {
                     const stats = <?= json_encode($data['interview_stats']); ?>;
-                    const labels = stats.map(row => row.updated_at);
-                    const completed = stats.map(row => row.completed);
-                    const scheduled = stats.map(row => row.scheduled);
+                    const labels = stats.map(row => row.scheduled_date);
+                    const scheduledCount = stats.map(row => row.scheduledCount);
+
 
                     const ctx = document.getElementById('myChart3').getContext('2d');
 
@@ -514,8 +588,63 @@
                         data: {
                             labels: labels,
                             datasets: [
-                                { label: 'Completed', data: completed, borderWidth: 2 },
-                                { label: 'Scheduled', data: scheduled, borderWidth: 2 },
+                                { label: 'Scheduled', data: scheduledCount, borderWidth: 2 },
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    // ticks: { precision: 0 }
+                                    min: 0,
+                                    max:10
+                                
+                                }
+                            }
+                        }
+                    });
+                }
+                interviewStatChart()
+
+                function userStatusChart() {
+                    const stats = <?= json_encode($data['user_status']); ?>;
+                    const labels = stats.map(row => row.status);
+                    const statusCount = stats.map(row => row.statusCount);
+
+
+                    const ctx = document.getElementById('myChart4').getContext('2d');
+
+                    userChart1 = new Chart(ctx, {   // store in global variable
+                        type: 'pie',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Counts', data: statusCount, borderWidth: 2 },
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                        }
+                    });
+                }
+                userStatusChart();
+
+                function jobDemandChart() {
+
+                    const stats = <?= json_encode($data['job_demand']); ?>;
+                    const labels = stats.map(row => row.title);
+                    const applicationCount = stats.map(row => row.applicationCount);
+
+
+                    const ctx = document.getElementById('myChart5').getContext('2d');
+
+                    userChart1 = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Applications', data: applicationCount, borderWidth: 2 },
                             ]
                         },
                         options: {
@@ -529,7 +658,7 @@
                         }
                     });
                 }
-                interviewStatChart()
+                jobDemandChart();
 
 
 

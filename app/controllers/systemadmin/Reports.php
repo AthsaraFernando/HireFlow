@@ -30,6 +30,9 @@ class Reports extends Controller
         $data['user_activity'] = $accessLogs->getUserTrendStats();
         $data['jobpost_stats'] = $jobPost->getJobPostStats();
         $data['interview_stats'] = $interviews->getInterviewStats();
+        $data['user_status'] = $user->getUserStatus();
+        $data['job_demand'] = $application->jobDemandStat();
+
 
         if ($_POST) {
             // Handle report generation
