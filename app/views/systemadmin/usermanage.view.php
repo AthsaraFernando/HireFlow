@@ -398,20 +398,16 @@
                 </div>
             <?php endif; ?>
 
-            <!-- User Management Controls -->
             <div class="page-controls">
-                <!-- Page Header -->
                 <div class="page-header">
                     <h1 class="page-title">User Management</h1>
                     <p class="page-description">Manage system users, roles, and permissions</p>
                 </div>
 
-                <!-- Statistics Cards -->
                 <div class="controls-stats">
                     <div class="metric-card">
                         <div class="metric-value"><?= count($users ?? []) ?></div>
                         <div class="metric-label">Total Users</div>
-                        <!-- <div class="metric-change neutral">All registered users</div> -->
                     </div>
                     <div class="metric-card">
                         <?php
@@ -421,7 +417,6 @@
                         ?>
                         <div class="metric-value"><?= count($activeUsers) ?></div>
                         <div class="metric-label">Active Users</div>
-                        <!-- <div class="metric-change positive">Currently active</div> -->
                     </div>
                     <div class="metric-card">
                         <?php
@@ -431,12 +426,10 @@
                         ?>
                         <div class="metric-value"><?= count($inactiveUsers) ?></div>
                         <div class="metric-label">Inactive Users</div>
-                        <!-- <div class="metric-change neutral">Currently inactive</div> -->
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= count($roles ?? []) ?></div>
                         <div class="metric-label">User Roles</div>
-                        <!-- <div class="metric-change neutral">Available roles</div> -->
                     </div>
                 </div>
 
@@ -501,7 +494,6 @@
                     </div>
                 <?php endif; ?>
 
-                <!-- Users Table -->
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
@@ -520,7 +512,6 @@
                             <?php if (!empty($users)): ?>
                                 <?php foreach ($users as $user): ?>
                                     <?php
-                                    // Generate initials for avatar
                                     $nameParts = explode(' ', trim($user['full_name']));
                                     $initials = '';
                                     foreach ($nameParts as $part) {
@@ -528,7 +519,6 @@
                                     }
                                     $initials = substr($initials, 0, 2);
 
-                                    // Format dates
                                     $lastLogin = $user['last_login'] ? date('M j, Y g:i A', strtotime($user['last_login'])) : 'Never';
                                     $createdDate = date('M j, Y', strtotime($user['created_at']));
                                     ?>
@@ -711,26 +701,22 @@
                     });
                 });
 
-                // User management functionality
                 function openUserModal(action, userId = null) {
                     const modal = document.getElementById('userModal');
                     const title = document.getElementById('modalTitle');
                     const form = document.getElementById('userForm');
                     const button = document.getElementById('action');
 
-                    // Reset all fields to be editable (remove readonly/disabled)
                     form.querySelectorAll('input, select').forEach(field => {
                         field.removeAttribute('readonly');
                         field.removeAttribute('disabled');
                     });
 
-                    // Show the action button
                     button.style.display = 'inline-block';
 
                     if (action === 'add') {
                         title.textContent = 'Add Staff User';
                         form.reset();
-                        // Reset password fields to required
                         document.getElementById('password').required = true;
                         document.getElementById('confirmPassword').required = true;
                         button.textContent = 'Create Staff Account';
@@ -738,12 +724,10 @@
                     } else if (action === 'edit') {
                         title.textContent = 'Edit User';
                         button.textContent = 'Update User';
-                        // Store userId in a data attribute for later use
                         modal.setAttribute('data-user-id', userId);
                         button.onclick = function () {
                             updateUser(userId);
                         };
-                        // Load user data for editing
                         loadUserData(userId, modal);
                     }
 
@@ -760,7 +744,6 @@
                         body: formData
                     })
                         .then(response => {
-                            // Check if response is JSON
                             const contentType = response.headers.get('content-type');
                             if (!contentType || !contentType.includes('application/json')) {
                                 throw new Error('Server did not return JSON');
@@ -769,17 +752,14 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                console.log(data);
                                 const user = data.user;
 
-                                // Split name into first and last
                                 const nameParts = user.full_name.split(' ');
                                 document.getElementById('firstName').value = nameParts[0] || '';
                                 document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
                                 document.getElementById('email').value = user.email;
                                 document.getElementById('phone').value = user.phone || '';
 
-                                // Map role_id to role name
                                 const roleMap = {
                                     1: 'system_admin',
                                     2: 'hr_admin',
@@ -789,7 +769,6 @@
                                 document.getElementById('role').value = roleMap[user.role_id] || '';
                                 document.getElementById('status').value = user.status;
 
-                                // Make password fields optional for edit
                                 document.getElementById('password').required = false;
                                 document.getElementById('confirmPassword').required = false;
                                 document.getElementById('password').value = '';
@@ -809,12 +788,10 @@
                 function updateUser(userId) {
                     const form = document.getElementById('userForm');
                     const formData = new FormData();
-
-                    // Add action and user_id
                     formData.append('action', 'update');
                     formData.append('user_id', userId);
+                    formData.append('csrf_token', '<?= $csrf_token ?>');
 
-                    // Add form fields
                     const firstName = document.getElementById('firstName').value.trim();
                     const lastName = document.getElementById('lastName').value.trim();
                     formData.append('full_name', firstName + ' ' + lastName);
@@ -822,7 +799,6 @@
                     formData.append('phone', document.getElementById('phone').value.trim());
                     formData.append('status', document.getElementById('status').value);
 
-                    // Map role name to role_id
                     const roleMap = {
                         'system_admin': 1,
                         'hr_admin': 2,
@@ -832,7 +808,6 @@
                     const roleValue = document.getElementById('role').value;
                     formData.append('role_id', roleMap[roleValue]);
 
-                    // Only include password if it was changed
                     const password = document.getElementById('password').value;
                     const confirmPassword = document.getElementById('confirmPassword').value;
 
@@ -848,21 +823,20 @@
                         formData.append('password', password);
                     }
 
-                    // Add CSRF token
-                    formData.append('csrf_token', '<?= $csrf_token ?>');
 
-                    // Send update request
                     fetch('/HireFlow/public/systemadmin/usermanage', {
                         method: 'POST',
                         body: formData
                     })
-                        .then(response => response.text())
+                        .then(response => response.json())
                         .then(data => {
-                            showToast('User updated successfully!', 'success');
-                            closeUserModal();
-                            setTimeout(() => {
-                                location.reload();
-                            }, 1000);
+                            if (data.success) {
+                                showToast('User updated successfully!', 'success');
+                                closeUserModal();
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            }
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -877,6 +851,9 @@
                 function saveUser() {
                     const form = document.getElementById('userForm');
                     const formData = new FormData(form);
+                    formData.append('action', 'create');
+                    formData.append('csrf_token', '<?= $csrf_token ?>');  // ADD THIS
+
 
                     console.log(formData);
                     // Basic validation
@@ -895,7 +872,7 @@
                     }
 
                     // Create user via AJAX
-                    fetch('/HireFlow/public/systemadmin/usermanage/create', {
+                    fetch('/HireFlow/public/systemadmin/usermanage', {
                         method: 'POST',
                         body: formData
                     })
@@ -904,7 +881,6 @@
                             if (data.success) {
                                 showToast('Staff account created successfully!', 'success');
                                 closeUserModal();
-                                // Refresh the page to show new user
                                 setTimeout(() => {
                                     location.reload();
                                 }, 1000);
@@ -941,7 +917,6 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                // Show user details in a modal or view
                                 showUserDetailsModal(data.user);
                             } else {
                                 showToast('User not found: ' + (data.message || ''), 'error');
@@ -954,14 +929,12 @@
                 }
 
                 function showUserDetailsModal(user) {
-                    // Create a view-only modal with user details
                     const modal = document.getElementById('userModal');
                     const title = document.getElementById('modalTitle');
                     const form = document.getElementById('userForm');
 
                     title.textContent = 'View User Details';
 
-                    // Populate fields
                     const nameParts = user.full_name.split(' ');
                     document.getElementById('firstName').value = nameParts[0] || '';
                     document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
@@ -977,17 +950,14 @@
                     document.getElementById('role').value = roleMap[user.role_id] || '';
                     document.getElementById('status').value = user.status;
 
-                    // Clear password fields for view mode
                     document.getElementById('password').value = '';
                     document.getElementById('confirmPassword').value = '';
 
-                    // Make all fields read-only AFTER populating them
                     form.querySelectorAll('input, select').forEach(field => {
                         field.setAttribute('readonly', true);
                         field.setAttribute('disabled', true);
                     });
 
-                    // Hide action button
                     document.getElementById('action').style.display = 'none';
 
                     modal.style.display = 'block';
@@ -1040,12 +1010,14 @@
                         method: 'POST',
                         body: formData
                     })
-                        .then(response => response.text())
+                        .then(response => response.json())
                         .then(data => {
-                            showToast('User status updated successfully!', 'success');
-                            setTimeout(() => {
-                                location.reload();
-                            }, 1000);
+                            if (data.success) {
+                                showToast('User status updated successfully!', 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            }
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -1106,7 +1078,6 @@
                     }, 100);
                 }
 
-                // Search and filter functionality
                 document.getElementById('userSearch').addEventListener('input', function () {
                     filterUsers();
                 });
@@ -1144,13 +1115,11 @@
                     });
                 }
 
-                // Clear all filters
                 function clearFilters() {
                     document.getElementById('userSearch').value = '';
                     document.getElementById('roleFilter').value = '';
                     document.getElementById('statusFilter').value = '';
 
-                    // Show all rows
                     const rows = document.querySelectorAll('tbody tr');
                     rows.forEach(row => {
                         row.style.display = '';
@@ -1167,9 +1136,7 @@
                     });
                 });
 
-                // Toast notification function
                 function showToast(message, type) {
-                    // Create and show toast notification
                     const toast = document.createElement('div');
                     toast.className = `toast toast-${type}`;
                     toast.textContent = message;
@@ -1179,32 +1146,6 @@
                         toast.remove();
                     }, 3000);
                 }
-
-                // Sidebar toggle functionality
-                document.getElementById('sidebarToggle').addEventListener('click', function () {
-                    document.querySelector('.sidebar').classList.toggle('collapsed');
-                    document.querySelector('.main-content').classList.toggle('expanded');
-                });
-
-                document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
-                    if (e.target.textContent.trim() === ">") {
-                        e.target.textContent = "<";
-                    } else {
-                        e.target.textContent = ">";
-                    }
-                });
-
-                document.addEventListener('DOMContentLoaded', function () {
-                    const currentPath = window.location.pathname;
-                    const navLinks = document.querySelectorAll('.nav-link');
-
-                    navLinks.forEach(link => {
-                        if (link.getAttribute('href').includes(currentPath)) {
-                            navLinks.forEach(l => l.classList.remove('active'));
-                            link.classList.add('active');
-                        }
-                    });
-                });
             </script>
 
         </div>

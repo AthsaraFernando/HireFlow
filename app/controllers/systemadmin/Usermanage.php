@@ -4,19 +4,16 @@ class Usermanage extends Controller
 {
     public function index()
     {
-        // Require System Admin role (role_id = 1)
         Auth::requireRole(1);
 
         $data = [];
         $user = new User();
         $role = new Role();
 
-        // Check if user has admin privileges for actions
-        $canManageUsers = Auth::hasRole(1); // Only System Admin can manage users
+        $canManageUsers = Auth::hasRole(1);
         $data['can_manage_users'] = $canManageUsers;
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Only System Admins can perform user management actions
             if (!$canManageUsers) {
                 $data['errors']['general'] = "Insufficient privileges to perform this action.";
             } elseif (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
@@ -33,85 +30,33 @@ class Usermanage extends Controller
                 switch ($action) {
                     case 'create':
                         $this->handleCreateUser($data, $user);
-                        break;
+                        return;
                     case 'update':
                         $this->handleUpdateUser($data, $user);
-                        break;
+                        return;
                     case 'delete':
                         $this->handleDeleteUser($data, $user);
-                        break;
+                        return;
                     case 'toggle_status':
                         $this->handleToggleStatus($data, $user);
-                        break;
+                        return;
                     case 'fetch':
                         $this->handleGetUser($data, $user);
                         return;
                     default:
                         $data['errors']['general'] = "Invalid action";
-                        break;
+                        return;
                 }
             }
 
         }
 
-        // Get all users with role information
         $data['users'] = $user->getUsersWithRoles();
         $data['roles'] = $role->findAll();
         $data['csrf_token'] = Auth::generateCSRFToken();
 
         $data['view'] = 'usermanage';
         $this->view('systemadmin', $data);
-    }
-
-    private function handleCreateUser(&$data, $user)
-    {
-        // Validate input
-        $requiredFields = ['full_name', 'email', 'password', 'role_id'];
-        foreach ($requiredFields as $field) {
-            if (empty($_POST[$field])) {
-                $data['errors'][$field] = ucfirst(str_replace('_', ' ', $field)) . " is required";
-            }
-        }
-
-        // Validate email
-        if (!empty($_POST['email']) && !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
-            $data['errors']['email'] = "Invalid email format";
-        }
-
-        // Check if email exists
-        if (!empty($_POST['email']) && $user->emailExists($_POST['email'])) {
-            $data['errors']['email'] = "Email already exists";
-        }
-
-        // Validate password
-        if (!empty($_POST['password']) && !isStrongPassword($_POST['password'])) {
-            $data['errors']['password'] = "Password must be at least 8 characters with uppercase, lowercase, number, and special character";
-        }
-
-        // Validate role (only allow HR Admin and Recruitment Manager creation)
-        $allowedRoles = [2, 3]; // HR Admin, Recruitment Manager
-        if (!empty($_POST['role_id']) && !in_array((int) $_POST['role_id'], $allowedRoles)) {
-            $data['errors']['role_id'] = "Invalid role selection";
-        }
-
-        if (empty($data['errors'])) {
-            $userData = [
-                'full_name' => trim($_POST['full_name']),
-                'email' => strtolower(trim($_POST['email'])),
-                'password' => $_POST['password'],
-                'role_id' => (int) $_POST['role_id'],
-                'phone' => $_POST['phone'] ?? '',
-                'address' => $_POST['address'] ?? '',
-                'status' => $_POST['status'] ?? 'active'
-            ];
-
-            if ($user->createUser($userData)) {
-                AccessLog::log('user_created', 'Created user: ' . $userData['email']);
-                $data['success'] = "User created successfully!";
-            } else {
-                $data['errors']['general'] = "Failed to create user";
-            }
-        }
     }
 
     private function handleGetUser(&$data, $user)
@@ -145,7 +90,6 @@ class Usermanage extends Controller
             return;
         }
 
-        // Don't allow updating own account through this interface
         if ($userId === Auth::user_id()) {
             $data['errors']['general'] = "Cannot modify your own account here. Use profile settings.";
             return;
@@ -161,7 +105,6 @@ class Usermanage extends Controller
             'updated_at' => date('Y-m-d H:i:s')
         ];
 
-        // Only update password if provided
         if (!empty($_POST['password'])) {
             if (isStrongPassword($_POST['password'])) {
                 $updateData['password'] = password_hash($_POST['password'], PASSWORD_DEFAULT);
@@ -174,8 +117,16 @@ class Usermanage extends Controller
         if ($user->update($userId, $updateData)) {
             AccessLog::log('user_updated', 'Updated user ID: ' . $userId);
             $data['success'] = "User updated successfully!";
+            echo json_encode([
+                'success' => true
+            ]);
+            exit;
         } else {
             $data['errors']['general'] = "Failed to update user";
+            echo json_encode([
+                'success' => false
+            ]);
+            exit;
         }
     }
 
@@ -187,13 +138,11 @@ class Usermanage extends Controller
             return;
         }
 
-        // Don't allow deleting own account
         if ($userId === Auth::user_id()) {
             $data['errors']['general'] = "Cannot delete your own account";
             return;
         }
 
-        // Get user info for logging
         $userData = $user->first(['id' => $userId], []);
 
         if ($user->delete($userId)) {
@@ -204,7 +153,6 @@ class Usermanage extends Controller
             ]);
             exit;
         } else {
-            // logger($userData);
             $data['errors']['general'] = "Failed to delete user";
             echo json_encode([
                 'success' => false
@@ -223,7 +171,6 @@ class Usermanage extends Controller
             return;
         }
 
-        // Don't allow deactivating own account
         if ($userId === Auth::user_id()) {
             $data['errors']['general'] = "Cannot modify your own account status";
             return;
@@ -232,34 +179,21 @@ class Usermanage extends Controller
         if ($user->update($userId, ['status' => $newStatus, 'updated_at' => date('Y-m-d H:i:s')])) {
             AccessLog::log('user_status_changed', "User ID $userId status changed to: $newStatus");
             $data['success'] = "User status updated successfully!";
+            echo json_encode([
+                'success' => true
+            ]);
+            exit;
         } else {
             $data['errors']['general'] = "Failed to update user status";
+            echo json_encode([
+                'success' => false
+            ]);
+            exit;
         }
     }
 
-    public function create()
+    public function handleCreateUser(&$data, $user)
     {
-        // Require System Admin role (role_id = 1)
-        Auth::requireRole(1);
-
-        // Set JSON response header
-        header('Content-Type: application/json');
-
-        // Check if user has System Admin privileges
-        if (!Auth::hasRole(1)) {
-            echo json_encode(['success' => false, 'message' => 'Insufficient privileges to create users']);
-            return;
-        }
-
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            echo json_encode(['success' => false, 'message' => 'Invalid request method']);
-            return;
-        }
-
-        $user = new User();
-        $response = ['success' => false, 'message' => '', 'errors' => []];
-
-        // Validate input
         $firstName = trim($_POST['firstName'] ?? '');
         $lastName = trim($_POST['lastName'] ?? '');
         $email = strtolower(trim($_POST['email'] ?? ''));
@@ -269,43 +203,40 @@ class Usermanage extends Controller
         $password = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirmPassword'] ?? '';
 
-        // Validation
         if (empty($firstName)) {
-            $response['errors']['firstName'] = 'First name is required';
+            $data['errors']['firstName'] = 'First name is required';
         }
         if (empty($lastName)) {
-            $response['errors']['lastName'] = 'Last name is required';
+            $data['errors']['lastName'] = 'Last name is required';
         }
         if (empty($email)) {
-            $response['errors']['email'] = 'Email is required';
+            $data['errors']['email'] = 'Email is required';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $response['errors']['email'] = 'Invalid email format';
+            $data['errors']['email'] = 'Invalid email format';
         } elseif ($user->emailExists($email)) {
-            $response['errors']['email'] = 'Email already exists';
+            $data['errors']['email'] = 'Email already exists';
         }
 
         if (empty($role)) {
-            $response['errors']['role'] = 'Role is required';
+            $data['errors']['role'] = 'Role is required';
         } elseif (!in_array($role, ['system_admin', 'hr_admin', 'recruitment_manager'])) {
-            $response['errors']['role'] = 'Invalid role';
+            $data['errors']['role'] = 'Invalid role';
         }
 
         if (empty($password)) {
-            $response['errors']['password'] = 'Password is required';
+            $data['errors']['password'] = 'Password is required';
         } elseif (strlen($password) < 8) {
-            $response['errors']['password'] = 'Password must be at least 8 characters';
+            $data['errors']['password'] = 'Password must be at least 8 characters';
         } elseif ($password !== $confirmPassword) {
-            $response['errors']['password'] = 'Passwords do not match';
+            $data['errors']['password'] = 'Passwords do not match';
         }
 
-        if (!empty($response['errors'])) {
-            // logger($response['errors']);
-            $response['message'] = 'Please fix the errors and try again';
-            echo json_encode($response);
+        if (!empty($data['errors'])) {
+            $data['message'] = 'Please fix the errors and try again';
+            echo json_encode($data);
             return;
         }
 
-        // Map role names to IDs
         $roleMap = [
             'system_admin' => 1,
             'hr_admin' => 2,
@@ -315,7 +246,7 @@ class Usermanage extends Controller
         $userData = [
             'full_name' => $firstName . ' ' . $lastName,
             'email' => $email,
-            'password' => $password, // Will be hashed by the User model
+            'password' => $password,
             'role_id' => $roleMap[$role],
             'phone' => $phone,
             'status' => $status
@@ -323,13 +254,14 @@ class Usermanage extends Controller
 
         if ($user->createUser($userData)) {
             AccessLog::log('user_created', 'Created user: ' . $email);
-            $response['success'] = true;
-            $response['message'] = 'Staff account created successfully!';
+            $data['success'] = true;
+            $data['message'] = 'Staff account created successfully!';
         } else {
-            // logger($userData);
-            $response['message'] = 'Failed to create user account';
+            $data['message'] = 'Failed to create user account';
         }
 
-        echo json_encode($response);
+        echo json_encode($data);
+        exit;
     }
+
 }
