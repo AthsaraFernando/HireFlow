@@ -212,6 +212,7 @@ INSERT INTO notifications (user_id, title, message, type) VALUES
 CREATE TABLE IF NOT EXISTS access_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NULL,
+    user_role INT NULL,
     ip_address VARCHAR(45),
     user_agent TEXT,
     action VARCHAR(255) NOT NULL,
@@ -220,6 +221,7 @@ CREATE TABLE IF NOT EXISTS access_logs (
     method VARCHAR(10),
     status_code INT,
     response_time_ms INT,
+    flagged TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     INDEX idx_user_action (user_id, action),
