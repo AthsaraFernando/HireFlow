@@ -21,7 +21,58 @@ class Accesslogs extends Controller
         // Get all access logs
         $data['logs'] = $accessLog->getAllLogs();
         $data['view'] = 'accesslogs';
+        $data['csrf_token'] = Auth::generateCSRFToken();
         $this->view('systemadmin', $data);
+    }
+
+    public function updateFlag($action = null, $id = null)
+    {
+        // logger($action); // Route testing
+        // logger($id);
+
+        Auth::requireRole(1);
+        $canUpdateLogs = Auth::hasRole(1);
+        $data = [];
+
+        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+            if (!$canUpdateLogs) {
+                echo json_encode([
+                    'message' => 'Not authorized to update accesslogs',
+                    'success' => false
+                ]);
+                exit;
+            } else if (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
+                echo json_encode([
+                    'message' => 'Not authorized to update accesslogs',
+                    'success' => false
+                ]);
+                exit;
+            }
+
+            $accessLogs = new AccessLog();
+
+            $logId = $_POST['log_id'];
+            $updateData = [
+                'flagged' => $_POST['flag_value']
+            ];
+
+            if ($accessLogs->update($logId, $updateData)) {
+                echo json_encode([
+                    'success' => true
+                ]);
+                exit;
+            } else {
+                echo json_encode([
+                    'success' => true
+                ]);
+                exit;
+            }
+
+
+
+
+        }
+
     }
 
 }

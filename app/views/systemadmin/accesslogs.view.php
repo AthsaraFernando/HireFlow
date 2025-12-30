@@ -459,8 +459,24 @@
                             <option value="login">Login</option>
                             <option value="logout">Logout</option>
                             <option value="failed_login">Failed Login</option>
-                            <option value="password_change">Password Change</option>
+                            <option value="password_change_request">Password Change Request</option>
                             <option value="profile_update">Profile Update</option>
+                            <option value="password_change">Password Change</option>
+                            <option value="registration">Registration</option>
+                            <option value="user_updated">User Updated</option>
+                            <option value="user_deleted">User Deleted</option>
+                            <option value="user_status_changed">User Status Changed</option>
+                            <option value="user_created">User Created</option>
+                            <option value="application_submit">Application Submit</option>
+
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Filter by Flag:</label>
+                        <select class="filter-select" id="flagFilter">
+                            <option value="">Unflagged</option>
+                            <option value="unflagged">Unflagged</option>
+                            <option value="flagged">Flagged</option>
                         </select>
                     </div>
                     <div class="filter-actions">
@@ -481,6 +497,7 @@
                                 <th>Action</th>
                                 <th>Details</th>
                                 <th>User Agent</th>
+                                <th>Flagged</th>
                                 <th>Created At</th>
                             </tr>
                         </thead>
@@ -503,12 +520,16 @@
                                         <td><?= $log['action'] ?></td>
                                         <td><?= $log['details'] ?></td>
                                         <td><?= $log['user_agent'] ?></td>
+                                        <td>
+                                            <input data-log-id="<?= $log['id'] ?>" class="flagged-checkbox"
+                                                style="width: 25px; height: 25px;" type="checkbox" <?= $log['flagged'] ? 'checked' : '' ?>>
+                                        </td>
                                         <td><?= $log['created_at'] ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="8" style="text-align: center; padding: 2rem;">
+                                    <td colspan="9" style="text-align: center; padding: 2rem;">
                                         <p>No access logs found.</p>
                                     </td>
                                 </tr>
@@ -543,11 +564,50 @@
                     document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
                 });
 
+                document.querySelectorAll('.flagged-checkbox').forEach(cb => {
+                    cb.addEventListener('change', function () {
+                        updateFlag(this);
+                    });
+                });
+
+                function updateFlag(checkbox) {
+                    const flagValue = checkbox.checked ? 1 : 0;
+                    const logId = checkbox.getAttribute('data-log-id');
+                    const formData = new FormData();
+                    formData.append('flag_value', flagValue);
+                    formData.append('log_id', logId);
+                    formData.append('csrf_token', '<?= $csrf_token ?>');
+
+                    fetch(`/HireFlow/public/systemadmin/accesslogs/updateFlag/details/${logId}`, { // details(action) and id(value) is passed for route testing
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToast('Flag updated successfully!', 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            }
+                            else {
+                                showToast('Failed to update flag', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToast('Failed to update flag', 'error');
+                        });
+
+
+                }
+
                 function applyFilters() {
                     const startDate = document.getElementById('startDate').value;
                     const endDate = document.getElementById('endDate').value;
                     const userFilter = document.getElementById('userFilter').value;
                     const actionFilter = document.getElementById('actionFilter').value;
+                    const flagFilter = document.getElementById('flagFilter').value;
 
                     const tableRows = document.querySelectorAll('.data-table tbody tr');
                     let visibleCount = 0;
@@ -565,7 +625,9 @@
                         const action = cells[4]?.textContent.trim().toLowerCase() || '';
                         const details = cells[5]?.textContent.trim().toLowerCase() || '';
                         const userAgent = cells[6]?.textContent.trim().toLowerCase() || '';
-                        const createdAt = cells[7]?.textContent.trim() || '';
+                        const flagValue = cells[7]?.querySelector('input[type="checkbox"]')?.checked ? 'flagged' : 'unflagged'
+                        const createdAt = cells[8]?.textContent.trim() || '';
+
 
                         let shouldShow = true;
 
@@ -596,6 +658,10 @@
                             shouldShow = false;
                         }
 
+                        if (flagFilter && flagValue.toLowerCase() !== flagFilter.toLowerCase()) {
+                            shouldShow = false;
+                        }
+
                         // Show or hide row
                         if (shouldShow) {
                             row.style.display = '';
@@ -620,8 +686,10 @@
                     document.getElementById('userFilter').value = '';
                     document.getElementById('actionFilter').value = '';
                     document.getElementById('logSearch').value = '';
+                    document.getElementById('flagFilter').value = '';
 
-                    showToast('Filters cleared', 'info');
+                    location.reload();
+                    // showToast('Filters cleared', 'info');
                 }
 
                 function searchLogs() {
@@ -630,7 +698,7 @@
                     let visibleCount = 0;
 
                     if (searchTerm.trim() === '') {
-                        showToast('Please enter a search term', 'warning');
+                        // showToast('Please enter a search term', 'warning');
                         return;
                     }
 
@@ -641,18 +709,20 @@
                         }
 
                         const cells = row.querySelectorAll('td');
-                        const createdAt = cells[6]?.textContent.trim() || '';
                         const userId = cells[1]?.textContent.trim() || '';
-                        const ipAddress = cells[2]?.textContent.trim() || '';
-                        const action = cells[3]?.textContent.trim().toLowerCase() || '';
-                        const details = cells[4]?.textContent.trim().toLowerCase() || '';
-                        const userAgent = cells[5]?.textContent.trim().toLowerCase() || '';
+                        const userRole = cells[2]?.textContent.trim() || '';
+                        const ipAddress = cells[3]?.textContent.trim() || '';
+                        const action = cells[4]?.textContent.trim().toLowerCase() || '';
+                        const details = cells[5]?.textContent.trim().toLowerCase() || '';
+                        const userAgent = cells[6]?.textContent.trim().toLowerCase() || '';
+                        const flagValue = cells[7]?.querySelector('input[type="checkbox"]')?.checked ? 'flagged' : 'unflagged'
+                        const createdAt = cells[8]?.textContent.trim() || '';
 
                         let shouldShow = true;
 
                         // Search term filter (searches across user_id, ip_address, action, details, user_agent)
                         if (searchTerm) {
-                            const searchableText = `${userId} ${ipAddress} ${action} ${details} ${userAgent}`;
+                            const searchableText = `${userId} ${userRole} ${ipAddress} ${action} ${details} ${userAgent} ${createdAt}`;
                             if (!searchableText.includes(searchTerm)) {
                                 shouldShow = false;
                             }
@@ -707,7 +777,7 @@
                     const csvRows = [];
 
                     // Add header row
-                    const headers = ['ID', 'User ID', 'User Role', 'IP Address', 'Action', 'Details', 'User Agent', 'Created At'];
+                    const headers = ['ID', 'User ID', 'User Role', 'IP Address', 'Action', 'Details', 'User Agent', 'Flagged', 'Created At'];
                     csvRows.push(headers.join(','));
 
                     // Add data rows
@@ -721,8 +791,10 @@
                             cells[4]?.textContent.trim() || '',
                             `"${(cells[5]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in details
                             `"${(cells[6]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in user agent
-                            cells[7]?.textContent.trim() || ''
+                            cells[7]?.querySelector('input[type="checkbox"]')?.checked ? 'Yes' : 'No' || '',
+                            cells[8]?.textContent.trim() || ''
                         ];
+
                         csvRows.push(rowData.join(','));
                     });
 

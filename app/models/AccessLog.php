@@ -11,22 +11,24 @@ class AccessLog
         'details',
         'ip_address',
         'user_agent',
-        'created_at'
+        'created_at',
+        'flagged'
     ];
 
-   
-    public static function log($action, $details = '', $userId = null)
+
+    public static function log($action, $details = '', $userId = null, $flagged = 0, $user_role = null)
     {
         $accessLog = new self();
 
         $data = [
             'user_id' => $userId ?? Auth::user_id(),
-            'user_role' => Auth::user_role(),
+            'user_role' => $user_role ?? Auth::user_role(),
             'action' => $action,
             'details' => $details,
             'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
             'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
-            'created_at' => date('Y-m-d H:i:s')
+            'created_at' => date('Y-m-d H:i:s'),
+            'flagged' => $flagged
         ];
 
         $accessLog->insert($data);
@@ -39,7 +41,7 @@ class AccessLog
 
     }
 
-   
+
     public function getAllActivityWithUsers($limit = 50)
     {
         $limit = (int) $limit;
@@ -54,7 +56,7 @@ class AccessLog
         return $this->query($query, []);
     }
 
-   
+
     public function getFailedLogins($timeframe = 24)
     {
         $timeframe = (int) $timeframe;
@@ -72,7 +74,7 @@ class AccessLog
         return [];
     }
 
-  
+
     public function countLoginAttempts($ipAddress, $timeframe = 1)
     {
         $timeframe = (int) $timeframe;
@@ -86,7 +88,7 @@ class AccessLog
         return $result ? $result[0]['attempts'] : 0;
     }
 
-  
+
     public function isIPBlocked($ipAddress, $maxAttempts = 5, $timeframe = 1)
     {
         $timeframe = (int) $timeframe;
