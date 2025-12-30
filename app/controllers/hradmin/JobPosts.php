@@ -22,6 +22,11 @@ class JobPosts extends Controller
         $jobPost = new JobPost();
         $jobs = $jobPost->getAllJobs();
         
+        // Get job statistics for hero section
+        $data['total_jobs'] = $jobPost->getJobCount();
+        $data['active_jobs'] = $jobPost->getJobCount('Open');
+        $data['draft_jobs'] = $jobPost->getJobCount('Draft');
+        
         // Get department model for lookups
         $departmentModel = new Department();
         $departments = $departmentModel->findAll();

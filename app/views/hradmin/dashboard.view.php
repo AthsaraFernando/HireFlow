@@ -457,7 +457,7 @@
 
 .stat-value {
     font-weight: 700;
-    color: #1f2937;
+    color: #6c757d;
     font-size: 1.1rem;
 }
 
@@ -577,7 +577,7 @@
         font-size: 1rem;
         opacity: 0.95;
         display: block;
-        color: rgba(255,255,255,0.95);
+        color: Black;
         text-shadow: 
             0 1px 3px rgba(0,0,0,0.4),
             0 2px 6px rgba(0,0,0,0.2);

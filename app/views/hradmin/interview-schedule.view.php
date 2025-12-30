@@ -87,15 +87,15 @@
                         <p class="hero-description">Schedule and manage interviews with top candidates. Coordinate with your team and track interview progress.</p>
                         <div class="hero-stats">
                             <div class="hero-stat">
-                                <span class="stat-number"><?= $today_interviews ?? '5' ?></span>
+                                <span class="stat-number"><?= $interviews_today ?? '0' ?></span>
                                 <span class="stat-label">Today</span>
                             </div>
                             <div class="hero-stat">
-                                <span class="stat-number"><?= $week_interviews ?? '18' ?></span>
+                                <span class="stat-number"><?= $interviews_this_week ?? '0' ?></span>
                                 <span class="stat-label">This Week</span>
                             </div>
                             <div class="hero-stat">
-                                <span class="stat-number"><?= $pending_interviews ?? '12' ?></span>
+                                <span class="stat-number"><?= $interviews_pending ?? '0' ?></span>
                                 <span class="stat-label">Pending</span>
                             </div>
                         </div>
@@ -384,37 +384,45 @@
             <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
         </div>
         <div class="modal-body">
-            <form class="schedule-form">
+            <form class="schedule-form" method="POST" action="<?= ROOT ?>/hradmin/interview-schedule">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Candidate</label>
-                        <select class="form-select" required>
+                        <select name="application_id" class="form-select" required>
                             <option value="">Select Candidate</option>
-                            <option value="1">John Smith - Senior Software Developer</option>
-                            <option value="2">Sarah Johnson - UI/UX Designer</option>
-                            <option value="3">Mike Wilson - Project Manager</option>
+                            <?php if(!empty($available_candidates)): ?>
+                                <?php foreach($available_candidates as $candidate): ?>
+                                    <option value="<?= $candidate['application_id'] ?>">
+                                        <?= htmlspecialchars($candidate['candidate_name']) ?> - <?= htmlspecialchars($candidate['job_title']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Interviewer</label>
-                        <select class="form-select" required>
+                        <select name="interviewer_id" class="form-select" required>
                             <option value="">Select Interviewer</option>
-                            <option value="1">Sarah Johnson - Engineering Manager</option>
-                            <option value="2">Mike Wilson - Design Lead</option>
-                            <option value="3">Emily Chen - HR Manager</option>
+                            <?php if(!empty($interviewers)): ?>
+                                <?php foreach($interviewers as $interviewer): ?>
+                                    <option value="<?= $interviewer['id'] ?>">
+                                        <?= htmlspecialchars($interviewer['full_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Interview Date</label>
-                        <input type="date" class="form-input" required>
+                        <input type="date" name="scheduled_date" class="form-input" required>
                     </div>
                     <div class="form-group">
                         <label>Start Time</label>
-                        <input type="time" class="form-input" required>
+                        <input type="time" name="scheduled_time" class="form-input" required>
                     </div>
                     <div class="form-group">
                         <label>Duration (minutes)</label>
-                        <select class="form-select">
+                        <select name="duration_minutes" class="form-select">
                             <option value="30">30 minutes</option>
                             <option value="45">45 minutes</option>
                             <option value="60" selected>1 hour</option>
@@ -424,29 +432,34 @@
                     </div>
                     <div class="form-group">
                         <label>Interview Type</label>
-                        <select class="form-select" required>
+                        <select name="interview_type" class="form-select" required>
                             <option value="">Select Type</option>
-                            <option value="phone">Phone Screen</option>
-                            <option value="video">Video Interview</option>
-                            <option value="in-person">In-Person</option>
-                            <option value="technical">Technical Interview</option>
-                            <option value="panel">Panel Interview</option>
+                            <option value="Phone">Phone Screen</option>
+                            <option value="Video">Video Interview</option>
+                            <option value="In-Person">In-Person</option>
+                            <option value="Technical">Technical Interview</option>
+                            <option value="Panel">Panel Interview</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Location / Meeting Link</label>
-                        <input type="text" class="form-input" placeholder="Conference Room A or Zoom link">
+                        <label>Location</label>
+                        <input type="text" name="location" class="form-input" placeholder="Conference Room A, Office Building, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Meeting Link (Optional)</label>
+                        <input type="url" name="meeting_link" class="form-input" placeholder="https://zoom.us/j/123456789 or other meeting link">
                     </div>
                     <div class="form-group full-width">
                         <label>Notes</label>
-                        <textarea class="form-textarea" rows="3" placeholder="Interview agenda, special instructions, etc."></textarea>
+                        <textarea name="notes" class="form-textarea" rows="3" placeholder="Interview agenda, special instructions, etc."></textarea>
                     </div>
+                    <input type="hidden" name="status" value="Scheduled">
                 </div>
             </form>
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeScheduleModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveInterview()">Schedule Interview</button>
+            <button class="btn btn-primary" onclick="document.querySelector('.schedule-form').submit()">Schedule Interview</button>
         </div>
     </div>
 </div>

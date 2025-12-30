@@ -7,7 +7,7 @@ class ApplicantDatabase extends Controller
         // Require HR Admin role (role_id = 2)
         Auth::requireRole(2);
         
-        // Sample data - in real implementation this would come from database
+        // Initialize data array
         $data = [];
         $data['errors'] = [];
         $data['success'] = '';
@@ -16,108 +16,77 @@ class ApplicantDatabase extends Controller
         // Get the active tab (applicants or applications)
         $data['active_tab'] = isset($_GET['tab']) ? $_GET['tab'] : 'applicants';
         
-        // Sample applicants data
-        $data['applicants'] = [
-            [
-                'id' => 1,
-                'name' => 'John Smith',
-                'email' => 'john.smith@email.com',
-                'phone' => '+1 (555) 123-4567',
-                'experience' => '5 years',
-                'skills' => ['JavaScript', 'Python', 'React'],
-                'location' => 'New York, NY',
-                'last_application' => '2024-01-15',
-                'status' => 'Active',
-                'rating' => 4.5
-            ],
-            [
-                'id' => 2,
-                'name' => 'Sarah Johnson',
-                'email' => 'sarah.johnson@email.com',
-                'phone' => '+1 (555) 234-5678',
-                'experience' => '3 years',
-                'skills' => ['UI/UX', 'Figma', 'Adobe Creative'],
-                'location' => 'San Francisco, CA',
-                'last_application' => '2024-01-14',
-                'status' => 'Active',
-                'rating' => 4.2
-            ],
-            [
-                'id' => 3,
-                'name' => 'Mike Wilson',
-                'email' => 'mike.wilson@email.com',
-                'phone' => '+1 (555) 345-6789',
-                'experience' => '7 years',
-                'skills' => ['Project Management', 'Agile', 'Scrum'],
-                'location' => 'Remote',
-                'last_application' => '2024-01-13',
-                'status' => 'Active',
-                'rating' => 4.8
-            ]
-        ];
+        // Load models
+        $userModel = new User();
+        $applicationModel = new Application();
+        
+        // Get all users who have applied for jobs (applicants)
+        $query = "SELECT DISTINCT u.* FROM users u 
+                  INNER JOIN applications a ON u.id = a.applicant_id 
+                  ORDER BY u.created_at DESC";
+        $applicantUsers = $userModel->query($query);
+        
+        // Transform applicant data to match view format
+        $data['applicants'] = [];
+        if ($applicantUsers) {
+            foreach ($applicantUsers as $user) {
+                // Get the most recent application for this user
+                $recentApplication = $applicationModel->query(
+                    "SELECT applied_at FROM applications WHERE applicant_id = ? ORDER BY applied_at DESC LIMIT 1", 
+                    [$user['id']]
+                );
+                
+                $data['applicants'][] = [
+                    'id' => $user['id'],
+                    'name' => $user['full_name'],
+                    'email' => $user['email'],
+                    'phone' => $user['phone'] ?? 'N/A',
+                    'experience' => 'N/A', // This would need to be added to user profile
+                    'skills' => [], // This would need to be added to user profile or separate table
+                    'location' => $user['address'] ?? 'N/A',
+                    'last_application' => $recentApplication ? $recentApplication[0]['applied_at'] : 'Never',
+                    'status' => ucfirst($user['status']),
+                    'rating' => 0 // This would need to be calculated from reviews/ratings
+                ];
+            }
+        }
 
-        // Sample applications data
-        $data['applications'] = [
-            [
-                'id' => 1,
-                'applicant_name' => 'John Smith',
-                'email' => 'john.smith@email.com',
-                'phone' => '+1 (555) 123-4567',
-                'position' => 'Senior Software Developer',
-                'status' => 'pending',
-                'applied_date' => '2024-01-15',
-                'experience' => '5 years',
-                'location' => 'New York, NY',
-                'source' => 'website',
-                'rating' => 4,
-                'education' => 'Bachelor\'s in Computer Science - MIT',
-                'skills' => ['JavaScript', 'Python', 'React', 'Node.js', 'AWS'],
-                'resume_url' => '/uploads/resumes/john_smith_resume.pdf'
-            ],
-            [
-                'id' => 2,
-                'applicant_name' => 'Sarah Johnson',
-                'email' => 'sarah.johnson@email.com',
-                'phone' => '+1 (555) 234-5678',
-                'position' => 'UI/UX Designer',
-                'status' => 'shortlisted',
-                'applied_date' => '2024-01-14',
-                'experience' => '3 years',
-                'location' => 'San Francisco, CA',
-                'source' => 'linkedin',
-                'rating' => 5,
-                'education' => 'Master\'s in Design - Stanford',
-                'skills' => ['UI/UX', 'Figma', 'Adobe Creative', 'Sketch'],
-                'resume_url' => '/uploads/resumes/sarah_johnson_resume.pdf'
-            ],
-            [
-                'id' => 3,
-                'applicant_name' => 'Mike Wilson',
-                'email' => 'mike.wilson@email.com',
-                'phone' => '+1 (555) 345-6789',
-                'position' => 'Marketing Manager',
-                'status' => 'interviewed',
-                'applied_date' => '2024-01-13',
-                'experience' => '7 years',
-                'location' => 'Remote',
-                'source' => 'indeed',
-                'rating' => 4,
-                'education' => 'MBA - Wharton',
-                'skills' => ['Project Management', 'Agile', 'Scrum', 'Digital Marketing'],
-                'resume_url' => '/uploads/resumes/mike_wilson_resume.pdf'
-            ]
-        ];
+        // Get applications data from database with details
+        $applications = $applicationModel->getApplicationsWithDetails();
+        
+        // Transform applications data to match view format
+        $data['applications'] = [];
+        if ($applications) {
+            foreach ($applications as $app) {
+                $data['applications'][] = [
+                    'id' => $app['id'],
+                    'applicant_name' => $app['full_name'],
+                    'email' => $app['email'],
+                    'phone' => 'N/A', // Would need to join user data for phone
+                    'position' => $app['job_title'],
+                    'status' => strtolower($app['status']),
+                    'applied_date' => date('Y-m-d', strtotime($app['applied_at'])),
+                    'experience' => 'N/A', // Would need additional profile data
+                    'location' => 'N/A', // Would need additional profile data
+                    'source' => 'website',
+                    'rating' => 0, // Would need rating system
+                    'education' => 'N/A', // Would need additional profile data
+                    'skills' => [], // Would need additional profile data
+                    'resume_url' => $app['resume_path'] ?? ''
+                ];
+            }
+        }
 
-        // Statistics
+        // Statistics - calculate from real data
         $data['total_candidates'] = count($data['applicants']);
-        $data['active_candidates'] = 423;
-        $data['hired_candidates'] = 89;
-        $data['top_skills'] = 156;
+        $data['active_candidates'] = $userModel->query("SELECT COUNT(DISTINCT u.id) as count FROM users u INNER JOIN applications a ON u.id = a.applicant_id WHERE u.status = 'active'")[0]['count'] ?? 0;
+        $data['hired_candidates'] = $applicationModel->query("SELECT COUNT(*) as count FROM applications WHERE status = 'hired'")[0]['count'] ?? 0;
+        $data['top_skills'] = 0; // This would need a skills tracking system
         
         $data['total_applications'] = count($data['applications']);
-        $data['pending_review'] = 34;
-        $data['shortlisted'] = 28;
-        $data['interviewed'] = 15;
+        $data['pending_review'] = $applicationModel->query("SELECT COUNT(*) as count FROM applications WHERE status = 'applied' OR status = 'under review'")[0]['count'] ?? 0;
+        $data['shortlisted'] = $applicationModel->query("SELECT COUNT(*) as count FROM applications WHERE status = 'shortlisted'")[0]['count'] ?? 0;
+        $data['interviewed'] = $applicationModel->query("SELECT COUNT(*) as count FROM applications WHERE status = 'interviewed' OR status = 'interview scheduled'")[0]['count'] ?? 0;
         
         $this->view('hradmin/applicant-database', $data);
     }
@@ -131,22 +100,43 @@ class ApplicantDatabase extends Controller
         $data['page_title'] = 'Application Details';
         $data['application_id'] = $id;
         
-        // Sample application data
-        $data['application'] = [
-            'id' => $id,
-            'applicant_name' => 'John Smith',
-            'email' => 'john.smith@email.com',
-            'phone' => '+1 (555) 123-4567',
-            'position' => 'Senior Software Developer',
-            'status' => 'Under Review',
-            'applied_date' => '2024-01-15',
-            'experience' => '5 years',
-            'location' => 'New York, NY',
-            'education' => 'Bachelor\'s in Computer Science - MIT',
-            'skills' => ['JavaScript', 'Python', 'React', 'Node.js', 'AWS'],
-            'cover_letter' => 'I am excited to apply for the Senior Software Developer position...',
-            'resume_url' => '/uploads/resumes/john_smith_resume.pdf'
-        ];
+        // Get real application data from database
+        $applicationModel = new Application();
+        $application = $applicationModel->getApplicationById($id);
+        
+        if ($application) {
+            $data['application'] = [
+                'id' => $application['id'],
+                'applicant_name' => $application['full_name'] ?? 'N/A',
+                'email' => $application['email'] ?? 'N/A',
+                'phone' => 'N/A', // Would need user phone from join
+                'position' => $application['job_title'] ?? 'N/A',
+                'status' => $application['status'] ?? 'Unknown',
+                'applied_date' => date('Y-m-d', strtotime($application['applied_at'] ?? 'now')),
+                'experience' => 'N/A', // Would need additional profile data
+                'location' => $application['location'] ?? 'N/A',
+                'education' => 'N/A', // Would need additional profile data
+                'skills' => [], // Would need additional profile data
+                'cover_letter' => $application['cover_letter'] ?? 'No cover letter provided.',
+                'resume_url' => $application['resume_path'] ?? ''
+            ];
+        } else {
+            $data['application'] = [
+                'id' => $id,
+                'applicant_name' => 'Application not found',
+                'email' => 'N/A',
+                'phone' => 'N/A',
+                'position' => 'N/A',
+                'status' => 'Not Found',
+                'applied_date' => 'N/A',
+                'experience' => 'N/A',
+                'location' => 'N/A',
+                'education' => 'N/A',
+                'skills' => [],
+                'cover_letter' => 'Application not found.',
+                'resume_url' => ''
+            ];
+        }
         
         $this->view('hradmin/view-application', $data);
     }

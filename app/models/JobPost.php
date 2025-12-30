@@ -130,7 +130,7 @@ class JobPost
         }
     }
     
-    public function getJobCount($filters = [])
+    public function getFilteredJobCount($filters = [])
     {
         $conditions = ["status = 'Open'"];
         $params = [];
@@ -160,5 +160,20 @@ class JobPost
         
         $result = $this->get_row($query, $params);
         return $result ? $result['total'] : 0;
+    }
+    
+    public function getJobCount($status = null)
+    {
+        if ($status === null) {
+            // Count all jobs
+            $query = "SELECT COUNT(*) as total FROM job_posts";
+            $result = $this->get_row($query);
+        } else {
+            // Count jobs by status
+            $query = "SELECT COUNT(*) as total FROM job_posts WHERE status = ?";
+            $result = $this->get_row($query, [$status]);
+        }
+        
+        return $result ? (int)$result['total'] : 0;
     }
 }

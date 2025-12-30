@@ -133,11 +133,6 @@
                                 <div class="stat-label">Successfully Hired</div>
                                 <div class="stat-change positive">+3 this month</div>
                             </div>
-                            <div class="stat-card">
-                                <div class="stat-value"><?= $top_skills ?? '156' ?></div>
-                                <div class="stat-label">JavaScript Developers</div>
-                                <div class="stat-change neutral">Most common skill</div>
-                            </div>
                         </div>
 
                         <!-- Advanced Search & Filters -->
