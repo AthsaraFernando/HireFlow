@@ -109,7 +109,7 @@ class Profile extends Controller
                         }
 
                         // Log the profile update
-                        $this->logActivity($_SESSION['USER']['id'], 'Profile Updated', 'System Admin profile information updated');
+                        $this->logActivity($_SESSION['USER']['id'], 'profile_update', 'System Admin profile information updated', $_SESSION['USER']['role_id'] ?? null);
 
                         $success = "Profile updated successfully!";
 
@@ -132,13 +132,14 @@ class Profile extends Controller
     }
 
     
-    private function logActivity($userId, $action, $details = '')
+    private function logActivity($userId, $action, $details = '', $userRole = null)
     {
         try {
             $accessLog = new AccessLog();
             $accessLog->insert([
                 'user_id' => $userId,
                 'action' => $action,
+                'user_role' => $userRole,
                 'ip_address' => $_SERVER['REMOTE_ADDR'] ?? 'Unknown',
                 'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown',
                 'details' => $details,
