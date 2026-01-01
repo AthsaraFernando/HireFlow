@@ -174,4 +174,11 @@ class AccessLog
         return $result ?: [];
     }
 
+    public function findLog($id)
+    {
+        $result = $this->query("SELECT * FROM access_logs WHERE id = '$id'");
+        //logger($result);
+        return $result[0] ?: [];
+    }
+
 }
