@@ -156,7 +156,7 @@
                 <button class="nav-btn" onclick="previousWeek()">
                     ←
                 </button>
-                <h3 class="calendar-title">January 15-21, 2024</h3>
+                <h3 class="calendar-title"><?= $week_title ?? 'This Week' ?></h3>
                 <button class="nav-btn" onclick="nextWeek()">
                     →
                 </button>
@@ -183,166 +183,101 @@
                 <div class="time-slot">5:00 PM</div>
             </div>
             
-            <!-- Monday -->
-            <div class="day-column">
-                <div class="day-header">
-                    <div class="day-name">Mon</div>
-                    <div class="day-date">15</div>
-                </div>
-                <div class="day-slots">
-                    <div class="interview-block" style="top: 120px; height: 60px;">
-                        <div class="interview-info">
-                            <div class="interview-time">10:00 AM</div>
-                            <div class="interview-candidate">John Smith</div>
-                            <div class="interview-position">Senior Developer</div>
+            <?php if (!empty($week_days)): ?>
+                <?php foreach ($week_days as $day): ?>
+                    <!-- <?= $day['day_name'] ?> -->
+                    <div class="day-column <?= $day['is_today'] ? 'today' : '' ?> <?= $day['is_weekend'] ? 'weekend' : '' ?>">
+                        <div class="day-header">
+                            <div class="day-name"><?= $day['day_name'] ?></div>
+                            <div class="day-date"><?= $day['day_number'] ?></div>
+                        </div>
+                        <div class="day-slots">
+                            <?php 
+                            $dayInterviews = $interviews_by_date[$day['date']] ?? [];
+                            if (!empty($dayInterviews)): 
+                                foreach ($dayInterviews as $interview): 
+                                    $statusClass = strtolower($interview['status']);
+                                    $stageColor = match($interview['interview_stage']) {
+                                        'Screening' => '#6366f1',
+                                        'Technical' => '#8b5cf6',
+                                        'Managerial' => '#a855f7',
+                                        'HR Review' => '#7c3aed',
+                                        'Final' => '#6d28d9',
+                                        default => '#6366f1'
+                                    };
+                            ?>
+                            <div class="interview-block status-<?= $statusClass ?>" 
+                                 style="top: <?= $interview['top_position'] ?>px; height: <?= $interview['height'] ?>px; background: <?= $stageColor ?>;"
+                                 onclick="viewInterviewDetails(<?= $interview['id'] ?>)"
+                                 title="<?= htmlspecialchars($interview['interview_stage']) ?> - <?= htmlspecialchars($interview['interviewer_role']) ?>">
+                                <div class="interview-info">
+                                    <div class="interview-time"><?= htmlspecialchars($interview['display_time']) ?></div>
+                                    <div class="interview-candidate"><?= htmlspecialchars($interview['candidate_name']) ?></div>
+                                    <div class="interview-position"><?= htmlspecialchars($interview['job_title']) ?></div>
+                                    <div class="interview-stage-badge"><?= htmlspecialchars($interview['interview_stage']) ?></div>
+                                </div>
+                            </div>
+                            <?php 
+                                endforeach;
+                            endif; 
+                            ?>
                         </div>
                     </div>
-                </div>
-            </div>
-            
-            <!-- Tuesday -->
-            <div class="day-column">
-                <div class="day-header">
-                    <div class="day-name">Tue</div>
-                    <div class="day-date">16</div>
-                </div>
-                <div class="day-slots">
-                    <div class="interview-block" style="top: 180px; height: 60px;">
-                        <div class="interview-info">
-                            <div class="interview-time">2:00 PM</div>
-                            <div class="interview-candidate">Sarah Johnson</div>
-                            <div class="interview-position">UI/UX Designer</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Wednesday -->
-            <div class="day-column">
-                <div class="day-header">
-                    <div class="day-name">Wed</div>
-                    <div class="day-date">17</div>
-                </div>
-                <div class="day-slots">
-                    <div class="interview-block" style="top: 90px; height: 60px;">
-                        <div class="interview-info">
-                            <div class="interview-time">11:00 AM</div>
-                            <div class="interview-candidate">Mike Wilson</div>
-                            <div class="interview-position">Project Manager</div>
-                        </div>
-                    </div>
-                    <div class="interview-block" style="top: 240px; height: 60px;">
-                        <div class="interview-info">
-                            <div class="interview-time">3:00 PM</div>
-                            <div class="interview-candidate">Emily Chen</div>
-                            <div class="interview-position">Marketing Manager</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Thursday -->
-            <div class="day-column">
-                <div class="day-header">
-                    <div class="day-name">Thu</div>
-                    <div class="day-date">18</div>
-                </div>
-                <div class="day-slots"></div>
-            </div>
-            
-            <!-- Friday -->
-            <div class="day-column">
-                <div class="day-header">
-                    <div class="day-name">Fri</div>
-                    <div class="day-date">19</div>
-                </div>
-                <div class="day-slots">
-                    <div class="interview-block" style="top: 150px; height: 60px;">
-                        <div class="interview-info">
-                            <div class="interview-time">1:00 PM</div>
-                            <div class="interview-candidate">David Brown</div>
-                            <div class="interview-position">Data Analyst</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
         <!-- List View (Hidden by default) -->
         <div id="listView" class="interview-list" style="display: none;">
-            <div class="interview-card">
-                <div class="interview-header">
-                    <div class="interview-datetime">
-                        <div class="interview-date">January 15, 2024</div>
-                        <div class="interview-time">10:00 AM - 11:00 AM</div>
-                    </div>
-                    <div class="interview-status">
-                        <span class="status-badge upcoming">Upcoming</span>
-                    </div>
-                </div>
-                <div class="interview-details">
-                    <div class="candidate-section">
-                        <h4>John Smith</h4>
-                        <p>Applying for: Senior Software Developer</p>
-                        <p>Email: john.smith@email.com</p>
-                        <p>Phone: +1 (555) 123-4567</p>
-                    </div>
-                    <div class="interview-meta">
-                        <div class="interviewer">
-                            <strong>Interviewer:</strong> Sarah Johnson
+            <?php if (!empty($interviews)): ?>
+                <?php foreach ($interviews as $interview): 
+                    $statusClass = strtolower($interview['status']);
+                    $statusLabel = $interview['status'];
+                    $interviewDateTime = date('F j, Y', strtotime($interview['date']));
+                    $endTime = date('g:i A', strtotime($interview['time']) + ($interview['duration_minutes'] ?? 60) * 60);
+                ?>
+                <div class="interview-card">
+                    <div class="interview-header">
+                        <div class="interview-datetime">
+                            <div class="interview-date"><?= $interviewDateTime ?></div>
+                            <div class="interview-time"><?= $interview['time'] ?> - <?= $endTime ?></div>
                         </div>
-                        <div class="location">
-                            <strong>Location:</strong> Conference Room A / Zoom
-                        </div>
-                        <div class="type">
-                            <strong>Type:</strong> Technical Interview
+                        <div class="interview-status">
+                            <span class="status-badge <?= $statusClass ?>"><?= htmlspecialchars($statusLabel) ?></span>
                         </div>
                     </div>
-                </div>
-                <div class="interview-actions">
-                    <button class="btn btn-outline btn-sm" onclick="editInterview(1)">Edit</button>
-                    <button class="btn btn-primary btn-sm" onclick="joinInterview(1)">Join</button>
-                    <button class="btn btn-secondary btn-sm" onclick="reschedule(1)">Reschedule</button>
-                    <button class="btn btn-danger btn-sm" onclick="cancelInterview(1)">Cancel</button>
-                </div>
-            </div>
-
-            <div class="interview-card">
-                <div class="interview-header">
-                    <div class="interview-datetime">
-                        <div class="interview-date">January 16, 2024</div>
-                        <div class="interview-time">2:00 PM - 3:00 PM</div>
-                    </div>
-                    <div class="interview-status">
-                        <span class="status-badge upcoming">Upcoming</span>
-                    </div>
-                </div>
-                <div class="interview-details">
-                    <div class="candidate-section">
-                        <h4>Sarah Johnson</h4>
-                        <p>Applying for: UI/UX Designer</p>
-                        <p>Email: sarah.johnson@email.com</p>
-                        <p>Phone: +1 (555) 234-5678</p>
-                    </div>
-                    <div class="interview-meta">
-                        <div class="interviewer">
-                            <strong>Interviewer:</strong> Mike Wilson
+                    <div class="interview-details">
+                        <div class="candidate-section">
+                            <h4><?= htmlspecialchars($interview['applicant_name']) ?></h4>
+                            <p><strong>Applying for:</strong> <?= htmlspecialchars($interview['position']) ?></p>
+                            <p><strong>Interview Stage:</strong> <?= htmlspecialchars($interview['interview_stage'] ?? 'N/A') ?></p>
+                            <p><strong>Interview Type:</strong> <?= htmlspecialchars($interview['type']) ?></p>
                         </div>
-                        <div class="location">
-                            <strong>Location:</strong> Design Studio / Zoom
-                        </div>
-                        <div class="type">
-                            <strong>Type:</strong> Portfolio Review
+                        <div class="interview-meta">
+                            <div class="interviewer">
+                                <strong>Interviewer:</strong> <?= htmlspecialchars($interview['interviewer']) ?>
+                            </div>
+                            <div class="role">
+                                <strong>Role:</strong> <?= htmlspecialchars($interview['interviewer_role'] ?? 'N/A') ?>
+                            </div>
+                            <div class="location">
+                                <strong>Location:</strong> <?= htmlspecialchars($interview['location']) ?>
+                            </div>
                         </div>
                     </div>
+                    <div class="interview-actions">
+                        <button class="btn btn-outline btn-sm" onclick="editInterview(<?= $interview['id'] ?>)">Edit</button>
+                        <button class="btn btn-primary btn-sm" onclick="joinInterview(<?= $interview['id'] ?>)">View Details</button>
+                        <button class="btn btn-secondary btn-sm" onclick="reschedule(<?= $interview['id'] ?>)">Reschedule</button>
+                        <button class="btn btn-danger btn-sm" onclick="cancelInterview(<?= $interview['id'] ?>)">Cancel</button>
+                    </div>
                 </div>
-                <div class="interview-actions">
-                    <button class="btn btn-outline btn-sm" onclick="editInterview(2)">Edit</button>
-                    <button class="btn btn-primary btn-sm" onclick="joinInterview(2)">Join</button>
-                    <button class="btn btn-secondary btn-sm" onclick="reschedule(2)">Reschedule</button>
-                    <button class="btn btn-danger btn-sm" onclick="cancelInterview(2)">Cancel</button>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="empty-state">
+                    <p>No interviews scheduled for this period.</p>
                 </div>
-            </div>
+            <?php endif; ?>
         </div>
     </div>
 
@@ -392,8 +327,45 @@
                             <option value="">Select Candidate</option>
                             <?php if(!empty($available_candidates)): ?>
                                 <?php foreach($available_candidates as $candidate): ?>
-                                    <option value="<?= $candidate['application_id'] ?>">
-                                        <?= htmlspecialchars($candidate['candidate_name']) ?> - <?= htmlspecialchars($candidate['job_title']) ?>
+                                    <option value="<?= $candidate['application_id'] ?>" title="Status: <?= htmlspecialchars($candidate['application_status']) ?> | Applied: <?= htmlspecialchars($candidate['applied_date']) ?>">
+                                        <?= htmlspecialchars($candidate['candidate_name']) ?> - <?= htmlspecialchars($candidate['job_title']) ?> (<?= htmlspecialchars($candidate['application_status']) ?>)
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <option value="" disabled>No candidates available for interview</option>
+                            <?php endif; ?>
+                        </select>
+                        <?php if(empty($available_candidates)): ?>
+                            <small class="form-help text-muted">
+                                No candidates found. Make sure there are applications with status: Applied, Under Review, or Shortlisted.
+                            </small>
+                        <?php else: ?>
+                            <small class="form-help text-muted">
+                                Showing <?= count($available_candidates) ?> candidate(s) available for interview scheduling.
+                            </small>
+                        <?php endif; ?>
+                    </div>
+                    <div class="form-group">
+                        <label>Interview Stage</label>
+                        <select name="interview_stage" class="form-select" required onchange="updateRecommendedRole(this.value)">
+                            <option value="">Select Interview Stage</option>
+                            <?php if(!empty($interview_stages)): ?>
+                                <?php foreach($interview_stages as $stage => $description): ?>
+                                    <option value="<?= $stage ?>" title="<?= htmlspecialchars($description) ?>">
+                                        <?= htmlspecialchars($stage) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Interviewer Role</label>
+                        <select name="interviewer_role" class="form-select" required onchange="filterInterviewers(this.value)">
+                            <option value="">Select Interviewer Role</option>
+                            <?php if(!empty($interviewer_roles)): ?>
+                                <?php foreach($interviewer_roles as $role => $description): ?>
+                                    <option value="<?= $role ?>" title="<?= htmlspecialchars($description) ?>">
+                                        <?= htmlspecialchars($role) ?>
                                     </option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -403,10 +375,10 @@
                         <label>Interviewer</label>
                         <select name="interviewer_id" class="form-select" required>
                             <option value="">Select Interviewer</option>
-                            <?php if(!empty($interviewers)): ?>
-                                <?php foreach($interviewers as $interviewer): ?>
-                                    <option value="<?= $interviewer['id'] ?>">
-                                        <?= htmlspecialchars($interviewer['full_name']) ?>
+                            <?php if(!empty($interviewers_by_role)): ?>
+                                <?php foreach($interviewers_by_role as $interviewer): ?>
+                                    <option value="<?= $interviewer['id'] ?>" data-role="<?= htmlspecialchars($interviewer['user_role']) ?>">
+                                        <?= htmlspecialchars($interviewer['full_name']) ?> (<?= htmlspecialchars($interviewer['user_role']) ?>)
                                     </option>
                                 <?php endforeach; ?>
                             <?php endif; ?>
@@ -590,15 +562,23 @@
     right: 4px;
     background: #4e31aa;
     color: white;
-    border-radius: 4px;
-    padding: 0.5rem;
+    border-radius: 6px;
+    padding: 6px;
     cursor: pointer;
     transition: all 0.2s;
+    overflow: visible;
+    min-height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .interview-block:hover {
     background: #3d2688;
     transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    z-index: 10;
 }
 
 .interview-info {
@@ -614,12 +594,53 @@
 
 .interview-candidate {
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
+    white-space: normal;
+    line-height: 1.2;
+    margin-bottom: 2px;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .interview-position {
     font-size: 0.75rem;
-    opacity: 0.9;
+    font-weight: 400;
+    white-space: normal;
+    line-height: 1.1;
+    margin-bottom: 3px;
+    color: rgba(255,255,255,0.95);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+}
+
+.interview-stage-badge {
+    font-size: 0.65rem;
+    background: rgba(255,255,255,0.25);
+    padding: 1px 4px;
+    border-radius: 3px;
+    display: inline-block;
+    width: fit-content;
+    color: white;
+    font-weight: 500;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.day-column.today .day-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.day-column.weekend {
+    background-color: #fafafa;
+}
+
+.day-column.weekend .day-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #6c757d;
+}
+
+.day-column.weekend.today .day-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
 }
 
 .interview-list {
@@ -957,13 +978,25 @@ function setCalendarView(view) {
 }
 
 function previousWeek() {
-    alert('Loading previous week...');
-    // Implement week navigation
+    const currentStart = '<?= $current_week_start ?? date('Y-m-d', strtotime('monday this week')) ?>';
+    const previousStart = new Date(currentStart);
+    previousStart.setDate(previousStart.getDate() - 7);
+    const dateStr = previousStart.toISOString().split('T')[0];
+    window.location.href = '<?= ROOT ?>/hradmin/interview-schedule?week_start=' + dateStr;
 }
 
 function nextWeek() {
-    alert('Loading next week...');
-    // Implement week navigation
+    const currentStart = '<?= $current_week_start ?? date('Y-m-d', strtotime('monday this week')) ?>';
+    const nextStart = new Date(currentStart);
+    nextStart.setDate(nextStart.getDate() + 7);
+    const dateStr = nextStart.toISOString().split('T')[0];
+    window.location.href = '<?= ROOT ?>/hradmin/interview-schedule?week_start=' + dateStr;
+}
+
+function viewInterviewDetails(interviewId) {
+    // Open detailed view modal or navigate to details page
+    alert('Interview ID: ' + interviewId + '\nDetailed view coming soon...');
+    // window.location.href = '<?= ROOT ?>/hradmin/interview-details/' + interviewId;
 }
 
 function editInterview(id) {
@@ -1004,6 +1037,76 @@ document.getElementById('scheduleModal').addEventListener('click', function(e) {
 setInterval(() => {
     console.log('Checking for interview updates...');
 }, 30000);
+
+// Role-based interviewer assignment functions
+const stageRoleRecommendations = {
+    'Screening': 'HR Admin',
+    'Technical': 'Recruitment Manager',
+    'Managerial': 'Recruitment Manager', 
+    'HR Review': 'HR Admin',
+    'Final': 'Recruitment Manager'
+};
+
+function updateRecommendedRole(stage) {
+    const roleSelect = document.querySelector('select[name="interviewer_role"]');
+    const recommendedRole = stageRoleRecommendations[stage];
+    
+    if (recommendedRole && roleSelect) {
+        // Set the recommended role
+        roleSelect.value = recommendedRole;
+        
+        // Trigger the interviewer filter
+        filterInterviewers(recommendedRole);
+        
+        // Add visual indicator for recommendation
+        roleSelect.style.backgroundColor = '#e8f5e8';
+        setTimeout(() => {
+            roleSelect.style.backgroundColor = '';
+        }, 2000);
+    }
+}
+
+function filterInterviewers(selectedRole) {
+    const interviewerSelect = document.querySelector('select[name="interviewer_id"]');
+    const allOptions = interviewerSelect.querySelectorAll('option[data-role]');
+    
+    // First, hide all interviewer options except the default one
+    allOptions.forEach(option => {
+        option.style.display = 'none';
+    });
+    
+    // Show only interviewers that match the selected role or show all for certain roles
+    if (selectedRole === 'HR Admin') {
+        allOptions.forEach(option => {
+            if (option.getAttribute('data-role') === 'HR Admin') {
+                option.style.display = 'block';
+            }
+        });
+    } else if (selectedRole === 'Recruitment Manager') {
+        allOptions.forEach(option => {
+            if (option.getAttribute('data-role') === 'Recruitment Manager') {
+                option.style.display = 'block';
+            }
+        });
+    } else {
+        // For Hiring Manager, Technical Lead, Panel - show all available interviewers
+        allOptions.forEach(option => {
+            option.style.display = 'block';
+        });
+    }
+    
+    // Reset the interviewer selection
+    interviewerSelect.value = '';
+    
+    // If only one option is available, auto-select it
+    const visibleOptions = Array.from(allOptions).filter(option => 
+        option.style.display !== 'none' && option.value !== ''
+    );
+    
+    if (visibleOptions.length === 1) {
+        interviewerSelect.value = visibleOptions[0].value;
+    }
+}
 
 // Sidebar toggle functionality
 document.getElementById('sidebarToggle').addEventListener('click', function () {
