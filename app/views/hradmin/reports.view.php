@@ -220,82 +220,82 @@
     <!-- Recruitment Funnel Summary -->
     <div class="data-section">
         <div class="section-header">
-            <h3>Recruitment Funnel Status</h3>
+            <h3>Recruitment Funnel Status <span style="font-size: 0.85rem; color: #666; font-weight: normal;">(Last 90 Days)</span></h3>
             <button class="btn btn-outline btn-sm" onclick="exportData('funnel')">Export Data</button>
         </div>
         <div class="data-grid">
             <div class="data-summary-card stage-applications">
                 <div class="stage-info">
-                    <div class="stage-icon"></div>
+                    <div class="stage-icon">📝</div>
                     <div class="stage-details">
                         <h4>Applications Received</h4>
-                        <p class="stage-number">1,247</p>
+                        <p class="stage-number"><?= number_format($funnel_stats['total_applications'] ?? 0) ?></p>
                         <p class="stage-percentage">100% of funnel</p>
                     </div>
                 </div>
                 <div class="stage-stats">
-                    <span class="stat-label">This Period</span>
-                    <span class="stat-change positive">+12.5%</span>
+                    <span class="stat-label">Last 30 Days</span>
+                    <span class="stat-change">Total Pipeline</span>
                 </div>
             </div>
 
             <div class="data-summary-card stage-screening">
                 <div class="stage-info">
-                    <div class="stage-icon"></div>
+                    <div class="stage-icon">🔍</div>
                     <div class="stage-details">
                         <h4>In Screening</h4>
-                        <p class="stage-number">562</p>
-                        <p class="stage-percentage">45.1% pass rate</p>
+                        <p class="stage-number"><?= number_format($funnel_stats['screening_passed'] ?? 0) ?></p>
+                        <p class="stage-percentage"><?= $conversion_rates['screening_rate'] ?? 0 ?>% pass rate</p>
                     </div>
                 </div>
                 <div class="stage-stats">
                     <span class="stat-label">Pass Through</span>
-                    <span class="stat-value">562 / 1,247</span>
+                    <span class="stat-value"><?= $funnel_stats['screening_passed'] ?? 0 ?> / <?= $funnel_stats['total_applications'] ?? 0 ?></span>
                 </div>
             </div>
 
             <div class="data-summary-card stage-interviews">
                 <div class="stage-info">
-                    <div class="stage-icon"></div>
+                    <div class="stage-icon">💬</div>
                     <div class="stage-details">
                         <h4>Interviews Scheduled</h4>
-                        <p class="stage-number">312</p>
-                        <p class="stage-percentage">25.0% of applications</p>
+                        <p class="stage-number"><?= number_format($funnel_stats['interviews_scheduled'] ?? 0) ?></p>
+                        <p class="stage-percentage"><?= round((($funnel_stats['interviews_scheduled'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% of applications</p>
                     </div>
                 </div>
                 <div class="stage-stats">
                     <span class="stat-label">Conversion</span>
-                    <span class="stat-value">55.5% from screening</span>
+                    <span class="stat-value"><?= $conversion_rates['interview_rate'] ?? 0 ?>% from screening</span>
                 </div>
             </div>
 
             <div class="data-summary-card stage-offers">
                 <div class="stage-info">
-                    <div class="stage-icon"></div>
+                    <div class="stage-icon">📄</div>
                     <div class="stage-details">
                         <h4>Offers Extended</h4>
-                        <p class="stage-number">187</p>
-                        <p class="stage-percentage">15.0% of applications</p>
+                        <p class="stage-number"><?= number_format($funnel_stats['offers_extended'] ?? 0) ?></p>
+                        <p class="stage-percentage"><?= round((($funnel_stats['offers_extended'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% of applications</p>
                     </div>
                 </div>
                 <div class="stage-stats">
                     <span class="stat-label">Offer Rate</span>
-                    <span class="stat-value">59.9% from interviews</span>
+                    <span class="stat-value"><?= $conversion_rates['offer_rate'] ?? 0 ?>% from interviews</span>
                 </div>
             </div>
 
             <div class="data-summary-card stage-hires">
                 <div class="stage-info">
-                    <div class="stage-icon"></div>
+                    <div class="stage-icon">✅</div>
                     <div class="stage-details">
                         <h4>Successful Hires</h4>
-                        <p class="stage-number">89</p>
-                        <p class="stage-percentage">7.1% overall success</p>
+                        <p class="stage-number"><?= number_format($funnel_stats['successful_hires'] ?? 0) ?></p>
+                        <p class="stage-percentage"><?= round((($funnel_stats['successful_hires'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% overall success</p>
                     </div>
                 </div>
                 <div class="stage-stats">
                     <span class="stat-label">Acceptance</span>
-                    <span class="stat-value">47.6% offer acceptance</span>
+                    <span class="stat-value"><?= $conversion_rates['hire_rate'] ?? 0 ?>% offer acceptance</span>
                 </div>
             </div>
         </div>
@@ -304,7 +304,7 @@
     <!-- Applications Timeline Data -->
     <div class="data-section">
         <div class="section-header">
-            <h3>Applications Over Time</h3>
+            <h3>Applications Over Time <span style="font-size: 0.85rem; color: #666; font-weight: normal;">(Last 12 Weeks)</span></h3>
             <button class="btn btn-outline btn-sm" onclick="exportData('timeline')">Export Data</button>
         </div>
         <div class="table-container">
@@ -321,33 +321,47 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td><strong>Week 6</strong></td>
-                        <td>72</td>
-                        <td><span class="trend-down">-31.4%</span></td>
-                        <td>32</td>
-                        <td>18</td>
-                        <td>11</td>
-                        <td>5</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Week 5</strong></td>
-                        <td>105</td>
-                        <td><span class="trend-up">+50.0%</span></td>
-                        <td>47</td>
-                        <td>26</td>
-                        <td>16</td>
-                        <td>8</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Week 4</strong></td>
-                        <td>78</td>
-                        <td><span class="trend-down">-12.4%</span></td>
-                        <td>35</td>
-                        <td>19</td>
-                        <td>12</td>
-                        <td>6</td>
-                    </tr>
+                    <?php if (!empty($applications_timeline)): ?>
+                        <?php 
+                        $previousCount = null;
+                        foreach ($applications_timeline as $index => $week): 
+                            $change = 0;
+                            $changeClass = '';
+                            
+                            if ($previousCount !== null && $previousCount > 0) {
+                                $change = (($week['total_applications'] - $previousCount) / $previousCount) * 100;
+                                $changeClass = $change >= 0 ? 'trend-up' : 'trend-down';
+                            }
+                        ?>
+                        <tr>
+                            <td><strong><?= htmlspecialchars($week['period']) ?></strong><br><small><?= date('M d', strtotime($week['week_start'])) ?> - <?= date('M d', strtotime($week['week_end'])) ?></small></td>
+                            <td><?= number_format($week['total_applications']) ?></td>
+                            <td>
+                                <?php if ($previousCount !== null): ?>
+                                    <span class="<?= $changeClass ?>"><?= $change >= 0 ? '+' : '' ?><?= number_format($change, 1) ?>%</span>
+                                <?php else: ?>
+                                    <span>-</span>
+                                <?php endif; ?>
+                            </td>
+                            <td><?= number_format($week['screenings']) ?></td>
+                            <td><?= number_format($week['interviews']) ?></td>
+                            <td><?= number_format($week['offers']) ?></td>
+                            <td><?= number_format($week['hires']) ?></td>
+                        </tr>
+                        <?php 
+                            $previousCount = $week['total_applications'];
+                        endforeach; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 30px;">
+                                <p style="color: #6c757d;">No application data available for the selected period.</p>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
                     <tr>
                         <td><strong>Week 3</strong></td>
                         <td>89</td>
@@ -385,7 +399,7 @@
         <!-- Department Hiring Breakdown -->
         <div class="table-card">
             <div class="table-header">
-                <h4>Hiring by Department</h4>
+                <h4>Hiring by Department <span style="font-size: 0.8rem; color: #666; font-weight: normal;">(All Time)</span></h4>
                 <button class="btn btn-outline btn-sm" onclick="exportData('department')">Export</button>
             </div>
             <div class="table-container">
@@ -400,61 +414,48 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>
-                                <div class="dept-name">
-                                    <span class="dept-color engineering"></span>
-                                    Engineering
-                                </div>
-                            </td>
-                            <td>498</td>
-                            <td>36</td>
-                            <td><span class="rate-good">7.2%</span></td>
-                            <td>40%</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="dept-name">
-                                    <span class="dept-color design"></span>
-                                    Design
-                                </div>
-                            </td>
-                            <td>312</td>
-                            <td>22</td>
-                            <td><span class="rate-good">7.1%</span></td>
-                            <td>25%</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="dept-name">
-                                    <span class="dept-color marketing"></span>
-                                    Marketing
-                                </div>
-                            </td>
-                            <td>249</td>
-                            <td>18</td>
-                            <td><span class="rate-good">7.2%</span></td>
-                            <td>20%</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="dept-name">
-                                    <span class="dept-color sales"></span>
-                                    Sales
-                                </div>
-                            </td>
-                            <td>188</td>
-                            <td>13</td>
-                            <td><span class="rate-average">6.9%</span></td>
-                            <td>15%</td>
-                        </tr>
+                        <?php 
+                        $total_apps = 0;
+                        $total_hires_count = 0;
+                        if (!empty($department_stats)):
+                            foreach ($department_stats as $dept):
+                                $total_apps += $dept['total_applications'];
+                                $total_hires_count += $dept['hires'];
+                            endforeach;
+                        endif;
+                        ?>
+                        <?php if (!empty($department_stats)): ?>
+                            <?php foreach ($department_stats as $dept): ?>
+                                <?php 
+                                $success_rate = $dept['total_applications'] > 0 ? ($dept['hires'] / $dept['total_applications']) * 100 : 0;
+                                $percent_of_total = $total_apps > 0 ? ($dept['total_applications'] / $total_apps) * 100 : 0;
+                                $rate_class = $success_rate >= 8 ? 'rate-excellent' : ($success_rate >= 5 ? 'rate-good' : 'rate-average');
+                                ?>
+                                <tr>
+                                    <td>
+                                        <div class="dept-name">
+                                            <span class="dept-color engineering"></span>
+                                            <?= htmlspecialchars($dept['department_name']) ?>
+                                        </div>
+                                    </td>
+                                    <td><?= number_format($dept['total_applications']) ?></td>
+                                    <td><?= number_format($dept['hires']) ?></td>
+                                    <td><span class="<?= $rate_class ?>"><?= number_format($success_rate, 1) ?>%</span></td>
+                                    <td><?= number_format($percent_of_total, 1) ?>%</td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 2rem;">No department data available</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                     <tfoot>
                         <tr>
                             <td><strong>Total</strong></td>
-                            <td><strong>1,247</strong></td>
-                            <td><strong>89</strong></td>
-                            <td><strong>7.1%</strong></td>
+                            <td><strong><?= number_format($total_apps) ?></strong></td>
+                            <td><strong><?= number_format($total_hires_count) ?></strong></td>
+                            <td><strong><?= $total_apps > 0 ? number_format(($total_hires_count / $total_apps) * 100, 1) : 0 ?>%</strong></td>
                             <td><strong>100%</strong></td>
                         </tr>
                     </tfoot>
@@ -465,7 +466,7 @@
         <!-- Application Sources -->
         <div class="table-card">
             <div class="table-header">
-                <h4>Application Sources</h4>
+                <h4>Application Sources <span style="font-size: 0.8rem; color: #666; font-weight: normal;">(Sample Data - No Source Tracking)</span></h4>
                 <button class="btn btn-outline btn-sm" onclick="exportData('sources')">Export</button>
             </div>
             <div class="table-container">

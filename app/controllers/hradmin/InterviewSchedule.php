@@ -22,14 +22,24 @@ class InterviewSchedule extends Controller
             $postData = $_POST;
             
             if ($interviewModel->validate($postData)) {
-                if ($interviewModel->createInterview($postData)) {
-                    $data['success'] = 'Interview scheduled successfully!';
+                $result = $interviewModel->createInterview($postData);
+                if ($result) {
+                    redirect('hradmin/interview-schedule?success=Interview scheduled successfully!');
                 } else {
                     $data['errors'][] = 'Failed to schedule interview. Please try again.';
+                    // Add model errors if any
+                    if (!empty($interviewModel->errors)) {
+                        $data['errors'] = array_merge($data['errors'], $interviewModel->errors);
+                    }
                 }
             } else {
                 $data['errors'] = $interviewModel->errors;
             }
+        }
+        
+        // Check for success message from redirect
+        if (isset($_GET['success'])) {
+            $data['success'] = urldecode($_GET['success']);
         }
         
         // Get current week start and end for calendar display
@@ -58,13 +68,16 @@ class InterviewSchedule extends Controller
         // Get detailed calendar interviews using enhanced method
         $data['calendar_interviews'] = $interviewModel->getCalendarInterviews($currentWeekStart, $currentWeekEnd);
         
-        // Get interview statistics for dashboard
-        $stats = $interviewModel->getInterviewStats($currentWeekStart, $currentWeekEnd);
+        // Get interview statistics for dashboard - always use current week, not calendar view week
+        // Stats should always reflect the actual current week regardless of calendar navigation
+        $actualCurrentWeekStart = date('Y-m-d', strtotime('monday this week'));
+        $actualCurrentWeekEnd = date('Y-m-d', strtotime('sunday this week'));
+        $stats = $interviewModel->getInterviewStats($actualCurrentWeekStart, $actualCurrentWeekEnd);
         $data['interviews_today'] = $stats['today_interviews'] ?? 0;
         $data['interviews_week'] = $stats['week_interviews'] ?? 0;
         $data['interviews_pending'] = $stats['pending_interviews'] ?? 0;
         $data['interviews_completed'] = $stats['completed_interviews'] ?? 0;
-        $data['avg_rating'] = number_format($stats['avg_rating'] ?? 4.2, 1);
+        $data['avg_rating'] = number_format($stats['avg_rating'] ?? 0, 1);
         
         // Legacy data for backward compatibility
         $interviews = $interviewModel->getInterviewsForRecruitment();
