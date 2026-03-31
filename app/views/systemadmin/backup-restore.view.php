@@ -1,515 +1,334 @@
-<?php
-// Sample backup data - in real implementation this would come from filesystem/database
-$backups = [
-    [
-        'id' => 1,
-        'filename' => 'hireflow_backup_2025_08_31_10_30.sql',
-        'size' => '2.5 MB',
-        'created_at' => '2025-08-31 10:30:15',
-        'type' => 'Full',
-        'status' => 'Complete'
-    ],
-    [
-        'id' => 2,
-        'filename' => 'hireflow_backup_2025_08_30_10_30.sql',
-        'size' => '2.3 MB',
-        'created_at' => '2025-08-30 10:30:12',
-        'type' => 'Full',
-        'status' => 'Complete'
-    ],
-    [
-        'id' => 3,
-        'filename' => 'hireflow_backup_2025_08_29_10_30.sql',
-        'size' => '2.1 MB',
-        'created_at' => '2025-08-29 10:30:08',
-        'type' => 'Full',
-        'status' => 'Complete'
-    ]
-];
-
-$backup_schedule = [
-    'auto_backup' => true,
-    'frequency' => 'daily',
-    'time' => '10:30',
-    'retention_days' => 30,
-    'max_backups' => 50
-];
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Backup & Restore - HireFlow Admin</title>
-    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/main.css">
-    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/components/input.css">
-    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/components/button.css">
-    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/components/card.css">
-    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/components/table.css">
-    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/components/alert.css">
-    <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/systemadmin/dashboard.style.css">
+    <title>Backup & Restore</title>
+
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/main.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/button.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/card.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/input.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/table.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/components/alert.css">
+
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/systemadmin/dashboard.style.css">
+    <link rel="stylesheet" href="<?= ROOT ?>/assets/css/systemadmin/system-admin.css">
+
     <link rel="icon" type="image/x-icon" href="<?= ROOT ?>/assets/images/logo.png">
-
-    <style>
-        .backup-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .backup-section {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 25px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .section-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-
-        .backup-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .action-card {
-            border: 2px solid #ecf0f1;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .action-card:hover {
-            border-color: #3498db;
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
-        }
-
-        .action-icon {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-        }
-
-        .backup-progress {
-            width: 100%;
-            height: 20px;
-            background: #ecf0f1;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, #3498db, #2ecc71);
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-
-        .backup-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .backup-table th,
-        .backup-table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #ecf0f1;
-        }
-
-        .backup-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #2c3e50;
-        }
-
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
-            font-weight: 500;
-        }
-
-        .status-complete {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .status-progress {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .status-error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
-        .schedule-form {
-            background: #f8f9fa;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .danger-zone {
-            border: 2px solid #e74c3c;
-            background: #fdf2f2;
-        }
-
-        .restore-warning {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 5px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-    </style>
 </head>
 
 <body>
-    <?php
-    // Set user data for header
-    $user_role = 'System Admin';
-    $user_name = 'Admin User';
-    // include '../views/components/header.view.php'; 
-    $this->view('components/header')
-
-        ?>
-
-    <div class="backup-container">
-        <div class="page-header">
-            <h1>💾 Backup & Restore</h1>
-            <p style="padding:20px;">Manage database backups and restore operations</p>
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
+            <p class="brand-subtitle">System Admin</p>
         </div>
 
-        <?php if (!empty($errors)): ?>
-            <div class="alert alert-error mb-3">
-                <?= implode('<br>', $errors) ?>
-            </div>
-        <?php endif; ?>
-
-        <?php if (!empty($success)): ?>
-            <div class="alert alert-success mb-3">
-                <?= $success ?>
-            </div>
-        <?php endif; ?>
-
-        <!-- Quick Actions -->
-        <div class="backup-section">
-            <h2 class="section-title">Quick Actions</h2>
-            <div class="backup-actions">
-                <div class="action-card">
-                    <!-- <div class="action-icon"></div> -->
-                    <h3>Create Backup</h3>
-                    <!-- <p>Generate a full database backup</p> -->
-                    <button class="btn btn-primary" onclick="createBackup()">Create Now</button>
-                </div>
-
-                <div class="action-card">
-                    <!-- <div class="action-icon"></div> -->
-                    <h3>Export Data</h3>
-                    <!-- <p>Export specific tables or data</p> -->
-                    <!-- <button class="btn btn-outline-primary" onclick="showExportModal()">Export</button> -->
-                </div>
-
-                <div class="action-card">
-                    <!-- <div class="action-icon"></div> -->
-                    <h3>Import Data</h3>
-                    <!-- <p>Import from backup file</p> -->
-                    <!-- <button class="btn btn-outline-secondary" onclick="showImportModal()">Import</button> -->
-                </div>
-
-                <div class="action-card">
-                    <!-- <div class="action-icon"></div> -->
-                    <h3>System Status</h3>
-                    <!-- <p>Database: <span style="color: #27ae60;">✓ Online</span></p>
-                    <p>Storage: <span style="color: #27ae60;">✓ 8.5GB Free</span></p> -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Backup Progress (hidden by default) -->
-        <div id="backupProgress" class="backup-section" style="display: none;">
-            <h2 class="section-title">Backup in Progress</h2>
-            <div class="backup-progress">
-                <div class="progress-bar" id="progressBar" style="width: 0%"></div>
-            </div>
-            <p id="progressText">Initializing backup...</p>
-            <button class="btn btn-outline-danger" onclick="cancelBackup()">Cancel</button>
-        </div>
-
-        <!-- Backup Schedule -->
-        <div class="backup-section">
-            <h2 class="section-title">Backup Schedule</h2>
-            <form method="POST" action="<?= ROOT ?>/systemadmin/backup-restore" class="schedule-form">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">
-                            <input type="checkbox" <?= $backup_schedule['auto_backup'] ? 'checked' : '' ?>
-                                name="auto_backup">
-                            Enable Automatic Backups
-                        </label>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="frequency" class="form-label">Frequency</label>
-                        <select id="frequency" name="frequency" class="form-input">
-                            <option value="daily" <?= $backup_schedule['frequency'] === 'daily' ? 'selected' : '' ?>>Daily
-                            </option>
-                            <option value="weekly" <?= $backup_schedule['frequency'] === 'weekly' ? 'selected' : '' ?>>
-                                Weekly</option>
-                            <option value="monthly" <?= $backup_schedule['frequency'] === 'monthly' ? 'selected' : '' ?>>
-                                Monthly</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="backup_time" class="form-label">Backup Time</label>
-                        <input type="time" id="backup_time" name="backup_time" class="form-input"
-                            value="<?= $backup_schedule['time'] ?>">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="retention_days" class="form-label">Keep Backups (days)</label>
-                        <input type="number" id="retention_days" name="retention_days" class="form-input"
-                            value="<?= $backup_schedule['retention_days'] ?>" min="1" max="365">
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn-primary mt-3">Save Schedule</button>
-            </form>
-        </div>
-
-        <!-- Existing Backups -->
-        <!-- <div class="backup-section">
-            <h2 class="section-title">Available Backups</h2>
-            <table class="backup-table">
-                <thead>
-                    <tr>
-                        <th>File Name</th>
-                        <th>Size</th>
-                        <th>Created</th>
-                        <th>Type</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($backups as $backup): ?>
-                        <tr>
-                            <td>
-                                <strong><?= htmlspecialchars($backup['filename']) ?></strong>
-                            </td>
-                            <td><?= htmlspecialchars($backup['size']) ?></td>
-                            <td><?= date('M d, Y H:i', strtotime($backup['created_at'])) ?></td>
-                            <td><?= htmlspecialchars($backup['type']) ?></td>
-                            <td>
-                                <span class="status-badge status-complete">
-                                    <?= htmlspecialchars($backup['status']) ?>
-                                </span>
-                            </td>
-                            <td>
-                                <button class="btn btn-sm btn-primary" onclick="downloadBackup('<?= $backup['id'] ?>')">
-                                    📥 Download
-                                </button>
-                                <button class="btn btn-sm btn-outline-warning ml-1"
-                                    onclick="restoreBackup('<?= $backup['id'] ?>', '<?= $backup['filename'] ?>')">
-                                    🔄 Restore
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger ml-1"
-                                    onclick="deleteBackup('<?= $backup['id'] ?>', '<?= $backup['filename'] ?>')">
-                                    🗑️ Delete
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div> -->
-
-        <!-- Restore Operations -->
-        <div class="backup-section danger-zone">
-            <h2 class="section-title">Restore Operations</h2>
-
-            <div class="restore-warning">
-                <strong>Warning:</strong> Restore operations will overwrite existing data.
-                Make sure to create a backup before proceeding with any restore operation.
-            </div>
-
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="restore_file" class="form-label">Upload Backup File</label>
-                    <input type="file" id="restore_file" name="restore_file" class="form-input" accept=".sql">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Restore Options</label>
-                    <div>
-                        <label><input type="checkbox" checked> Drop existing tables</label><br>
-                        <label><input type="checkbox" checked> Reset auto-increment values</label><br>
-                        <label><input type="checkbox"> Create database if not exists</label>
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn btn-danger" onclick="confirmRestore()">
-                Start Restore Process
-            </button>
-        </div>
-
-        <div class="text-center mt-4">
-            <a href="<?= ROOT ?>/systemadmin/dashboard" class="btn btn-outline-secondary">
-                ← Back to Dashboard
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/dashboard" class="nav-link active">
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/usermanage" class="nav-link">
+                        <span class="nav-text">Manage Users</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/reports" class="nav-link">
+                        <span class="nav-text">Reports & Analytics</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/accesslogs" class="nav-link">
+                        <span class="nav-text">Access Logs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/backuprestore" class="nav-link">
+                        <span class="nav-text">Backup & Restore</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
+                        <span class="nav-text">My Profile</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="<?= ROOT ?>/signout" class="logout-btn">
+                <span>Logout</span>
             </a>
         </div>
     </div>
 
-    <?php  //include '../views/components/footer.view.php'; 
-    $this->view('components/footer')
+    <div class="main-content">
+        <header class="top-header">
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    < </button>
+                        <h1 class="page-title">Backup & Restore</h1>
+            </div>
 
-        ?>
+            <div class="header-right">
+                <div class="header-notifications">
+                    <button class="notification-btn"></button>
+                </div>
 
-    <script src="<?= ROOT ?>/assets/js/main.js"></script>
+                <div class="header-user">
+                    <div class="user-info">
+                        <span class="user-name">
+                            <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
+                        <span class="user-role">System Administrator</span>
+                    </div>
+                    <div class="user-avatar">
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="dashboard-content">
+            <?php if (!($is_system_admin ?? false)): ?>
+                <div class="alert alert-info mb-4">
+                    <h4> Viewing as <?= htmlspecialchars($user_role_name ?? 'Unknown Role') ?></h4>
+                    <p>You are viewing the System Admin dashboard with limited permissions. Some features may be restricted
+                        or hidden based on your role.</p>
+                </div>
+            <?php endif; ?>
+
+            <div class="dashboard-sections">
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <h2 class="section-title">Backups and Restores</h2>
+                    </div>
+                    <!-- <div class="activity-list"> -->
+                    <?php if (!empty($logs)): ?>
+                        <?php //  logger($recent_logins) ?>
+                        <div class="table-container">
+                            <table class="data-table activity-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Backup name</th>
+                                        <th>File path</th>
+                                        <th>Size</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Restored</th>
+                                        <th style="text-align: center;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($logs as $log): ?>
+                                        <tr>
+                                            <td><?= htmlspecialchars($log['id']) ?></td>
+                                            <td><?= htmlspecialchars($log['backup_name']) ?></td>
+                                            <td><?= htmlspecialchars(strstr(str_replace('\\', '/', $log['file_path']), 'systemadmin/')) ?>
+                                            </td>
+                                            <td><?= htmlspecialchars(round($log['file_size'] / (1024 * 1024), 2)) ?> MB</td>
+                                            <td><?= htmlspecialchars($log['status']) ?></td>
+                                            <td><?= htmlspecialchars($log['created_at']) ?></td>
+                                            <td><?= !empty($log['restored_at']) ? htmlspecialchars($log['restored_at']) : 'N/A' ?>
+                                            </td>
+                                            <td style="display:flex; gap :15px">
+                                                <button <?= !empty($log['restored_at']) ? 'disabled' : '' ?> type="button"
+                                                    class="btn btn-sm btn-primary"
+                                                    onclick="restoreBackup(<?= $log['id'] ?>,this)"><?= empty($log['restored_at']) ? 'Restore' : 'Restored' ?>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-secondary"
+                                                    onclick="downloadBackup(<?= $log['id'] ?>)">Download</button>
+                                            </td>
+
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php else: ?>
+                        <div class="empty-state">
+                            <p>No backups or restores to display</p>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div style="display:grid;  grid-template-columns: repeat(2, 1fr); gap:16px"
+                    class="dashboard-section-parent">
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <h2 class="section-title">Create backup</h2>
+                        </div>
+                        <form id="backup-form" action="" method="post">
+                            <input type="hidden" name="csrf_token" value="<?= $data['csrf_token'] ?>">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="backupName">Backup Name *</label>
+                                    <input type="text" id="backupName" name="backupName" required>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="resetForm()">Reset</button>
+                            <button type="button" class="btn btn-primary" onclick="createBackup()">Create</button>
+                        </form>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        < </div>
+
+
+    </div>
+
     <script>
+        const csrfToken = '<?= $data['csrf_token'] ?>';
+
         function createBackup() {
-            if (confirm('Create a new full database backup?')) {
-                showProgress();
-                simulateBackupProgress();
-            }
-        }
-
-        function showProgress() {
-            document.getElementById('backupProgress').style.display = 'block';
-            document.getElementById('backupProgress').scrollIntoView();
-        }
-
-        function simulateBackupProgress() {
-            const progressBar = document.getElementById('progressBar');
-            const progressText = document.getElementById('progressText');
-            let progress = 0;
-
-            const steps = [
-                'Initializing backup...',
-                'Backing up user data...',
-                'Backing up job posts...',
-                'Backing up applications...',
-                'Compressing backup file...',
-                'Backup completed successfully!'
-            ];
-
-            const interval = setInterval(() => {
-                progress += 20;
-                progressBar.style.width = progress + '%';
-
-                if (progress <= 100) {
-                    progressText.textContent = steps[Math.floor(progress / 20)];
-                }
-
-                if (progress >= 100) {
-                    clearInterval(interval);
-                    setTimeout(() => {
-                        document.getElementById('backupProgress').style.display = 'none';
-                        showToast('Backup created successfully!', 'success');
-                        // In real implementation, reload the backup list
-                    }, 2000);
-                }
-            }, 1000);
-        }
-
-        function cancelBackup() {
-            if (confirm('Cancel the current backup operation?')) {
-                document.getElementById('backupProgress').style.display = 'none';
-                showToast('Backup operation cancelled', 'warning');
-            }
-        }
-
-        function downloadBackup(id) {
-            showToast('Preparing download...', 'info');
-            // In real implementation, this would trigger a file download
-            setTimeout(() => {
-                showToast('Download started', 'success');
-            }, 1000);
-        }
-
-        function restoreBackup(id, filename) {
-            if (confirm(`Restore from backup: ${filename}?\n\nWARNING: This will overwrite all existing data!`)) {
-                showToast('Restore operation started', 'warning');
-                // In real implementation, this would start the restore process
-            }
-        }
-
-        function deleteBackup(id, filename) {
-            if (confirm(`Delete backup: ${filename}?\n\nThis action cannot be undone.`)) {
-                showToast('Backup deleted', 'success');
-                // In real implementation, this would delete the file
-            }
-        }
-
-        function confirmRestore() {
-            const fileInput = document.getElementById('restore_file');
-            if (!fileInput.files.length) {
-                showToast('Please select a backup file first', 'error');
+            if (!confirm("Do you want to create a backup now?")) {
                 return;
             }
 
-            if (confirm('Start restore process?\n\nWARNING: This will overwrite all existing data!')) {
-                showToast('Restore process initiated', 'warning');
-                // In real implementation, this would upload and restore the file
+            const form = document.getElementById('backup-form');
+            const formData = new FormData(form);
+            formData.set('action', 'create');
+
+            const backupName = formData.get('backupName').trim();
+            if (backupName === "") {
+                showToast('Backup name is required', 'error');
+                return;
             }
+
+            fetch('/HireFlow/public/systemadmin/backuprestore', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('An error occurred while creating database backup', 'error');
+                });
+
         }
 
-        function showExportModal() {
-            showToast('Export feature coming soon', 'info');
-            // In real implementation, this would show an export modal
+
+        function restoreBackup(id, button) { // Add restoration feature if required only
+
+            if (!confirm("Do you want to restore a backup now?")) {
+                return;
+            }
+
+            button.disabled = true;
+            button.textContent = 'Restoring...';
+
+            const formData = new FormData(document.createElement('form'));
+            formData.set('csrf_token', csrfToken);
+            formData.set('action', 'restore');
+            formData.set('backup_id', id);
+
+            fetch('/HireFlow/public/systemadmin/backuprestore', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        button.disabled = false;
+                        button.textContent = 'Restore';
+                        showToast(data.message || 'Restore failed', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    button.disabled = false;
+                    button.textContent = 'Restore';
+                    showToast('An error occurred while restoring database backup', 'error');
+                });
+
         }
 
-        function showImportModal() {
-            showToast('Import feature coming soon', 'info');
-            // In real implementation, this would show an import modal
+        function downloadBackup(id) {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/HireFlow/public/systemadmin/backuprestore';
+            form.style.display = 'none';
+
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrf_token';
+            csrfInput.value = csrfToken;
+            form.appendChild(csrfInput);
+
+            const actionInput = document.createElement('input');
+            actionInput.type = 'hidden';
+            actionInput.name = 'action';
+            actionInput.value = 'download';
+            form.appendChild(actionInput);
+
+            const idInput = document.createElement('input');
+            idInput.type = 'hidden';
+            idInput.name = 'backup_id';
+            idInput.value = id;
+            form.appendChild(idInput);
+
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
         }
+
+        function resetForm() {
+            document.getElementById('backup-form').reset();
+        }
+
+        document.getElementById('sidebarToggle').addEventListener('click', function () {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        });
+
+        document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
+            if (e.target.textContent.trim() === ">") {
+                e.target.textContent = "<";
+            } else {
+                e.target.textContent = ">";
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                if (link.getAttribute('href').includes(currentPath)) {
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                }
+            });
+        });
 
         function showToast(message, type) {
             const toast = document.createElement('div');
-            toast.className = `alert alert-${type}`;
-            toast.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 1000;
-                min-width: 300px;
-                animation: slideIn 0.3s ease;
-            `;
+            toast.className = `toast toast-${type}`;
             toast.textContent = message;
-
             document.body.appendChild(toast);
 
             setTimeout(() => {
-                toast.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
+                toast.remove();
             }, 3000);
         }
     </script>
