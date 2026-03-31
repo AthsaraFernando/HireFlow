@@ -49,6 +49,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/backuprestore" class="nav-link">
+                        <span class="nav-text">Backup & Restore</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -212,7 +217,7 @@
                         </a>
                     </div>
                 </div>
-                
+
             </div>
         </div>
     </div>
