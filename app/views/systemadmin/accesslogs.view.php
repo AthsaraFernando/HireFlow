@@ -333,6 +333,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/backuprestore" class="nav-link">
+                        <span class="nav-text">Backup & Restore</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -445,7 +450,6 @@
                         <label>Filter by User:</label>
                         <select class="filter-select" id="userFilter">
                             <option value="">All Users</option>
-                            <option value="">All Users</option>
                             <option value="System Admin">System Admin</option>
                             <option value="HR Admin">HR Admin</option>
                             <option value="Recruitment Manager">Recruitment Manager</option>
@@ -468,6 +472,9 @@
                             <option value="user_status_changed">User Status Changed</option>
                             <option value="user_created">User Created</option>
                             <option value="application_submit">Application Submit</option>
+                            <option value="db_backup">Database Backup</option>
+                            <option value="db_restore">Database Restore</option>
+                            <option value="db_backup_download">Database Backup Download</option>
 
                         </select>
                     </div>
@@ -586,9 +593,9 @@
                         .then(data => {
                             if (data.success) {
                                 showToast('Flag updated successfully!', 'success');
-                                setTimeout(() => {
-                                    location.reload();
-                                }, 1000);
+                                // setTimeout(() => {
+                                //     location.reload();
+                                // }, 1000);
                             }
                             else {
                                 showToast('Failed to update flag', 'error');

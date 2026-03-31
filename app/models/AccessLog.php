@@ -176,9 +176,26 @@ class AccessLog
 
     public function findLog($id)
     {
-        $result = $this->query("SELECT * FROM access_logs WHERE id = '$id'");
+        $result = $this->query(query: "SELECT * FROM access_logs WHERE id = '$id'");
         //logger($result);
         return $result[0] ?: [];
     }
+
+
+    public function getRecentRegistrationsCount()
+    {
+        $query = "SELECT COUNT(*) AS total FROM {$this->table} WHERE action = 'registration' AND created_at >= DATE_SUB(NOW(), INTERVAL 7 DAY)";
+        $result = $this->query($query);
+        return $result ? (int) $result[0]['total'] : 0;
+    }
+
+    public function getPendingApplicationsCount()
+    {
+        $query = "SELECT COUNT(*) AS total FROM applications WHERE status = 'applied'";
+        $result = $this->query($query);
+        return $result ? (int) $result[0]['total'] : 0;
+
+    }
+
 
 }
