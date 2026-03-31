@@ -345,6 +345,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/backuprestore" class="nav-link">
+                        <span class="nav-text">Backup & Restore</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -482,7 +487,7 @@
                 <?php if ($can_manage_users ?? false): ?>
                     <div class="info-note">
                         <p class="text-muted">
-                            <i class="icon-info"></i>
+                            <!-- <i class="icon-info"></i> -->
                             <strong>Note:</strong> Applicants self-register through the public portal. Only create HR Admin
                             and Recruitment Manager accounts here.
                         </p>
@@ -1091,21 +1096,21 @@
                 });
 
                 function filterUsers() {
-                    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-                    const roleFilter = document.getElementById('roleFilter').value;
-                    const statusFilter = document.getElementById('statusFilter').value;
+                    const searchTerm = document.getElementById('userSearch').value.toLowerCase().trim();
+                    const roleFilter = document.getElementById('roleFilter').value.toLowerCase().trim();
+                    const statusFilter = document.getElementById('statusFilter').value.toLowerCase().trim();
 
                     // Filter table rows based on criteria
                     const rows = document.querySelectorAll('tbody tr');
                     rows.forEach(row => {
-                        const name = row.cells[1].textContent.toLowerCase();
-                        const email = row.cells[2].textContent.toLowerCase();
-                        const role = row.cells[3].textContent.toLowerCase();
-                        const status = row.cells[4].textContent.toLowerCase();
+                        const name = row.cells[1].textContent.toLowerCase().trim();
+                        const email = row.cells[2].textContent.toLowerCase().trim();
+                        const role = row.cells[3].textContent.toLowerCase().trim();
+                        const status = row.cells[4].textContent.toLowerCase().trim();
 
                         const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
-                        const matchesRole = !roleFilter || role.includes(roleFilter.toLowerCase());
-                        const matchesStatus = !statusFilter || status.includes(statusFilter);
+                        const matchesRole = !roleFilter || role === roleFilter;
+                        const matchesStatus = !statusFilter || status === statusFilter;
 
                         if (matchesSearch && matchesRole && matchesStatus) {
                             row.style.display = '';
