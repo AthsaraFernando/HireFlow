@@ -30,6 +30,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/backuprestore" class="nav-link">
+                        <span class="nav-text">Backup & Restore</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link active">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -86,7 +91,7 @@
             <div class="profile-content">
                 <form method="POST" action="<?= ROOT ?>/systemadmin/profile" class="profile-form"
                     enctype="multipart/form-data">
-                    
+
                     <?php
                     $defaultProfileImage = 'default-avatar.jpg';
                     $profileImage = $defaultProfileImage;
@@ -101,8 +106,8 @@
                     }
                     ?>
                     <div class="profile-header-card">
-                        <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>"
-                            alt="" class="profile_picture">
+                        <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt=""
+                            class="profile_picture">
                         <div class="form-group">
                             <label for="profile_picture" class="form-label"></label>
                             <input hidden type="file" id="profile_picture" name="profile_picture" class="form-input"
