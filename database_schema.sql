@@ -260,6 +260,18 @@ INSERT INTO system_settings (setting_key, setting_value, description, updated_by
 ('session_timeout', '3600', 'Session timeout in seconds', 1),
 ('email_notifications', 'true', 'Enable/disable email notifications', 1);
 
+CREATE TABLE IF NOT EXISTS db_backups (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    backup_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_size BIGINT,
+    status VARCHAR(20),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    restored_at DATETIME NULL
+);
+
+
+
 -- ====================================================================
 -- DATABASE VERIFICATION
 -- ====================================================================
