@@ -124,14 +124,16 @@ class Profile extends Controller
             }
         }
 
-        // Load the profile view
+        $logs = $this->getActivityLogs();
+
         $this->view('systemadmin/profile', [
+            'logs' => $logs,
             'errors' => $errors,
             'success' => $success
         ]);
     }
 
-    
+
     private function logActivity($userId, $action, $details = '', $userRole = null)
     {
         try {
@@ -151,7 +153,7 @@ class Profile extends Controller
         }
     }
 
-    
+
     private function handleProfileImageUpload($file)
     {
         $uploadDir = '../public/assets/images/profiles/';
@@ -194,21 +196,18 @@ class Profile extends Controller
         }
     }
 
-  
+
     public function getActivityLogs()
     {
         Auth::requireLogin();
         Auth::requireRole(1);
 
         $accessLog = new AccessLog();
-        $logs = $accessLog->where(['user_id' => $_SESSION['USER']['id']], 'created_at DESC');
-
-        header('Content-Type: application/json');
-        echo json_encode($logs);
-        exit;
+        $logs = $accessLog->getAllActivityOfUser(25, ['user_id' => $_SESSION['USER']['id']]);
+        return $logs;
     }
 
- 
+
     public function downloadData()
     {
         Auth::requireLogin();
@@ -218,8 +217,7 @@ class Profile extends Controller
         $userData = $user->first(['id' => $_SESSION['USER']['id']]);
 
         if ($userData) {
-            // Remove sensitive data
-            unset($userData->password);
+            unset($userData['password']);
 
             $filename = 'user_data_' . $_SESSION['USER']['id'] . '_' . date('Y-m-d') . '.json';
 
@@ -231,7 +229,7 @@ class Profile extends Controller
         }
     }
 
-    
+
     public function checkEmail()
     {
         Auth::requireLogin();

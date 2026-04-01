@@ -131,6 +131,9 @@
                                     <strong>Last Login:</strong> <?= date('M j, Y g:i A') ?>
                                 </div>
                             </div>
+                            <button type="button" class="btn btn-primary btn-large" onclick="downloadData()">
+                                <i class="icon-save"></i>Download Data
+                            </button>
                         </div>
                     </div>
 
@@ -229,6 +232,51 @@
                         </div>
                     </div>
                 </form>
+
+                <div class="recent-actions-card">
+                    <h3 class="card-title">Your Recent Activity</h3>
+                    <div class="recent-actions-grid">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>User Role</th>
+                                        <th>Action</th>
+                                        <th>Details</th>
+                                        <th>User Agent</th>
+                                        <th>Created At</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    $roles = [
+                                        1 => 'System Admin'
+                                    ];
+                                    ?>
+                                    <?php if (!empty($logs)): ?>
+                                        <?php foreach ($logs as $log): ?>
+                                            <tr>
+                                                <td><?= $log['id'] ?></td>
+                                                <td><?= $roles[$log['user_role']] ?? 'Unknown' ?></td>
+                                                <td><?= $log['action'] ?></td>
+                                                <td><?= $log['details'] ?></td>
+                                                <td><?= $log['user_agent'] ?></td>
+                                                <td><?= $log['created_at'] ?></td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    <?php else: ?>
+                                        <tr>
+                                            <td colspan="9" style="text-align: center; padding: 2rem;">
+                                                <p>No access logs found.</p>
+                                            </td>
+                                        </tr>
+                                    <?php endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Quick Actions Card -->
                 <div class="quick-actions-card">
@@ -332,6 +380,10 @@
 
         .profile-header-info {
             flex: 1;
+        }
+
+        .profile-header-info button {
+            margin-top: 20px;
         }
 
         .profile-name {
@@ -490,6 +542,14 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
+        .recent-actions-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
         .card-title {
             font-size: 1.3rem;
             font-weight: 600;
@@ -498,6 +558,12 @@
         }
 
         .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .recent-actions-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 20px;
@@ -586,6 +652,15 @@
         }
         uploadPhoto()
 
+        function downloadData() {
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '/HireFlow/public/systemadmin/profile/downloadData';
+            form.style.display = 'none';
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
 
         // Password validation
         document.getElementById('confirm_password').addEventListener('input', function () {
