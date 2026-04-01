@@ -56,6 +56,21 @@ class AccessLog
         return $this->query($query, []);
     }
 
+    public function getAllActivityOfUser($limit = 50, $user_id = 0)
+    {
+        $limit = (int) $limit;
+        $user_id = (int) $user_id;
+
+        $query = "SELECT al.*, u.full_name, u.email, r.role_name 
+                  FROM access_logs al 
+                  LEFT JOIN users u ON al.user_id = u.id 
+                  LEFT JOIN roles r ON u.role_id = r.id
+                  WHERE u.id  = $user_id
+                  ORDER BY al.created_at DESC 
+                  LIMIT $limit";
+
+        return $this->query($query, []);
+    }
 
     public function getFailedLogins($timeframe = 24)
     {
