@@ -158,7 +158,7 @@ CREATE TABLE IF NOT EXISTS interviews (
 -- Insert sample interviews
 INSERT INTO interviews (application_id, interviewer_id, interview_type, scheduled_date, scheduled_time, duration_minutes, meeting_link, status) VALUES
 (1, 3, 'Video', '2025-09-05', '10:00:00', 60, 'https://meet.google.com/abc-def-ghi', 'Scheduled'),
-(4, 3, 'In-person', '2025-09-03', '14:00:00', 45, 'Conference Room A, 2nd Floor', 'Scheduled');
+(3, 3, 'In-person', '2025-09-03', '14:00:00', 45, 'Conference Room A, 2nd Floor', 'Scheduled');
 
 -- ====================================================================
 -- 6. FEEDBACK TABLE
@@ -212,6 +212,7 @@ INSERT INTO notifications (user_id, title, message, type) VALUES
 CREATE TABLE IF NOT EXISTS access_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NULL,
+    user_role INT NULL,
     ip_address VARCHAR(45),
     user_agent TEXT,
     action VARCHAR(255) NOT NULL,
@@ -220,6 +221,7 @@ CREATE TABLE IF NOT EXISTS access_logs (
     method VARCHAR(10),
     status_code INT,
     response_time_ms INT,
+    flagged TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id),
     INDEX idx_user_action (user_id, action),
@@ -257,6 +259,18 @@ INSERT INTO system_settings (setting_key, setting_value, description, updated_by
 ('allowed_file_types', 'pdf,doc,docx', 'Allowed file types for resume upload', 1),
 ('session_timeout', '3600', 'Session timeout in seconds', 1),
 ('email_notifications', 'true', 'Enable/disable email notifications', 1);
+
+CREATE TABLE IF NOT EXISTS db_backups (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    backup_name VARCHAR(255) NOT NULL,
+    file_path VARCHAR(255) NOT NULL,
+    file_size BIGINT,
+    status VARCHAR(20),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    restored_at DATETIME NULL
+);
+
+
 
 -- ====================================================================
 -- DATABASE VERIFICATION

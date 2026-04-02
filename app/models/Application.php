@@ -43,7 +43,7 @@ class Application
                   LEFT JOIN job_posts jp ON a.job_id = jp.id 
                   LEFT JOIN users u ON a.applicant_id = u.id 
                   ORDER BY a.applied_at DESC";
-        
+
         return $this->query($query);
     }
 
@@ -54,10 +54,10 @@ class Application
                   LEFT JOIN job_posts jp ON a.job_id = jp.id 
                   WHERE a.applicant_id = ?
                   ORDER BY a.applied_at DESC";
-        
+
         return $this->query($query, [$user_id]);
     }
-    
+
     public function getApplicationStats($user_id)
     {
         $query = "SELECT 
@@ -70,17 +70,17 @@ class Application
                     SUM(CASE WHEN status = 'Offered' THEN 1 ELSE 0 END) as offered_applications
                   FROM applications 
                   WHERE applicant_id = ?";
-        
+
         return $this->get_row($query, [$user_id]);
     }
-    
+
     public function hasAppliedToJob($user_id, $job_id)
     {
         $query = "SELECT id FROM applications WHERE applicant_id = ? AND job_id = ?";
         $result = $this->get_row($query, [$user_id, $job_id]);
         return $result !== false;
     }
-    
+
     public function submitApplication($data)
     {
         // Check if user already applied
@@ -88,9 +88,10 @@ class Application
             $this->errors['duplicate'] = "You have already applied to this job";
             return false;
         }
-        
+
         if ($this->validate($data)) {
             $data['applied_at'] = date('Y-m-d H:i:s');
+            AccessLog::log('application_submit', 'Apllication submission jobId: ' . $data['job_id'], Auth::user_id());
             $this->insert($data);
             return true;
         }
@@ -142,7 +143,7 @@ class Application
     {
         return $this->update($application_id, $data);
     }
-    
+
     public function deleteApplication($application_id)
     {
         $query = "DELETE FROM applications WHERE id = ?";
@@ -151,7 +152,7 @@ class Application
         $result = $stmt->execute([$application_id]);
         return $result; // Returns true if delete was successful
     }
-    
+
     public function getApplicationById($application_id)
     {
         $query = "SELECT a.*, jp.title as job_title, jp.location, jp.employment_type, 
@@ -159,7 +160,23 @@ class Application
                   FROM applications a 
                   LEFT JOIN job_posts jp ON a.job_id = jp.id 
                   WHERE a.id = ?";
-        
+
         return $this->get_row($query, [$application_id]);
+    }
+
+    public function getApplicationCount()
+    {
+        $query = "SELECT COUNT(*) AS total FROM {$this->table}";
+        $result = $this->query($query);
+        return $result ? (int) $result[0]['total'] : 0;
+    }
+
+    public function jobDemandStat()
+    {
+        $query = "SELECT jp.title, COUNT(*) AS applicationCount
+                  FROM applications a
+                  JOIN job_posts jp ON a.job_id = jp.id
+                  GROUP BY jp.title";
+        return $this->query(query: $query) ?: [];
     }
 }

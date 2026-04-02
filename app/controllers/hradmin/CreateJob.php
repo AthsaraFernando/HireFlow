@@ -17,48 +17,23 @@ class CreateJob extends Controller
         $data['success'] = '';
         $data['page_title'] = 'Create New Job';
         
-        // Fetch departments from database
+        // Fetch departments (use model abstraction, not raw SQL)
         $departmentModel = new Department();
         $data['departments'] = $departmentModel->findAll();
         
-        // Sample data for dropdowns (keeping other dropdowns)
-        // $data['departments'] = [
-        //     'Engineering',
-        //     'Marketing', 
-        //     'Sales',
-        //     'HR',
-        //     'Finance',
-        //     'Operations'
-        // ];
-        
-        $data['locations'] = [
-            'New York, NY',
-            'San Francisco, CA',
-            'Los Angeles, CA',
-            'Chicago, IL',
-            'Remote',
-            'Hybrid'
-        ];
-        
-        $data['job_types'] = [
-            'Full-time',
-            'Part-time',
-            'Contract',
-            'Internship'
-        ];
-        
-        $data['experience_levels'] = [
-            'Entry Level',
-            'Mid Level',
-            'Senior Level',
-            'Executive Level'
-        ];
+        // Fetch recruitment managers (role_id = 3)
+        $userModel = new User();
+        $data['hiring_managers'] = $userModel->query(
+            "SELECT id, full_name FROM users 
+             WHERE role_id = 3 AND status = 'active' 
+             ORDER BY full_name ASC"
+        );
         
         // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Validate form data
+
             $required_fields = ['job_title', 'department_id', 'location', 'employment_type', 'summary'];
-            
+
             $field_labels = [
                 'job_title' => 'Job title',
                 'department_id' => 'Department',
@@ -75,12 +50,17 @@ class CreateJob extends Controller
             }
             
             if (empty($data['errors'])) {
-                // Save to database
+
                 $jobPost = new JobPost();
                 
+                // Hiring manager override (new feature, keep it)
+                $hr_id = !empty($_POST['hiring_manager']) 
+                    ? $_POST['hiring_manager'] 
+                    : Auth::user_id();
+
                 $jobData = [
                     'title' => $_POST['job_title'] ?? '',
-                    'department_id' => $_POST['department_id'] ?? '',
+                    'department_id' => $_POST['department_id'] ?? null,
                     'description' => $_POST['summary'] ?? '',
                     'requirements' => $_POST['requirements'] ?? '',
                     'responsibilities' => $_POST['responsibilities'] ?? '',
@@ -90,22 +70,21 @@ class CreateJob extends Controller
                     'experience_level' => $_POST['experience_level'] ?? '',
                     'status' => $_POST['status'] ?? 'Draft',
                     'posted_by' => Auth::user_id(),
-                    'hr_id' => Auth::user_id(),
-                    'deadline' => !empty($_POST['application_deadline']) ? $_POST['application_deadline'] : null
+                    'hr_id' => $hr_id,
+                    'deadline' => !empty($_POST['application_deadline']) 
+                        ? $_POST['application_deadline'] 
+                        : null
                 ];
                 
-                // Debug: Log the data being inserted (remove this after debugging)
+                // Debug logging (keep for now, remove later)
                 error_log("Job Post Data: " . print_r($jobData, true));
                 
-                // Use model insert directly (skip validate since we already checked required fields)
                 $insertId = $jobPost->insert($jobData);
                 
                 if ($insertId) {
                     $_SESSION['success_message'] = 'Job posted successfully!';
-                    // Redirect to job posts list
                     redirect('hradmin/job-posts');
                 } else {
-                    // Show actual database errors for debugging
                     if (!empty($jobPost->errors)) {
                         foreach ($jobPost->errors as $error) {
                             $data['errors'][] = 'Database error: ' . $error;
@@ -116,7 +95,6 @@ class CreateJob extends Controller
                     $data['form_data'] = $_POST;
                 }
             } else {
-                // Keep form data for display
                 $data['form_data'] = $_POST;
             }
         }

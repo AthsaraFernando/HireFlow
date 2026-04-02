@@ -176,7 +176,7 @@ class Auth
     public static function profileImage()
     {
         $user = self::user();
-        return $user['profile_image'] ?? 'default-avatar.png';
+        return $user['profile_picture'] ?? 'default-avatar.jpg';
     }
 
     /**

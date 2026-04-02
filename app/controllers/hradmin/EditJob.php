@@ -4,11 +4,9 @@ class EditJob extends Controller
 {
     public function index($id = null)
     {
-        // Require HR Admin role (role_id = 2)
         Auth::requireRole(2);
         
         if (!$id) {
-            // Redirect to job posts if no ID provided
             redirect('hradmin/job-posts');
             exit;
         }
@@ -19,7 +17,6 @@ class EditJob extends Controller
         $data['page_title'] = 'Edit Job';
         $data['job_id'] = $id;
         
-        // Fetch job from database
         $jobPost = new JobPost();
         $job = $jobPost->first(['id' => $id], []);
         
@@ -31,19 +28,17 @@ class EditJob extends Controller
         
         $data['job'] = $job;
         
-        // Fetch departments from database
+        // Use model abstraction
         $departmentModel = new Department();
         $data['departments'] = $departmentModel->findAll();
         
-        // Sample data for dropdowns (commented out)
-        // $data['departments'] = [
-        //     'Engineering',
-        //     'Marketing', 
-        //     'Sales',
-        //     'HR',
-        //     'Finance',
-        //     'Operations'
-        // ];
+        // Hiring managers (new feature, keep)
+        $userModel = new User();
+        $data['hiring_managers'] = $userModel->query(
+            "SELECT id, full_name FROM users 
+             WHERE role_id = 3 AND status = 'active' 
+             ORDER BY full_name ASC"
+        );
         
         $data['locations'] = [
             'New York, NY',
@@ -74,11 +69,10 @@ class EditJob extends Controller
             'Draft'
         ];
         
-        // Handle form submission
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Validate form data
+
             $required_fields = ['job_title', 'department_id', 'location', 'employment_type', 'summary'];
-            
+
             $field_labels = [
                 'job_title' => 'Job title',
                 'department_id' => 'Department',
@@ -95,10 +89,25 @@ class EditJob extends Controller
             }
             
             if (empty($data['errors'])) {
-                // Update job in database
+
+                // Validate hiring manager (don’t trust POST)
+                $hr_id = $job['hr_id']; // default = existing
+
+                if (!empty($_POST['hiring_manager'])) {
+                    $manager = $userModel->first([
+                        'id' => $_POST['hiring_manager'],
+                        'role_id' => 3,
+                        'status' => 'active'
+                    ]);
+
+                    if ($manager) {
+                        $hr_id = $manager['id'];
+                    }
+                }
+
                 $updateData = [
                     'title' => $_POST['job_title'] ?? '',
-                    'department_id' => $_POST['department_id'] ?? '',
+                    'department_id' => $_POST['department_id'] ?? null,
                     'description' => $_POST['summary'] ?? '',
                     'requirements' => $_POST['requirements'] ?? '',
                     'responsibilities' => $_POST['responsibilities'] ?? '',
@@ -107,7 +116,10 @@ class EditJob extends Controller
                     'employment_type' => $_POST['employment_type'] ?? '',
                     'experience_level' => $_POST['experience_level'] ?? '',
                     'status' => $_POST['status'] ?? 'Draft',
-                    'deadline' => !empty($_POST['application_deadline']) ? $_POST['application_deadline'] : null
+                    'hr_id' => $hr_id,
+                    'deadline' => !empty($_POST['application_deadline']) 
+                        ? $_POST['application_deadline'] 
+                        : null
                 ];
                 
                 if ($jobPost->update($id, $updateData)) {
@@ -118,7 +130,6 @@ class EditJob extends Controller
                 }
             }
             
-            // Keep form data for display on error
             if (!empty($data['errors'])) {
                 $data['form_data'] = $_POST;
             }

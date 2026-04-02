@@ -345,6 +345,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/backuprestore" class="nav-link">
+                        <span class="nav-text">Backup & Restore</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -398,20 +403,16 @@
                 </div>
             <?php endif; ?>
 
-            <!-- User Management Controls -->
             <div class="page-controls">
-                <!-- Page Header -->
                 <div class="page-header">
                     <h1 class="page-title">User Management</h1>
                     <p class="page-description">Manage system users, roles, and permissions</p>
                 </div>
 
-                <!-- Statistics Cards -->
                 <div class="controls-stats">
                     <div class="metric-card">
                         <div class="metric-value"><?= count($users ?? []) ?></div>
                         <div class="metric-label">Total Users</div>
-                        <!-- <div class="metric-change neutral">All registered users</div> -->
                     </div>
                     <div class="metric-card">
                         <?php
@@ -421,7 +422,6 @@
                         ?>
                         <div class="metric-value"><?= count($activeUsers) ?></div>
                         <div class="metric-label">Active Users</div>
-                        <!-- <div class="metric-change positive">Currently active</div> -->
                     </div>
                     <div class="metric-card">
                         <?php
@@ -431,12 +431,10 @@
                         ?>
                         <div class="metric-value"><?= count($inactiveUsers) ?></div>
                         <div class="metric-label">Inactive Users</div>
-                        <!-- <div class="metric-change neutral">Currently inactive</div> -->
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= count($roles ?? []) ?></div>
                         <div class="metric-label">User Roles</div>
-                        <!-- <div class="metric-change neutral">Available roles</div> -->
                     </div>
                 </div>
 
@@ -455,12 +453,9 @@
                                 <!-- <i class="icon-plus"></i> -->
                                 Add Staff User
                             </button>
-                            <!-- <button class="btn btn-secondary" onclick="exportUsers()">
-                                <i class="icon-download"></i>Export
-                            </button> -->
-                            <!-- <button class="btn btn-outline" onclick="openBulkActionsModal()">
-                                <i class="icon-edit"></i>Bulk Actions
-                            </button> -->
+                            <button class="btn btn-secondary" onclick="exportUsers()">
+                                Export
+                            </button>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -470,10 +465,10 @@
                         <label>Filter by Role:</label>
                         <select class="filter-select" id="roleFilter">
                             <option value="">All Roles</option>
-                            <option value="system_admin">System Admin</option>
-                            <option value="hr_admin">HR Admin</option>
-                            <option value="recruitment_manager">Recruitment Manager</option>
-                            <option value="applicant">Applicant</option>
+                            <option value="System Admin">System Admin</option>
+                            <option value="HR Admin">HR Admin</option>
+                            <option value="Recruitment Manager">Recruitment Manager</option>
+                            <option value="Applicant">Applicant</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -482,7 +477,6 @@
                             <option value="">All Status</option>
                             <option value="active">Active</option>
                             <option value="inactive">Inactive</option>
-                            <option value="suspended">Suspended</option>
                         </select>
                     </div>
                     <div class="filter-actions">
@@ -493,7 +487,7 @@
                 <?php if ($can_manage_users ?? false): ?>
                     <div class="info-note">
                         <p class="text-muted">
-                            <i class="icon-info"></i>
+                            <!-- <i class="icon-info"></i> -->
                             <strong>Note:</strong> Applicants self-register through the public portal. Only create HR Admin
                             and Recruitment Manager accounts here.
                         </p>
@@ -505,12 +499,10 @@
                     </div>
                 <?php endif; ?>
 
-                <!-- Users Table -->
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <!-- <th><input type="checkbox" id="selectAll"></th> -->
                                 <th>User ID</th>
                                 <th>Name</th>
                                 <th>Email</th>
@@ -525,7 +517,6 @@
                             <?php if (!empty($users)): ?>
                                 <?php foreach ($users as $user): ?>
                                     <?php
-                                    // Generate initials for avatar
                                     $nameParts = explode(' ', trim($user['full_name']));
                                     $initials = '';
                                     foreach ($nameParts as $part) {
@@ -533,24 +524,18 @@
                                     }
                                     $initials = substr($initials, 0, 2);
 
-                                    // Format role badge class
-                                    // $roleClass = str_replace(' ', '-', strtolower($user['role_name'] ?? 'unknown'));
-                            
-                                    // Format dates
                                     $lastLogin = $user['last_login'] ? date('M j, Y g:i A', strtotime($user['last_login'])) : 'Never';
                                     $createdDate = date('M j, Y', strtotime($user['created_at']));
                                     ?>
                                     <tr data-user-id="<?= $user['id'] ?>">
-                                        <!-- <td><input type="checkbox" class="user-checkbox" value="<?= $user['id'] ?>"></td> -->
                                         <td>USR-<?= str_pad($user['id'], 3, '0', STR_PAD_LEFT) ?></td>
                                         <td>
                                             <div class="user-info">
-                                                <div class="user-avatar"><?= $initials ?></div>
+                                                <!-- <div class="user-avatar"><?= $initials ?></div> -->
                                                 <div>
                                                     <div class="user-name"><?= htmlspecialchars($user['full_name']) ?></div>
-                                                    <div class="user-meta">
-                                                        <? // = htmlspecialchars($user['role_name'] ?? 'Unknown Role') ?>
-                                                    </div>
+                                                    <!-- <div class="user-meta">
+                                                    </div> -->
                                                 </div>
                                             </div>
                                         </td>
@@ -628,13 +613,6 @@
                         <span class="close" onclick="closeUserModal()">&times;</span>
                     </div>
                     <div class="modal-body">
-                        <!-- <div class="info-box mb-3">
-                            <p class="text-muted small">
-                                <strong>Account Creation Policy:</strong> Only create HR Admin and Recruitment Manager
-                                accounts here.
-                                Applicants register themselves through the public signup page.
-                            </p>
-                        </div> -->
                         <form id="userForm">
                             <div class="form-row">
                                 <div class="form-group">
@@ -667,8 +645,7 @@
                                         <option value="hr_admin">HR Admin</option>
                                         <option value="recruitment_manager">Recruitment Manager</option>
                                     </select>
-                                    <!-- <small class="form-text">Applicant accounts are created through public
-                                        registration</small> -->
+
                                 </div>
                                 <div class="form-group">
                                     <label for="status">Status</label>
@@ -691,12 +668,7 @@
                                 <input type="password" id="confirmPassword" name="confirmPassword" required>
                             </div>
 
-                            <!-- <div class="form-group">
-                                <label>
-                                    <input type="checkbox" id="sendWelcome" name="sendWelcome" checked>
-                                    Send welcome email to user
-                                </label>
-                            </div> -->
+
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -734,26 +706,22 @@
                     });
                 });
 
-                // User management functionality
                 function openUserModal(action, userId = null) {
                     const modal = document.getElementById('userModal');
                     const title = document.getElementById('modalTitle');
                     const form = document.getElementById('userForm');
                     const button = document.getElementById('action');
 
-                    // Reset all fields to be editable (remove readonly/disabled)
                     form.querySelectorAll('input, select').forEach(field => {
                         field.removeAttribute('readonly');
                         field.removeAttribute('disabled');
                     });
 
-                    // Show the action button
                     button.style.display = 'inline-block';
 
                     if (action === 'add') {
                         title.textContent = 'Add Staff User';
                         form.reset();
-                        // Reset password fields to required
                         document.getElementById('password').required = true;
                         document.getElementById('confirmPassword').required = true;
                         button.textContent = 'Create Staff Account';
@@ -761,12 +729,10 @@
                     } else if (action === 'edit') {
                         title.textContent = 'Edit User';
                         button.textContent = 'Update User';
-                        // Store userId in a data attribute for later use
                         modal.setAttribute('data-user-id', userId);
                         button.onclick = function () {
                             updateUser(userId);
                         };
-                        // Load user data for editing
                         loadUserData(userId, modal);
                     }
 
@@ -783,7 +749,6 @@
                         body: formData
                     })
                         .then(response => {
-                            // Check if response is JSON
                             const contentType = response.headers.get('content-type');
                             if (!contentType || !contentType.includes('application/json')) {
                                 throw new Error('Server did not return JSON');
@@ -792,17 +757,14 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                console.log(data);
                                 const user = data.user;
 
-                                // Split name into first and last
                                 const nameParts = user.full_name.split(' ');
                                 document.getElementById('firstName').value = nameParts[0] || '';
                                 document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
                                 document.getElementById('email').value = user.email;
                                 document.getElementById('phone').value = user.phone || '';
 
-                                // Map role_id to role name
                                 const roleMap = {
                                     1: 'system_admin',
                                     2: 'hr_admin',
@@ -812,7 +774,6 @@
                                 document.getElementById('role').value = roleMap[user.role_id] || '';
                                 document.getElementById('status').value = user.status;
 
-                                // Make password fields optional for edit
                                 document.getElementById('password').required = false;
                                 document.getElementById('confirmPassword').required = false;
                                 document.getElementById('password').value = '';
@@ -828,15 +789,14 @@
                             alert('Failed to load user data: ' + error.message);
                         });
                 }
+
                 function updateUser(userId) {
                     const form = document.getElementById('userForm');
                     const formData = new FormData();
-
-                    // Add action and user_id
                     formData.append('action', 'update');
                     formData.append('user_id', userId);
+                    formData.append('csrf_token', '<?= $csrf_token ?>');
 
-                    // Add form fields
                     const firstName = document.getElementById('firstName').value.trim();
                     const lastName = document.getElementById('lastName').value.trim();
                     formData.append('full_name', firstName + ' ' + lastName);
@@ -844,7 +804,6 @@
                     formData.append('phone', document.getElementById('phone').value.trim());
                     formData.append('status', document.getElementById('status').value);
 
-                    // Map role name to role_id
                     const roleMap = {
                         'system_admin': 1,
                         'hr_admin': 2,
@@ -854,7 +813,6 @@
                     const roleValue = document.getElementById('role').value;
                     formData.append('role_id', roleMap[roleValue]);
 
-                    // Only include password if it was changed
                     const password = document.getElementById('password').value;
                     const confirmPassword = document.getElementById('confirmPassword').value;
 
@@ -870,21 +828,20 @@
                         formData.append('password', password);
                     }
 
-                    // Add CSRF token
-                    formData.append('csrf_token', '<?= $csrf_token ?>');
 
-                    // Send update request
                     fetch('/HireFlow/public/systemadmin/usermanage', {
                         method: 'POST',
                         body: formData
                     })
-                        .then(response => response.text())
+                        .then(response => response.json())
                         .then(data => {
-                            showToast('User updated successfully!', 'success');
-                            closeUserModal();
-                            setTimeout(() => {
-                                location.reload();
-                            }, 1000);
+                            if (data.success) {
+                                showToast('User updated successfully!', 'success');
+                                closeUserModal();
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            }
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -899,6 +856,9 @@
                 function saveUser() {
                     const form = document.getElementById('userForm');
                     const formData = new FormData(form);
+                    formData.append('action', 'create');
+                    formData.append('csrf_token', '<?= $csrf_token ?>');  // ADD THIS
+
 
                     console.log(formData);
                     // Basic validation
@@ -917,7 +877,7 @@
                     }
 
                     // Create user via AJAX
-                    fetch('/HireFlow/public/systemadmin/usermanage/create', {
+                    fetch('/HireFlow/public/systemadmin/usermanage', {
                         method: 'POST',
                         body: formData
                     })
@@ -926,7 +886,6 @@
                             if (data.success) {
                                 showToast('Staff account created successfully!', 'success');
                                 closeUserModal();
-                                // Refresh the page to show new user
                                 setTimeout(() => {
                                     location.reload();
                                 }, 1000);
@@ -963,7 +922,6 @@
                         })
                         .then(data => {
                             if (data.success) {
-                                // Show user details in a modal or view
                                 showUserDetailsModal(data.user);
                             } else {
                                 showToast('User not found: ' + (data.message || ''), 'error');
@@ -976,14 +934,12 @@
                 }
 
                 function showUserDetailsModal(user) {
-                    // Create a view-only modal with user details
                     const modal = document.getElementById('userModal');
                     const title = document.getElementById('modalTitle');
                     const form = document.getElementById('userForm');
 
                     title.textContent = 'View User Details';
 
-                    // Populate fields
                     const nameParts = user.full_name.split(' ');
                     document.getElementById('firstName').value = nameParts[0] || '';
                     document.getElementById('lastName').value = nameParts.slice(1).join(' ') || '';
@@ -999,17 +955,14 @@
                     document.getElementById('role').value = roleMap[user.role_id] || '';
                     document.getElementById('status').value = user.status;
 
-                    // Clear password fields for view mode
                     document.getElementById('password').value = '';
                     document.getElementById('confirmPassword').value = '';
 
-                    // Make all fields read-only AFTER populating them
                     form.querySelectorAll('input, select').forEach(field => {
                         field.setAttribute('readonly', true);
                         field.setAttribute('disabled', true);
                     });
 
-                    // Hide action button
                     document.getElementById('action').style.display = 'none';
 
                     modal.style.display = 'block';
@@ -1026,14 +979,20 @@
                             method: 'POST',
                             body: formData
                         })
-                            .then(response => response.text())
+                            .then(response => response.json())
                             .then(data => {
-                                showToast('User deleted successfully!', 'success');
-                                setTimeout(() => {
-                                    location.reload();
-                                }, 1000);
+                                if (data.success) {
+                                    showToast('User deleted successfully!', 'success');
+                                    setTimeout(() => {
+                                        location.reload();
+                                    }, 1000);
+                                }
+                                else {
+                                    showToast('User deletion unsuccessful!', 'error');
+                                }
                             })
                             .catch(error => {
+                                console.log(error);
                                 console.error('Error:', error);
                                 showToast('Failed to delete user', 'error');
                             });
@@ -1056,12 +1015,14 @@
                         method: 'POST',
                         body: formData
                     })
-                        .then(response => response.text())
+                        .then(response => response.json())
                         .then(data => {
-                            showToast('User status updated successfully!', 'success');
-                            setTimeout(() => {
-                                location.reload();
-                            }, 1000);
+                            if (data.success) {
+                                showToast('User status updated successfully!', 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
+                            }
                         })
                         .catch(error => {
                             console.error('Error:', error);
@@ -1070,11 +1031,58 @@
                 }
 
                 function exportUsers() {
-                    // Export users to CSV
-                    showToast('Export started. Download will begin shortly.', 'info');
+                    const tableRows = document.querySelectorAll('.data-table tbody tr');
+                    const visibleRows = Array.from(tableRows).filter(row => {
+                        return row.style.display !== 'none' && !row.querySelector('td[colspan]');
+                    });
+
+                    if (visibleRows.length === 0) {
+                        showToast('No users to export', 'warning');
+                        return;
+                    }
+
+                    const csvRows = [];
+                    const headers = ['User ID', 'Name', 'Email', 'Role', 'Status', 'Last Login', 'Created At'];
+                    csvRows.push(headers.join(','));
+
+                    const escapeCsv = (value) => {
+                        const text = (value || '').toString().replace(/"/g, '""');
+                        return `"${text}"`;
+                    };
+
+                    visibleRows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        const rowData = [
+                            cells[0]?.textContent.trim() || '',
+                            cells[1]?.textContent.trim() || '',
+                            cells[2]?.textContent.trim() || '',
+                            cells[3]?.textContent.trim() || '',
+                            cells[4]?.textContent.trim() || '',
+                            cells[5]?.textContent.trim() || '',
+                            cells[6]?.textContent.trim() || ''
+                        ].map(escapeCsv);
+
+                        csvRows.push(rowData.join(','));
+                    });
+
+                    const csvString = csvRows.join('\n');
+
+                    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+
+                    link.href = url;
+                    link.download = `users_${new Date().toISOString().split('T')[0]}.csv`;
+
+                    document.body.appendChild(link);
+                    link.click();
+
+                    setTimeout(() => {
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url);
+                    }, 100);
                 }
 
-                // Search and filter functionality
                 document.getElementById('userSearch').addEventListener('input', function () {
                     filterUsers();
                 });
@@ -1088,21 +1096,21 @@
                 });
 
                 function filterUsers() {
-                    const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-                    const roleFilter = document.getElementById('roleFilter').value;
-                    const statusFilter = document.getElementById('statusFilter').value;
+                    const searchTerm = document.getElementById('userSearch').value.toLowerCase().trim();
+                    const roleFilter = document.getElementById('roleFilter').value.toLowerCase().trim();
+                    const statusFilter = document.getElementById('statusFilter').value.toLowerCase().trim();
 
                     // Filter table rows based on criteria
                     const rows = document.querySelectorAll('tbody tr');
                     rows.forEach(row => {
-                        const name = row.querySelector('.user-name').textContent.toLowerCase();
-                        const email = row.cells[3].textContent.toLowerCase();
-                        const role = row.querySelector('.role-badge').textContent.toLowerCase();
-                        const status = row.querySelector('.status-badge').textContent.toLowerCase();
+                        const name = row.cells[1].textContent.toLowerCase().trim();
+                        const email = row.cells[2].textContent.toLowerCase().trim();
+                        const role = row.cells[3].textContent.toLowerCase().trim();
+                        const status = row.cells[4].textContent.toLowerCase().trim();
 
                         const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm);
-                        const matchesRole = !roleFilter || role.includes(roleFilter.toLowerCase());
-                        const matchesStatus = !statusFilter || status.includes(statusFilter);
+                        const matchesRole = !roleFilter || role === roleFilter;
+                        const matchesStatus = !statusFilter || status === statusFilter;
 
                         if (matchesSearch && matchesRole && matchesStatus) {
                             row.style.display = '';
@@ -1112,19 +1120,17 @@
                     });
                 }
 
-                // Clear all filters
                 function clearFilters() {
                     document.getElementById('userSearch').value = '';
                     document.getElementById('roleFilter').value = '';
                     document.getElementById('statusFilter').value = '';
 
-                    // Show all rows
                     const rows = document.querySelectorAll('tbody tr');
                     rows.forEach(row => {
                         row.style.display = '';
                     });
 
-                    showToast('Filters cleared', 'info');
+                    // showToast('Filters cleared', 'info');
                 }
 
                 // Select all functionality
@@ -1135,9 +1141,7 @@
                     });
                 });
 
-                // Toast notification function
                 function showToast(message, type) {
-                    // Create and show toast notification
                     const toast = document.createElement('div');
                     toast.className = `toast toast-${type}`;
                     toast.textContent = message;
@@ -1147,32 +1151,6 @@
                         toast.remove();
                     }, 3000);
                 }
-
-                // Sidebar toggle functionality
-                document.getElementById('sidebarToggle').addEventListener('click', function () {
-                    document.querySelector('.sidebar').classList.toggle('collapsed');
-                    document.querySelector('.main-content').classList.toggle('expanded');
-                });
-
-                document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
-                    if (e.target.textContent.trim() === ">") {
-                        e.target.textContent = "<";
-                    } else {
-                        e.target.textContent = ">";
-                    }
-                });
-
-                document.addEventListener('DOMContentLoaded', function () {
-                    const currentPath = window.location.pathname;
-                    const navLinks = document.querySelectorAll('.nav-link');
-
-                    navLinks.forEach(link => {
-                        if (link.getAttribute('href').includes(currentPath)) {
-                            navLinks.forEach(l => l.classList.remove('active'));
-                            link.classList.add('active');
-                        }
-                    });
-                });
             </script>
 
         </div>

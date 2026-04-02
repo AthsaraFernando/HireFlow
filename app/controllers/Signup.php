@@ -12,7 +12,7 @@ class Signup extends Controller
 
         $data = [];
         $user = new User;
-        
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Check for CSRF token
             if (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
@@ -35,10 +35,11 @@ class Signup extends Controller
                 ];
 
                 // Create user account
-                if ($user->createUser($userData)) {
+                $newUser = $user->createUser($userData);
+                // logger($newUser);
+                if ($newUser) {
                     // Log registration
-                    AccessLog::log('registration', 'New applicant account created: ' . $userData['email'], null);
-                    
+                    AccessLog::log('registration', 'New applicant account created: ' . $userData['email'], $newUser, user_role: 4);
                     // Redirect to login with success message
                     redirect('signin?registered=1');
                     return;
