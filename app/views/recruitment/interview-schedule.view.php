@@ -15,8 +15,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/assigned-jobs" class="nav-link">
-                        <span class="nav-text">Assigned Jobs</span>
+                    <a href="<?= ROOT ?>/recruitment/applicationforms" class="nav-link">
+                        <span class="nav-text">Application Forms</span>
                     </a>
                 </li>
                 <li class="nav-item">
