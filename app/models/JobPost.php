@@ -3,16 +3,20 @@
 class JobPost
 {
     use Model;
+
     protected $table = 'job_posts';
+
     protected $allowedColumns = [
         'title',
         'department_id',
-        'department',
+        // ❌ removed 'department' (denormalized, don’t store)
         'description',
         'requirements',
+        'responsibilities', // ✅ keep (was removed in PR incorrectly)
         'salary_range',
         'location',
         'employment_type',
+        'experience_level', // ✅ keep (was removed in PR incorrectly)
         'status',
         'posted_by',
         'hr_id',
@@ -39,11 +43,7 @@ class JobPost
             $this->errors['posted_by'] = "Posted by user ID is required";
         }
 
-        if (empty($this->errors)) {
-            return true;
-        }
-
-        return false;
+        return empty($this->errors);
     }
 
     public function getAllJobs()
@@ -95,9 +95,10 @@ class JobPost
             $params[] = '%' . $filters['title'] . '%';
         }
 
-        if (!empty($filters['department'])) {
-            $conditions[] = "department LIKE ?";
-            $params[] = '%' . $filters['department'] . '%';
+        // ✅ FIX: use department_id instead of department string
+        if (!empty($filters['department_id'])) {
+            $conditions[] = "department_id = ?";
+            $params[] = $filters['department_id'];
         }
 
         if (!empty($filters['location'])) {
@@ -112,12 +113,10 @@ class JobPost
 
         $whereClause = implode(' AND ', $conditions);
 
-        // Execute the query with parameters first to get filtered results
         if (!empty($params)) {
             $baseQuery = "SELECT * FROM job_posts WHERE {$whereClause} ORDER BY created_at DESC";
             $results = $this->query($baseQuery, $params);
 
-            // Apply pagination manually to avoid PDO parameter binding issues with LIMIT/OFFSET
             if ($results && is_array($results)) {
                 return array_slice($results, $offset, $limit);
             }
@@ -128,7 +127,8 @@ class JobPost
         }
     }
 
-    public function getJobCount($filters = [])
+    // ✅ KEEP original count method (used elsewhere likely)
+    public function getFilteredJobCount($filters = [])
     {
         $conditions = ["status = 'Open'"];
         $params = [];
@@ -138,9 +138,9 @@ class JobPost
             $params[] = '%' . $filters['title'] . '%';
         }
 
-        if (!empty($filters['department'])) {
-            $conditions[] = "department LIKE ?";
-            $params[] = '%' . $filters['department'] . '%';
+        if (!empty($filters['department_id'])) {
+            $conditions[] = "department_id = ?";
+            $params[] = $filters['department_id'];
         }
 
         if (!empty($filters['location'])) {
@@ -160,20 +160,34 @@ class JobPost
         return $result ? $result['total'] : 0;
     }
 
+    // ✅ KEEP original signature (don’t break callers)
+    public function getJobCount($status = null)
+    {
+        if ($status === null) {
+            $query = "SELECT COUNT(*) as total FROM job_posts";
+            $result = $this->get_row($query);
+        } else {
+            $query = "SELECT COUNT(*) as total FROM job_posts WHERE status = ?";
+            $result = $this->get_row($query, [$status]);
+        }
+
+        return $result ? (int)$result['total'] : 0;
+    }
+
+    // ✅ NEW feature from PR (good addition)
     public function getJobPostStats()
     {
-        $query = 'SELECT
-        d.id AS department_id,
-        d.name AS department_name,
-        COUNT(jp.id) as job_count
-        FROM departments d 
-        LEFT JOIN job_posts jp
-            ON jp.department_id = d.id
-        GROUP BY d.id
-        ORDER BY d.id ASC';
+        $query = "SELECT
+                    d.id AS department_id,
+                    d.name AS department_name,
+                    COUNT(jp.id) as job_count
+                  FROM departments d 
+                  LEFT JOIN job_posts jp
+                    ON jp.department_id = d.id
+                  GROUP BY d.id
+                  ORDER BY d.id ASC";
 
         $result = $this->query($query);
-        // logger($result);
-        return $result ? $result : 0;
+        return $result ?: [];
     }
 }

@@ -25,13 +25,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/applications" class="nav-link">
-                        <span class="nav-text">Applications</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link">
-                        <span class="nav-text">Applicant Database</span>
+                        <span class="nav-text">Applicants & Applications</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -86,9 +81,33 @@
 
         <div class="dashboard-content">
             <div class="main-container">
-                <div class="header-section">
-                    <h1 class="page-title">My Profile</h1>
-                    <p class="page-description">Manage your personal information and account settings</p>
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">My Profile</h1>
+                        <p class="hero-description">Manage your personal information, account settings, and preferences to customize your HR admin experience.</p>
+                        <div class="profile-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Role:</span>
+                                <span class="meta-value">HR Administrator</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Department:</span>
+                                <span class="meta-value">Human Resources</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Last Login:</span>
+                                <span class="meta-value"><?= date('M d, Y H:i') ?></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="editProfile()">
+                            <i class="icon-edit"></i>Edit Profile
+                        </button>
+                        <button class="btn btn-outline" onclick="changePassword()">
+                            <i class="icon-key"></i>Change Password
+                        </button>
+                    </div>
                 </div>
 
                 <?php if(!empty($errors)): ?>
@@ -469,7 +488,205 @@ document.querySelector('.sidebar-toggle').addEventListener('click', function (e)
         e.target.textContent = ">";
     }
 });
+</script>
 
+<!-- Modern HR Admin Design System -->
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        --card-hover-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dashboard-content {
+        background: var(--background-gradient);
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, #4c63d2 0%, #5a67d8 50%, #667eea 100%);
+        color: white;
+        padding: 3rem 2.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2.5rem;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+        position: relative;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.1);
+        border-radius: var(--border-radius);
+        pointer-events: none;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: #ffffff;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-description {
+        font-size: 1.125rem;
+        opacity: 1;
+        margin-bottom: 1.5rem;
+        color: rgba(255,255,255,0.95);
+        text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 1;
+    }
+
+    .profile-meta {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .meta-label {
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+
+    .meta-value {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .btn {
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #667eea;
+        box-shadow: 0 8px 25px rgba(255,255,255,0.3);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 35px rgba(255,255,255,0.4);
+    }
+
+    .btn-outline {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    .btn-outline:hover {
+        background: rgba(255,255,255,0.2);
+        transform: translateY(-3px);
+    }
+
+    .profile-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+
+    .profile-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-hover-shadow);
+    }
+
+    .action-item-beautiful {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        text-decoration: none;
+        color: #2d3748;
+        transition: var(--transition);
+        box-shadow: var(--card-shadow);
+        margin-bottom: 1rem;
+    }
+
+    .action-item-beautiful:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--card-hover-shadow);
+        color: #667eea;
+    }
+
+    .icon-wrapper {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        background: var(--primary-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .alert {
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        font-weight: 500;
+    }
+
+    .alert-error {
+        background: linear-gradient(135deg, #feb2b2, #f56565);
+        color: white;
+        box-shadow: 0 8px 25px rgba(245, 101, 101, 0.3);
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #9ae6b4, #48bb78);
+        color: white;
+        box-shadow: 0 8px 25px rgba(72, 187, 120, 0.3);
+    }
+
+    @media (max-width: 768px) {
+        .hero-section {
+            flex-direction: column;
+            text-align: center;
+        }
+        .dashboard-content {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-link');

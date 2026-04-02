@@ -25,8 +25,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/applications" class="nav-link">
-                        <span class="nav-text">Applications</span>
+                    <a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link">
+                        <span class="nav-text">Applicants & Applications</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -81,23 +81,39 @@
 
         <div class="dashboard-content">
             <div class="main-container">
-    <div class="header-section">
-        <h1 class="page-title">Interview Schedule</h1>
-        <p class="page-description">Schedule and manage interviews with candidates</p>
-        <div class="action-buttons">
-            <button class="btn btn-primary" onclick="scheduleNewInterview()">
-                Schedule Interview
-            </button>
-            <a href="<?= ROOT ?>/hradmin/applications" class="btn btn-secondary">
-                View Applications
-            </a>
-        </div>
-    </div>
+                <div class="hero-section">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Interview Schedule</h1>
+                        <p class="hero-description">Schedule and manage interviews with top candidates. Coordinate with your team and track interview progress.</p>
+                        <div class="hero-stats">
+                            <div class="hero-stat">
+                                <span class="stat-number"><?= $interviews_today ?? '0' ?></span>
+                                <span class="stat-label">Today</span>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="stat-number"><?= $interviews_this_week ?? '0' ?></span>
+                                <span class="stat-label">This Week</span>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="stat-number"><?= $interviews_pending ?? '0' ?></span>
+                                <span class="stat-label">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <button class="btn btn-primary" onclick="scheduleNewInterview()">
+                            <i class="icon-calendar-plus"></i>Schedule Interview
+                        </button>
+                        <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications" class="btn btn-outline">
+                            <i class="icon-applications"></i>View Applications
+                        </a>
+                    </div>
+                </div>
 
-    <?php if(!empty($errors)): ?>
-        <div class="alert alert-error">
-            <?php foreach($errors as $error): ?>
-                <p><?php echo $error ?></p>
+                <?php if(!empty($errors)): ?>
+                    <div class="alert alert-error">
+                        <?php foreach($errors as $error): ?>
+                            <p><?php echo $error ?></p>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
@@ -368,37 +384,45 @@
             <button class="modal-close" onclick="closeScheduleModal()">&times;</button>
         </div>
         <div class="modal-body">
-            <form class="schedule-form">
+            <form class="schedule-form" method="POST" action="<?= ROOT ?>/hradmin/interview-schedule">
                 <div class="form-grid">
                     <div class="form-group">
                         <label>Candidate</label>
-                        <select class="form-select" required>
+                        <select name="application_id" class="form-select" required>
                             <option value="">Select Candidate</option>
-                            <option value="1">John Smith - Senior Software Developer</option>
-                            <option value="2">Sarah Johnson - UI/UX Designer</option>
-                            <option value="3">Mike Wilson - Project Manager</option>
+                            <?php if(!empty($available_candidates)): ?>
+                                <?php foreach($available_candidates as $candidate): ?>
+                                    <option value="<?= $candidate['application_id'] ?>">
+                                        <?= htmlspecialchars($candidate['candidate_name']) ?> - <?= htmlspecialchars($candidate['job_title']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Interviewer</label>
-                        <select class="form-select" required>
+                        <select name="interviewer_id" class="form-select" required>
                             <option value="">Select Interviewer</option>
-                            <option value="1">Sarah Johnson - Engineering Manager</option>
-                            <option value="2">Mike Wilson - Design Lead</option>
-                            <option value="3">Emily Chen - HR Manager</option>
+                            <?php if(!empty($interviewers)): ?>
+                                <?php foreach($interviewers as $interviewer): ?>
+                                    <option value="<?= $interviewer['id'] ?>">
+                                        <?= htmlspecialchars($interviewer['full_name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
                         </select>
                     </div>
                     <div class="form-group">
                         <label>Interview Date</label>
-                        <input type="date" class="form-input" required>
+                        <input type="date" name="scheduled_date" class="form-input" required>
                     </div>
                     <div class="form-group">
                         <label>Start Time</label>
-                        <input type="time" class="form-input" required>
+                        <input type="time" name="scheduled_time" class="form-input" required>
                     </div>
                     <div class="form-group">
                         <label>Duration (minutes)</label>
-                        <select class="form-select">
+                        <select name="duration_minutes" class="form-select">
                             <option value="30">30 minutes</option>
                             <option value="45">45 minutes</option>
                             <option value="60" selected>1 hour</option>
@@ -408,29 +432,34 @@
                     </div>
                     <div class="form-group">
                         <label>Interview Type</label>
-                        <select class="form-select" required>
+                        <select name="interview_type" class="form-select" required>
                             <option value="">Select Type</option>
-                            <option value="phone">Phone Screen</option>
-                            <option value="video">Video Interview</option>
-                            <option value="in-person">In-Person</option>
-                            <option value="technical">Technical Interview</option>
-                            <option value="panel">Panel Interview</option>
+                            <option value="Phone">Phone Screen</option>
+                            <option value="Video">Video Interview</option>
+                            <option value="In-Person">In-Person</option>
+                            <option value="Technical">Technical Interview</option>
+                            <option value="Panel">Panel Interview</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Location / Meeting Link</label>
-                        <input type="text" class="form-input" placeholder="Conference Room A or Zoom link">
+                        <label>Location</label>
+                        <input type="text" name="location" class="form-input" placeholder="Conference Room A, Office Building, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Meeting Link (Optional)</label>
+                        <input type="url" name="meeting_link" class="form-input" placeholder="https://zoom.us/j/123456789 or other meeting link">
                     </div>
                     <div class="form-group full-width">
                         <label>Notes</label>
-                        <textarea class="form-textarea" rows="3" placeholder="Interview agenda, special instructions, etc."></textarea>
+                        <textarea name="notes" class="form-textarea" rows="3" placeholder="Interview agenda, special instructions, etc."></textarea>
                     </div>
+                    <input type="hidden" name="status" value="Scheduled">
                 </div>
             </form>
         </div>
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeScheduleModal()">Cancel</button>
-            <button class="btn btn-primary" onclick="saveInterview()">Schedule Interview</button>
+            <button class="btn btn-primary" onclick="document.querySelector('.schedule-form').submit()">Schedule Interview</button>
         </div>
     </div>
 </div>
@@ -759,6 +788,139 @@
         grid-column: span 1;
     }
 }
+</style>
+
+/* Modern HR Admin Design System */
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        --card-hover-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        --border-radius: 16px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .dashboard-content {
+        background: var(--background-gradient);
+        min-height: 100vh;
+        padding: 2rem;
+    }
+
+    .hero-section {
+        background: linear-gradient(135deg, #4c63d2 0%, #5a67d8 50%, #667eea 100%);
+        color: white;
+        padding: 3rem 2.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2.5rem;
+        box-shadow: var(--card-shadow);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 2rem;
+        position: relative;
+    }
+
+    .hero-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.1);
+        border-radius: var(--border-radius);
+        pointer-events: none;
+    }
+
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: #ffffff;
+        text-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-description {
+        font-size: 1.125rem;
+        opacity: 1;
+        margin-bottom: 1.5rem;
+        color: rgba(255,255,255,0.95);
+        text-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-stats {
+        display: flex;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .hero-stat {
+        text-align: center;
+    }
+
+    .stat-number {
+        display: block;
+        font-size: 2.5rem;
+        font-weight: 700;
+    }
+
+    .stat-label {
+        font-size: 0.875rem;
+        opacity: 0.8;
+    }
+
+    .btn {
+        padding: 0.875rem 2rem;
+        border-radius: 12px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: var(--transition);
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #667eea;
+        box-shadow: 0 8px 25px rgba(255,255,255,0.3);
+    }
+
+    .btn-outline {
+        background: rgba(255,255,255,0.1);
+        color: white;
+        border: 2px solid rgba(255,255,255,0.3);
+    }
+
+    .interview-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        transition: var(--transition);
+        margin-bottom: 2rem;
+    }
+
+    .interview-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-hover-shadow);
+    }
+
+    /* Icons */
+    .icon-calendar-plus::before { content: '📅'; }
+    .icon-applications::before { content: '📋'; }
+
+    @media (max-width: 768px) {
+        .hero-section { flex-direction: column; text-align: center; }
+        .dashboard-content { padding: 1rem; }
+    }
 </style>
 
 <script>

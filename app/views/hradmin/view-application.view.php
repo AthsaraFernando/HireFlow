@@ -5,7 +5,7 @@
         <h1 class="page-title">Application Details</h1>
         <p class="page-description">Detailed view of candidate application and profile</p>
         <div class="action-buttons">
-            <a href="<?= ROOT ?>/hradmin/applications" class="btn btn-secondary">
+            <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications" class="btn btn-secondary">
                 <i class="icon-back"></i>Back to Applications
             </a>
             <button class="btn btn-primary" onclick="scheduleInterview()">
@@ -981,7 +981,7 @@ function sendEmail() {
 function rejectCandidate() {
     if (confirm('Are you sure you want to reject this candidate? This action cannot be undone.')) {
         alert('Candidate rejected');
-        window.location.href = '<?= ROOT ?>/hradmin/applications';
+        window.location.href = '<?= ROOT ?>/hradmin/applicant-database?tab=applications';
     }
 }
 

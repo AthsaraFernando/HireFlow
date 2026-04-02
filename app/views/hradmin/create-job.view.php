@@ -25,27 +25,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/applications" class="nav-link">
-                        <span class="nav-text">Applications</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/interview-schedule" class="nav-link">
-                        <span class="nav-text">Interviews</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/reports" class="nav-link">
-                        <span class="nav-text">Reports</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/profile" class="nav-link">
-                        <span class="nav-text">My Profile</span>
+                    <a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link">
+                        <span class="nav-text">Applicants & Applications</span>
                     </a>
                 </li>
             </ul>
         </nav>
+
         <div class="sidebar-footer">
             <a href="<?= ROOT ?>/signout" class="logout-btn">
                 <span>Logout</span>
@@ -55,329 +41,155 @@
 
     <div class="main-content">
         <header class="top-header">
-            <div class="header-left">
-                <button class="sidebar-toggle" id="sidebarToggle">
-                    <
-                </button>
-                <h1 class="page-title">Create Job Post</h1>
-            </div>
-
-            <div class="header-right">
-                <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div>
-
-                <div class="header-user">
-                    <div class="user-info">
-                        <span class="user-name">
-                            <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
-                        <span class="user-role">HR Administrator</span>
-                    </div>
-                    <div class="user-avatar">
-                    </div>
-                </div>
-            </div>
+            <h1 class="page-title">Create Job Post</h1>
         </header>
 
         <div class="dashboard-content">
             <div class="main-container">
-    <div class="header-section">
-        <h1 class="page-title">Create Job Post</h1>
-        <p class="page-description">Create a new job posting to attract candidates</p>
-        <div class="action-buttons">
-            <a href="<?= ROOT ?>/hradmin/job-posts" class="btn btn-secondary">
-                <i class="icon-back"></i>Back to Job Posts
-            </a>
+
+                <?php if(!empty($errors)): ?>
+                    <div class="alert alert-error">
+                        <?php foreach($errors as $error): ?>
+                            <p><?= $error ?></p>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+
+                <div class="form-container">
+                    <form method="POST" action="<?= ROOT ?>/hradmin/create-job" class="job-form">
+
+                        <!-- Basic Info -->
+                        <div class="form-section">
+                            <h3 class="section-title">Basic Information</h3>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Job Title *</label>
+                                    <input type="text" name="job_title" class="form-input"
+                                        value="<?= $_POST['job_title'] ?? '' ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Department *</label>
+                                    <select name="department_id" class="form-select" required>
+                                        <option value="">Select Department</option>
+                                        <?php foreach ($departments ?? [] as $dept): ?>
+                                            <option value="<?= $dept['id'] ?>"
+                                                <?= ($_POST['department_id'] ?? '') == $dept['id'] ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($dept['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Employment Type *</label>
+                                    <select name="employment_type" class="form-select" required>
+                                        <option value="">Select</option>
+                                        <option value="Full-time" <?= ($_POST['employment_type'] ?? '') == 'Full-time' ? 'selected' : '' ?>>Full-time</option>
+                                        <option value="Part-time" <?= ($_POST['employment_type'] ?? '') == 'Part-time' ? 'selected' : '' ?>>Part-time</option>
+                                        <option value="Contract" <?= ($_POST['employment_type'] ?? '') == 'Contract' ? 'selected' : '' ?>>Contract</option>
+                                        <option value="Internship" <?= ($_POST['employment_type'] ?? '') == 'Internship' ? 'selected' : '' ?>>Internship</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Experience Level *</label>
+                                    <select name="experience_level" class="form-select" required>
+                                        <option value="">Select</option>
+                                        <option value="entry" <?= ($_POST['experience_level'] ?? '') == 'entry' ? 'selected' : '' ?>>Entry</option>
+                                        <option value="mid" <?= ($_POST['experience_level'] ?? '') == 'mid' ? 'selected' : '' ?>>Mid</option>
+                                        <option value="senior" <?= ($_POST['experience_level'] ?? '') == 'senior' ? 'selected' : '' ?>>Senior</option>
+                                        <option value="executive" <?= ($_POST['experience_level'] ?? '') == 'executive' ? 'selected' : '' ?>>Executive</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Location *</label>
+                                    <input type="text" name="location" class="form-input"
+                                        value="<?= $_POST['location'] ?? '' ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Salary Range</label>
+                                    <input type="text" name="salary_range" class="form-input"
+                                        value="<?= $_POST['salary_range'] ?? '' ?>">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="form-section">
+                            <h3 class="section-title">Job Description</h3>
+
+                            <div class="form-group">
+                                <label class="form-label">Summary *</label>
+                                <textarea name="summary" class="form-textarea" required><?= $_POST['summary'] ?? '' ?></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Responsibilities</label>
+                                <textarea name="responsibilities" class="form-textarea"><?= $_POST['responsibilities'] ?? '' ?></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Requirements *</label>
+                                <textarea name="requirements" class="form-textarea" required><?= $_POST['requirements'] ?? '' ?></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Application -->
+                        <div class="form-section">
+                            <h3 class="section-title">Application Settings</h3>
+
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Deadline</label>
+                                    <input type="date" name="application_deadline" class="form-input"
+                                        value="<?= $_POST['application_deadline'] ?? '' ?>">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Status *</label>
+                                    <select name="status" id="status" class="form-select" required>
+                                        <option value="Draft" <?= ($_POST['status'] ?? 'Draft') == 'Draft' ? 'selected' : '' ?>>Draft</option>
+                                        <option value="Open" <?= ($_POST['status'] ?? '') == 'Open' ? 'selected' : '' ?>>Open</option>
+                                        <option value="Closed" <?= ($_POST['status'] ?? '') == 'Closed' ? 'selected' : '' ?>>Closed</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Hiring Manager</label>
+                                    <select name="hiring_manager" class="form-select">
+                                        <option value="">Select</option>
+                                        <?php foreach ($hiring_managers ?? [] as $manager): ?>
+                                            <option value="<?= $manager['id'] ?>"
+                                                <?= ($_POST['hiring_manager'] ?? '') == $manager['id'] ? 'selected' : '' ?>>
+                                                <?= htmlspecialchars($manager['full_name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" onclick="saveDraft()" class="btn btn-secondary">Save Draft</button>
+                            <button type="submit" class="btn btn-primary">Create Job</button>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
         </div>
     </div>
-
-    <?php if(!empty($errors)): ?>
-        <div class="alert alert-error">
-            <?php foreach($errors as $error): ?>
-                <p><?php echo $error ?></p>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-
-    <div class="form-container">
-        <form method="POST" action="<?= ROOT ?>/hradmin/create-job" class="job-form">
-            <!-- Basic Information -->
-            <div class="form-section">
-                <h3 class="section-title">Basic Information</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="job_title" class="form-label">Job Title *</label>
-                        <input type="text" id="job_title" name="job_title" class="form-input" 
-                               value="<?= $_POST['job_title'] ?? '' ?>" placeholder="e.g. Senior Software Developer" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="department" class="form-label">Department *</label>
-                        <select id="department" name="department" class="form-select" required>
-                            <option value="">Select Department</option>
-                            <?php if (!empty($departments)): ?>
-                                <?php foreach ($departments as $dept): ?>
-                                    <option value="<?= htmlspecialchars($dept['id']) ?>" data-name="<?= htmlspecialchars($dept['name']) ?>" <?= (isset($_POST['department']) && $_POST['department'] == $dept['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($dept['name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <option value="" disabled>No departments found</option>
-                            <?php endif; ?>
-                        </select>
-                    </div>
- 
-                    <div class="form-group">
-                        <label for="employment_type" class="form-label">Employment Type *</label>
-                        <select id="employment_type" name="employment_type" class="form-select" required>
-                            <option value="">Select Type</option>
-                            <option value="Full-time" <?= ($_POST['employment_type'] ?? '') == 'Full-time' ? 'selected' : '' ?>>Full-time</option>
-                            <option value="Part-time" <?= ($_POST['employment_type'] ?? '') == 'Part-time' ? 'selected' : '' ?>>Part-time</option>
-                            <option value="Contract" <?= ($_POST['employment_type'] ?? '') == 'Contract' ? 'selected' : '' ?>>Contract</option>
-                            <option value="Internship" <?= ($_POST['employment_type'] ?? '') == 'Internship' ? 'selected' : '' ?>>Internship</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="location" class="form-label">Location *</label>
-                        <input type="text" id="location" name="location" class="form-input" 
-                               value="<?= $_POST['location'] ?? '' ?>" placeholder="e.g. San Francisco, CA or Remote" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="salary_range" class="form-label">Salary Range</label>
-                        <input type="text" id="salary_range" name="salary_range" class="form-input" 
-                               value="<?= $_POST['salary_range'] ?? '' ?>" placeholder="e.g. $80,000 - $120,000">
-                    </div>
-                </div>
-            </div>
-
-            <!-- Job Description -->
-            <div class="form-section">
-                <h3 class="section-title">Job Description</h3>
-                <div class="form-group">
-                    <label for="description" class="form-label">Description *</label>
-                    <textarea id="description" name="description" class="form-textarea" rows="8" 
-                              placeholder="Brief overview of the role and its importance to the company" required><?= $_POST['description'] ?? '' ?></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="requirements" class="form-label">Requirements *</label>
-                    <textarea id="requirements" name="requirements" class="form-textarea" rows="8" 
-                              placeholder="• Education requirements&#10;• Years of experience needed&#10;• Technical skills required&#10;• Soft skills preferred" required><?= $_POST['requirements'] ?? '' ?></textarea>
-                </div>
-            </div>
-
-            <!-- Application Settings -->
-            <div class="form-section">
-                <h3 class="section-title">Application Settings</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="application_deadline" class="form-label">Application Deadline</label>
-                        <input type="date" id="application_deadline" name="application_deadline" class="form-input" 
-                               value="<?= $_POST['application_deadline'] ?? '' ?>">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="status" class="form-label">Status *</label>
-                        <select id="status" name="status" class="form-select" required>
-                            <option value="Draft" <?= ($_POST['status'] ?? 'Draft') == 'Draft' ? 'selected' : '' ?>>Draft</option>
-                            <option value="Open" <?= ($_POST['status'] ?? '') == 'Open' ? 'selected' : '' ?>>Open</option>
-                            <option value="Closed" <?= ($_POST['status'] ?? '') == 'Closed' ? 'selected' : '' ?>>Closed</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="hiring_manager" class="form-label">Hiring Manager (Recruitment Manager)</label>
-                        <select id="hiring_manager" name="hiring_manager" class="form-select">
-                            <option value="">Select Hiring Manager</option>
-                            <?php if (!empty($hiring_managers)): ?>
-                                <?php foreach ($hiring_managers as $manager): ?>
-                                    <option value="<?= htmlspecialchars($manager['id']) ?>" <?= (isset($_POST['hiring_manager']) && $_POST['hiring_manager'] == $manager['id']) ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($manager['full_name']) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            <?php else: ?>
-                                <option value="" disabled>No recruitment managers found</option>
-                            <?php endif; ?>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="form-actions">
-                <button type="button" class="btn btn-secondary" onclick="saveDraft()">Save as Draft</button>
-                <button type="submit" class="btn btn-primary">
-                    <i class="icon-save"></i>Create Job Post
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<style>
-.form-container {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 2rem;
-    margin-top: 1.5rem;
-}
-
-.form-section {
-    margin-bottom: 2.5rem;
-}
-
-.form-section:last-child {
-    margin-bottom: 0;
-}
-
-.section-title {
-    color: #2c3e50;
-    margin-bottom: 1.5rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-    border-bottom: 2px solid #f1f3f4;
-    padding-bottom: 0.5rem;
-}
-
-.form-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-}
-
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-    color: #2c3e50;
-}
-
-.form-input, .form-select, .form-textarea {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid #ced4da;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-    outline: none;
-    border-color: #4e31aa;
-    box-shadow: 0 0 0 3px rgba(78, 49, 170, 0.1);
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding-top: 2rem;
-    border-top: 1px solid #e9ecef;
-    margin-top: 2rem;
-}
-
-.form-actions .btn {
-    min-width: 150px;
-}
-
-/* Required field indicator */
-.form-label::after {
-    content: ' *';
-    color: #dc3545;
-}
-
-.form-label:not([for$="_required"])::after {
-    content: '';
-}
-
-/* Icon styles */
-.icon-back::before { content: '←'; }
-.icon-save::before { content: ''; }
-
-/* Responsive design */
-@media (max-width: 768px) {
-    .form-grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-    }
-    
-    .form-actions .btn {
-        width: 100%;
-    }
-}
-</style>
 
 <script>
 function saveDraft() {
-    // Set status to draft and submit form
-    document.getElementById('status').value = 'draft';
+    document.getElementById('status').value = 'Draft';
     document.querySelector('.job-form').submit();
 }
-
-// Auto-save functionality (optional)
-let autoSaveTimeout;
-function autoSave() {
-    clearTimeout(autoSaveTimeout);
-    autoSaveTimeout = setTimeout(() => {
-        // Save form data to localStorage or send AJAX request
-        console.log('Auto-saving form data...');
-    }, 30000); // Save every 30 seconds
-}
-
-// Add event listeners for auto-save
-document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(element => {
-    element.addEventListener('input', autoSave);
-});
-
-// Load saved data on page load
-document.addEventListener('DOMContentLoaded', function() {
-    // Load any previously saved data
-});
-
-// Sidebar toggle functionality
-document.getElementById('sidebarToggle').addEventListener('click', function () {
-    document.querySelector('.sidebar').classList.toggle('collapsed');
-    document.querySelector('.main-content').classList.toggle('expanded');
-});
-
-document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
-    if (e.target.textContent.trim() === ">") {
-        e.target.textContent = "<";
-    } else {
-        e.target.textContent = ">";
-    }
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const currentPath = window.location.pathname;
-    const navLinks = document.querySelectorAll('.nav-link');
-
-    navLinks.forEach(link => {
-        if (link.getAttribute('href').includes(currentPath)) {
-            navLinks.forEach(l => l.classList.remove('active'));
-            link.classList.add('active');
-        }
-    });
-});
 </script>
-
-        </div>
-    </div>
 
 <?php $this->view('components/footer') ?>
