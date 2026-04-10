@@ -92,7 +92,8 @@
     }
 
     .search-btn:hover {
-        background: #3b2693;
+        /* background: #3b2693; */
+        color: white;
     }
 
     .controls-right {
@@ -162,11 +163,13 @@
         background: transparent;
         border: 1px solid #d1d5db;
         color: #374151;
+
     }
 
     .btn-outline:hover {
         background: #f9fafb;
         border-color: #9ca3af;
+        color: black;
     }
 
     .info-note {

@@ -96,7 +96,8 @@
     }
 
     .search-btn:hover {
-        background: #3b2693;
+        /* background: #3b2693; */
+        color: white
     }
 
     .controls-right {
@@ -171,6 +172,7 @@
     .btn-outline:hover {
         background: #f9fafb;
         border-color: #9ca3af;
+        color: black;
     }
 
     .info-note {
@@ -727,6 +729,8 @@
                         button.textContent = 'Create Staff Account';
                         button.onclick = saveUser;
                     } else if (action === 'edit') {
+                        document.querySelector('input[name="password"]').setAttribute('disabled',true);
+                        document.querySelector('input[name="confirmPassword"]').setAttribute('disabled',true);
                         title.textContent = 'Edit User';
                         button.textContent = 'Update User';
                         modal.setAttribute('data-user-id', userId);
@@ -1134,12 +1138,12 @@
                 }
 
                 // Select all functionality
-                document.getElementById('selectAll').addEventListener('change', function () {
-                    const checkboxes = document.querySelectorAll('.user-checkbox');
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = this.checked;
-                    });
-                });
+                // document.getElementById('selectAll').addEventListener('change', function () {
+                //     const checkboxes = document.querySelectorAll('.user-checkbox');
+                //     checkboxes.forEach(checkbox => {
+                //         checkbox.checked = this.checked;
+                //     });
+                // });
 
                 function showToast(message, type) {
                     const toast = document.createElement('div');
