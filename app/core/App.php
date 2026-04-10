@@ -101,7 +101,7 @@ class App
     {
         // Define public pages that don't require authentication
         $publicPages = [
-            'home', 'signin', 'signup', 'signout', '_404',
+            'home', 'signin', 'signup', 'signout', '_404','passwordreset',
             'password-reset', 'admin-setup'
         ];
         

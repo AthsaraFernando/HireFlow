@@ -92,7 +92,8 @@
     }
 
     .search-btn:hover {
-        background: #3b2693;
+        /* background: #3b2693; */
+        color: white;
     }
 
     .controls-right {
@@ -162,11 +163,13 @@
         background: transparent;
         border: 1px solid #d1d5db;
         color: #374151;
+
     }
 
     .btn-outline:hover {
         background: #f9fafb;
         border-color: #9ca3af;
+        color: black;
     }
 
     .info-note {
@@ -475,6 +478,8 @@
                             <option value="db_backup">Database Backup</option>
                             <option value="db_restore">Database Restore</option>
                             <option value="db_backup_download">Database Backup Download</option>
+                            <option value="password_reset_request">Password Reset Request</option>
+                            <option value="password_change">Password Change</option>
 
                         </select>
                     </div>

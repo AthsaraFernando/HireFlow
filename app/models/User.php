@@ -177,8 +177,7 @@ class User
         $user = $this->first(['email' => $email], []);
         if ($user) {
             $token = bin2hex(random_bytes(32));
-            $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
-
+            $expires = date('Y-m-d H:i:s', strtotime('+20 minutes'));
             $this->update($user['id'], [
                 'password_reset_token' => $token,
                 'password_reset_expires' => $expires
@@ -191,20 +190,19 @@ class User
 
     public function resetPassword($token, $newPassword)
     {
-        // $user = $this->first([
-        //     'password_reset_token' => $token,
-        //     'password_reset_expires >' => date('Y-m-d H:i:s')
-        // ], []);
-
-        if ($_SESSION['USER_ID']) {
+        $user = $this->first([
+            'password_reset_token' => $token
+            // ,'password_reset_expires' => date('Y-m-d H:i:s')
+        ], []);
+        if ($user['id']) {
             $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-            $this->update($_SESSION['USER_ID'], [
+            $this->update($user['id'], [
                 'password' => $hashedPassword,
-                // 'password_reset_token' => null,
-                // 'password_reset_expires' => null,
-                // 'updated_at' => date('Y-m-d H:i:s')
+                'password_reset_token' => null,
+                'password_reset_expires' => null,
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
-            return true;
+            return $user;
         }
         return false;
     }

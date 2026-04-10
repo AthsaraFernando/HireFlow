@@ -31,7 +31,8 @@
                         <?php if (!empty($debug_token)): ?>
                              <hr>
                          <!--   Reset Token: <code><?= esc($debug_token) ?></code><br> -->
-                            Reset Link: <a href="<?= esc($debug_link) ?>" target="_blank">Click Here to Reset</a>
+                        <!-- Remove below link in production -->
+                         <!-- Reset Link: <a href="<?= esc($debug_link) ?>" target="_blank">Click Here to Reset</a> -->
                         <?php endif; ?>
                     </div>
 

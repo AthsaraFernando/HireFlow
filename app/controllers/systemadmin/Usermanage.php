@@ -192,6 +192,27 @@ class Usermanage extends Controller
         }
     }
 
+    public function sendAccountCreationEmail($email, $initialPassword)
+    {
+        $loginLink = ROOT . '/';
+        $subject = 'Your HireFlow account is ready';
+        $htmlBody = "
+                <p>Hello,</p>
+                <p>Your HireFlow account has been created.</p>
+                <p>Email: {$email}</p>
+                <p>Temporary Password: {$initialPassword}</p>
+                <p>You can log in here:</p>
+                <p><a href=\"{$loginLink}\">Login</a></p>
+                <p>Please change your password after logging in.</p>
+                <p>If you did not expect this account, you can ignore this email.</p>
+        ";
+        $textBody = "Your HireFlow account has been created.\n
+        Email: {$email}\n
+        Temporary Password: {$initialPassword}\n
+        Login: {$loginLink}\n
+        Please change your password in the Profile section after logging in.";
+        Mailer::send($email, $subject, $htmlBody, '', $textBody);
+    }
     public function handleCreateUser(&$data, $user)
     {
         $firstName = trim($_POST['firstName'] ?? '');
@@ -253,6 +274,7 @@ class Usermanage extends Controller
         ];
 
         if ($user->createUser($userData)) {
+            $this->sendAccountCreationEmail($userData['email'], $userData['password']);
             AccessLog::log('user_created', 'Created user: ' . $email);
             $data['success'] = true;
             $data['message'] = 'Staff account created successfully!';
