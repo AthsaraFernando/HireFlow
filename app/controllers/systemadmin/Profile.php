@@ -52,7 +52,7 @@ class Profile extends Controller
                 } else {
                     // Verify current password
                     $currentUser = $user->first(['id' => $_SESSION['USER']['id']]);
-                    if (!$currentUser || !password_verify($data['current_password'], $currentUser->password)) {
+                    if (!$currentUser || !password_verify($data['current_password'], $currentUser['password'])) {
                         $errors[] = "Current password is incorrect";
                     }
                 }
