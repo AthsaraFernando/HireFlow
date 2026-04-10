@@ -475,6 +475,8 @@
                             <option value="db_backup">Database Backup</option>
                             <option value="db_restore">Database Restore</option>
                             <option value="db_backup_download">Database Backup Download</option>
+                            <option value="password_reset_request">Password Reset Request</option>
+                            <option value="password_change">Password Change</option>
 
                         </select>
                     </div>
