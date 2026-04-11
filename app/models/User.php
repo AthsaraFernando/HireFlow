@@ -91,7 +91,7 @@ class User
         // Find user by email
         $arr['email'] = $data['email'];
         $row = $user->first($arr, []);
-        
+
         if ($row) {
             // Check if account is active
             if (isset($row['status']) && $row['status'] !== 'active') {
@@ -105,7 +105,7 @@ class User
                 if (isset($data['role_id'])) {
                     $posted_role_id = (int) $data['role_id'];
                     $db_role_id = (int) $row['role_id'];
-                    
+
                     if ($db_role_id !== $posted_role_id) {
                         $this->errors['role_id'] = "Invalid user type";
                         return false;
@@ -114,13 +114,13 @@ class User
 
                 // Update last login
                 $this->updateLastLogin($row['id']);
-                
+
                 // Set session
                 $_SESSION['USER'] = $row;
                 $_SESSION['USER_ID'] = $row['id'];
                 $_SESSION['USER_ROLE'] = $row['role_id'];
                 $_SESSION['LOGIN_TIME'] = time();
-                
+
                 return true;
             } else {
                 $this->errors['password'] = "Invalid password";
@@ -177,13 +177,12 @@ class User
         $user = $this->first(['email' => $email], []);
         if ($user) {
             $token = bin2hex(random_bytes(32));
-            $expires = date('Y-m-d H:i:s', strtotime('+1 hour'));
-            
+            $expires = date('Y-m-d H:i:s', strtotime('+20 minutes'));
             $this->update($user['id'], [
                 'password_reset_token' => $token,
                 'password_reset_expires' => $expires
             ]);
-            
+
             return $token;
         }
         return false;
@@ -192,11 +191,10 @@ class User
     public function resetPassword($token, $newPassword)
     {
         $user = $this->first([
-            'password_reset_token' => $token,
-            'password_reset_expires >' => date('Y-m-d H:i:s')
+            'password_reset_token' => $token
+            // ,'password_reset_expires' => date('Y-m-d H:i:s')
         ], []);
-
-        if ($user) {
+        if ($user['id']) {
             $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
             $this->update($user['id'], [
                 'password' => $hashedPassword,
@@ -204,7 +202,7 @@ class User
                 'password_reset_expires' => null,
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
-            return true;
+            return $user;
         }
         return false;
     }
@@ -215,7 +213,7 @@ class User
                   FROM users u 
                   LEFT JOIN roles r ON u.role_id = r.id 
                   WHERE u.id = ?";
-        
+
         $result = $this->query($query, [$userId]);
         return $result ? $result[0] : false;
     }
@@ -261,4 +259,30 @@ class User
 
         return empty($this->errors);
     }
+
+    public function getUserCount()
+    {
+        $query = "SELECT COUNT(*) AS total FROM {$this->table}";
+        $result = $this->query($query);
+        return $result ? (int) $result[0]['total'] : 0;
+    }
+
+    public function getUsersWithRoles()
+    {
+        $query = "SELECT u.*, r.role_name 
+                  FROM users u 
+                  LEFT JOIN roles r ON u.role_id = r.id 
+                  ORDER BY u.created_at DESC";
+
+        return $this->query($query) ?: [];
+    }
+
+    public function getUserStatus()
+    {
+        $query = "SELECT status, COUNT(*) AS statusCount
+                  FROM users
+                  GROUP BY status";
+        return $this->query(query: $query) ?: [];
+    }
+
 }

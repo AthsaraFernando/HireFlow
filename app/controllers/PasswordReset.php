@@ -5,7 +5,7 @@ class PasswordReset extends Controller
     public function index()
     {
         $data = [];
-        
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Check for CSRF token
             if (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
@@ -15,7 +15,7 @@ class PasswordReset extends Controller
             }
 
             $email = trim($_POST['email']);
-            
+
             if (empty($email)) {
                 $data['errors']['email'] = "Email is required";
             } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -23,23 +23,40 @@ class PasswordReset extends Controller
             } else {
                 $user = new User();
                 $token = $user->generatePasswordResetToken($email);
-                
+
                 if ($token) {
-                    // In a real application, you would send an email here
                     // For now, we'll just show a success message
-                    $data['success'] = "If an account with that email exists, you will receive password reset instructions.";
-                    
+                    $data['success'] = "If an account with that email exists, you will receive password reset link.";
+
                     // Log password reset request
                     AccessLog::log('password_reset_request', 'Password reset requested for: ' . $email);
-                    
+
                     // For development, you might want to show the token
+                    // Remove below data in production
                     if (DEBUG) {
                         $data['debug_token'] = $token;
-                        $data['debug_link'] = ROOT . '/password-reset/reset?token=' . $token;
+                        $data['debug_link'] = ROOT . '/passwordreset/reset?token=' . $token;
                     }
+
+                    $resetLink = ROOT . '/passwordreset/reset?token=' . urlencode($token);
+                    $subject = 'Reset your HireFlow password';
+                    $htmlBody = "
+                        <p>Hello,</p>
+                        <p>We received a request to reset your HireFlow password.</p>
+                        <p>Click the link below to reset your password:</p>
+                        <p><a href=\"{$resetLink}\">Reset Password</a></p>
+                        <p>If the button does not work, copy and paste this URL:</p>
+                        <p>{$resetLink}</p>
+                        <p>This link will expire in 20 mins.</p>
+                        <p>If you did not request this, you can ignore this email.</p>
+                    ";
+                    $textBody = "Reset your HireFlow password: {$resetLink} (expires in 20 mins).";
+                    // Do not expose mail delivery status to the UI for account enumeration safety.
+                    Mailer::send($email, $subject, $htmlBody, '', $textBody);
+
                 } else {
                     // Don't reveal if email exists or not for security
-                    $data['success'] = "If an account with that email exists, you will receive password reset instructions.";
+                    $data['success'] = "If an account with that email exists, you will receive password reset link.";
                 }
             }
         }
@@ -52,7 +69,6 @@ class PasswordReset extends Controller
     {
         $data = [];
         $token = $_GET['token'] ?? '';
-        
         if (empty($token)) {
             redirect('password-reset');
             return;
@@ -68,14 +84,14 @@ class PasswordReset extends Controller
 
             $password = $_POST['password'];
             $confirmPassword = $_POST['confirm_password'];
-            
+
             // Validate password
             if (empty($password)) {
                 $data['errors']['password'] = "Password is required";
             } elseif (!preg_match('/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/', $password)) {
                 $data['errors']['password'] = "Password must be at least 8 characters and include uppercase, lowercase, number, and special character";
             }
-            
+
             if (empty($confirmPassword)) {
                 $data['errors']['confirm_password'] = "Please confirm your password";
             } elseif ($password !== $confirmPassword) {
@@ -84,10 +100,11 @@ class PasswordReset extends Controller
 
             if (empty($data['errors'])) {
                 $user = new User();
-                if ($user->resetPassword($token, $password)) {
+                $resettedUser = $user->resetPassword($token, $password);
+                if ($resettedUser) {
                     // Log successful password reset
-                    AccessLog::log('password_reset_success', 'Password successfully reset');
-                    
+                    AccessLog::log('password_change', 'Password successfully reset', $resettedUser['id'], 0, $resettedUser['role_id']);
+
                     redirect('signin?password_reset=1');
                     return;
                 } else {

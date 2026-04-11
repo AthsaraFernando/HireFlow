@@ -32,6 +32,13 @@ spl_autoload_register(function ($className) {
 });
 
 // Use __DIR__ to ensure we load project files, not system files
+
+// Load Composer autoloader (for PHPMailer and other vendor packages)
+$composerAutoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
+if (file_exists($composerAutoload)) {
+    require_once $composerAutoload;
+}
+
 require __DIR__ . '/config.php';
 require __DIR__ . '/functions.php';
 require __DIR__ . '/Database.php';

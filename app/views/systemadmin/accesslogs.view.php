@@ -1,9 +1,6 @@
 <?php $this->view('components/header') ?>
 
 <style>
-    /* Page Controls Styling - Full Width */
-
-    /* Page Header inside Controls */
     .page-header {
         padding: 25px 25px 20px 25px;
         border-bottom: 1px solid #e5e7eb;
@@ -25,7 +22,6 @@
         color: rgba(255, 255, 255, 0.9);
     }
 
-    /* Statistics Cards */
     .controls-stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -96,7 +92,8 @@
     }
 
     .search-btn:hover {
-        background: #3b2693;
+        /* background: #3b2693; */
+        color: white;
     }
 
     .controls-right {
@@ -166,11 +163,13 @@
         background: transparent;
         border: 1px solid #d1d5db;
         color: #374151;
+
     }
 
     .btn-outline:hover {
         background: #f9fafb;
         border-color: #9ca3af;
+        color: black;
     }
 
     .info-note {
@@ -188,7 +187,6 @@
         color: #0369a1;
     }
 
-    /* Table Container inside Page Controls */
     .page-controls .table-container {
         margin: 20px 25px 0 25px;
         border-radius: 8px;
@@ -204,7 +202,6 @@
         margin: 20px 25px 25px 25px;
     }
 
-    /* Proper full width within content area */
     .dashboard-content {
         padding: 20px;
         width: 100%;
@@ -232,7 +229,6 @@
         color: #6b7280;
     }
 
-    /* Icon Styles */
     .icon-search::before {
         content: "🔍";
     }
@@ -251,7 +247,6 @@
 
 
 
-    /* Responsive Design */
     @media (max-width: 768px) {
         .page-header {
             padding: 20px 20px 15px 20px;
@@ -341,6 +336,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/systemadmin/backuprestore" class="nav-link">
+                        <span class="nav-text">Backup & Restore</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -407,22 +407,18 @@
                     <div class="metric-card">
                         <div class="metric-value"><?= number_format($total_logs ?? 0) ?></div>
                         <div class="metric-label">Total Logins Today</div>
-                        <!-- <div class="metric-change positive">+15% from yesterday</div> -->
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= number_format($unique_users_today ?? 0) ?></div>
                         <div class="metric-label">Unique Users</div>
-                        <!-- <div class="metric-change positive">+8 new users</div> -->
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= number_format($failed_logins_today ?? 0) ?></div>
                         <div class="metric-label">Failed Attempts</div>
-                        <!-- <div class="metric-change negative">+4 from yesterday</div> -->
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= count($blocked_ips ?? []) ?></div>
                         <div class="metric-label">Suspicious Activities</div>
-                        <!-- <div class="metric-change warning">Requires attention</div> -->
                     </div>
                 </div>
 
@@ -432,22 +428,17 @@
                             <input type="text" placeholder="Search by user, IP address, or action..."
                                 class="search-input" id="logSearch">
                             <button class="search-btn" onclick="searchLogs()">
-                                <!-- <i class="icon-search"></i> -->Search
+                                Search
                             </button>
                         </div>
                     </div>
                     <div class="controls-right">
                         <button class="btn btn-primary" onclick="exportLogs()">
-                            <!-- <i class="icon-download"></i> -->
                             Export Logs
                         </button>
                         <button class="btn btn-secondary" onclick="refreshLogs()">
-                            <!-- <i class="icon-refresh"></i> -->
                             Refresh
                         </button>
-                        <!-- <button class="btn btn-warning" onclick="clearOldLogs()">
-                    <i class="icon-trash"></i>Clear Old
-                </button> -->
                     </div>
                 </div>
 
@@ -462,10 +453,10 @@
                         <label>Filter by User:</label>
                         <select class="filter-select" id="userFilter">
                             <option value="">All Users</option>
-                            <option value="system_admin">System Admins</option>
-                            <option value="hr_admin">HR Admins</option>
-                            <option value="recruitment_manager">Recruitment Managers</option>
-                            <option value="applicant">Applicants</option>
+                            <option value="System Admin">System Admin</option>
+                            <option value="HR Admin">HR Admin</option>
+                            <option value="Recruitment Manager">Recruitment Manager</option>
+                            <option value="Applicant">Applicant</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -475,10 +466,29 @@
                             <option value="login">Login</option>
                             <option value="logout">Logout</option>
                             <option value="failed_login">Failed Login</option>
-                            <option value="password_change">Password Change</option>
+                            <option value="password_change_request">Password Change Request</option>
                             <option value="profile_update">Profile Update</option>
-                            <option value="data_access">Data Access</option>
-                            <option value="admin_action">Admin Action</option>
+                            <option value="password_change">Password Change</option>
+                            <option value="registration">Registration</option>
+                            <option value="user_updated">User Updated</option>
+                            <option value="user_deleted">User Deleted</option>
+                            <option value="user_status_changed">User Status Changed</option>
+                            <option value="user_created">User Created</option>
+                            <option value="application_submit">Application Submit</option>
+                            <option value="db_backup">Database Backup</option>
+                            <option value="db_restore">Database Restore</option>
+                            <option value="db_backup_download">Database Backup Download</option>
+                            <option value="password_reset_request">Password Reset Request</option>
+                            <option value="password_change">Password Change</option>
+
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Filter by Flag:</label>
+                        <select class="filter-select" id="flagFilter">
+                            <option value="">Unflagged</option>
+                            <option value="unflagged">Unflagged</option>
+                            <option value="flagged">Flagged</option>
                         </select>
                     </div>
                     <div class="filter-actions">
@@ -494,176 +504,48 @@
                             <tr>
                                 <th>ID</th>
                                 <th>User ID</th>
+                                <th>User Role</th>
                                 <th>IP Address</th>
                                 <th>Action</th>
                                 <th>Details</th>
                                 <th>User Agent</th>
+                                <th>Flagged</th>
                                 <th>Created At</th>
                             </tr>
                         </thead>
                         <tbody>
+                            <?php
+                            $roles = [
+                                1 => 'System Admin',
+                                2 => 'HR Admin',
+                                3 => 'Recruitment Manager',
+                                4 => 'Applicant'
+                            ];
+                            ?>
                             <?php if (!empty($logs)): ?>
                                 <?php foreach ($logs as $log): ?>
                                     <tr>
                                         <td><?= $log['id'] ?></td>
                                         <td><?= $log['user_id'] ?></td>
+                                        <td><?= $roles[$log['user_role']] ?? 'Unknown' ?></td>
                                         <td><?= $log['ip_address'] ?></td>
                                         <td><?= $log['action'] ?></td>
                                         <td><?= $log['details'] ?></td>
                                         <td><?= $log['user_agent'] ?></td>
+                                        <td>
+                                            <input data-log-id="<?= $log['id'] ?>" class="flagged-checkbox"
+                                                style="width: 25px; height: 25px;" type="checkbox" <?= $log['flagged'] ? 'checked' : '' ?>>
+                                        </td>
                                         <td><?= $log['created_at'] ?></td>
                                     </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <tr>
-                                    <td colspan="8" style="text-align: center; padding: 2rem;">
+                                    <td colspan="9" style="text-align: center; padding: 2rem;">
                                         <p>No access logs found.</p>
                                     </td>
                                 </tr>
                             <?php endif; ?>
-                            <!-- <tr>
-                                <td>2024-01-15 14:32:15</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">JD</div>
-                                        <div>
-                                            <div class="user-name">John Doe</div>
-                                            <div class="user-email">john.doe@company.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge system-admin">System Admin</span></td>
-                                <td><span class="action-badge login">Login</span></td>
-                                <td>192.168.1.100</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">Chrome 120.0
-                                    (Windows)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(1)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:30:22</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">MS</div>
-                                        <div>
-                                            <div class="user-name">Mary Smith</div>
-                                            <div class="user-email">mary.smith@company.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge hr-admin">HR Admin</span></td>
-                                <td><span class="action-badge data-access">Data Access</span></td>
-                                <td>192.168.1.105</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36">Chrome
-                                    120.0 (macOS)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(2)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:28:45</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">UK</div>
-                                        <div>
-                                            <div class="user-name">Unknown User</div>
-                                            <div class="user-email">test@suspicious.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge unknown">Unknown</span></td>
-                                <td><span class="action-badge failed-login">Failed Login</span></td>
-                                <td>203.145.67.89</td>
-                                <td class="user-agent" title="Bot/Crawler attempting access">Suspicious Bot Activity
-                                </td>
-                                <td><span class="status-badge error">Failed</span></td>
-                                <td>
-                                    <button class="btn-icon warning" onclick="viewLogDetails(3)" title="View Details">
-                                        <i class="icon-warning"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:25:12</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">RJ</div>
-                                        <div>
-                                            <div class="user-name">Robert Johnson</div>
-                                            <div class="user-email">robert.johnson@company.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge recruitment-manager">Recruitment Manager</span></td>
-                                <td><span class="action-badge profile-update">Profile Update</span></td>
-                                <td>192.168.1.112</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">Edge 120.0
-                                    (Windows)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(4)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:20:33</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">LD</div>
-                                        <div>
-                                            <div class="user-name">Lisa Davis</div>
-                                            <div class="user-email">lisa.davis@email.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge applicant">Applicant</span></td>
-                                <td><span class="action-badge login">Login</span></td>
-                                <td>203.123.45.67</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (iPhone; CPU iPhone OS 17_1 like Mac OS X) AppleWebKit/605.1.15">
-                                    Safari (iOS)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(5)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2024-01-15 14:18:15</td>
-                                <td>
-                                    <div class="user-info">
-                                        <div class="user-avatar">JD</div>
-                                        <div>
-                                            <div class="user-name">John Doe</div>
-                                            <div class="user-email">john.doe@company.com</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><span class="role-badge system-admin">System Admin</span></td>
-                                <td><span class="action-badge admin-action">Admin Action</span></td>
-                                <td>192.168.1.100</td>
-                                <td class="user-agent"
-                                    title="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36">Chrome 120.0
-                                    (Windows)</td>
-                                <td><span class="status-badge success">Success</span></td>
-                                <td>
-                                    <button class="btn-icon" onclick="viewLogDetails(6)" title="View Details">
-                                        <i class="icon-eye"></i>
-                                    </button>
-                                </td>
-                            </tr> -->
                         </tbody>
                     </table>
                 </div>
@@ -683,61 +565,6 @@
                 </div>
             </div>
 
-            <!-- Log Details Modal -->
-            <div id="logDetailsModal" class="modal">
-                <div class="modal-content large">
-                    <div class="modal-header">
-                        <h2>Access Log Details</h2>
-                        <span class="close" onclick="closeLogDetailsModal()">&times;</span>
-                    </div>
-                    <div class="modal-body">
-                        <div class="log-detail-grid">
-                            <div class="detail-item">
-                                <label>Timestamp:</label>
-                                <span id="detailTimestamp">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>User:</label>
-                                <span id="detailUser">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Role:</label>
-                                <span id="detailRole">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Action:</label>
-                                <span id="detailAction">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>IP Address:</label>
-                                <span id="detailIP">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Location:</label>
-                                <span id="detailLocation">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>User Agent:</label>
-                                <span id="detailUserAgent">-</span>
-                            </div>
-                            <div class="detail-item">
-                                <label>Session ID:</label>
-                                <span id="detailSession">-</span>
-                            </div>
-                            <div class="detail-item full-width">
-                                <label>Additional Details:</label>
-                                <div id="detailAdditional">-</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" onclick="closeLogDetailsModal()">Close</button>
-                        <button type="button" class="btn btn-warning" onclick="flagSuspicious()">Flag as
-                            Suspicious</button>
-                    </div>
-                </div>
-            </div>
-
             <script>
                 // Initialize filters with today's date
                 document.addEventListener('DOMContentLoaded', function () {
@@ -749,11 +576,50 @@
                     document.getElementById('startDate').value = weekAgo.toISOString().split('T')[0];
                 });
 
+                document.querySelectorAll('.flagged-checkbox').forEach(cb => {
+                    cb.addEventListener('change', function () {
+                        updateFlag(this);
+                    });
+                });
+
+                function updateFlag(checkbox) {
+                    const flagValue = checkbox.checked ? 1 : 0;
+                    const logId = checkbox.getAttribute('data-log-id');
+                    const formData = new FormData();
+                    formData.append('flag_value', flagValue);
+                    formData.append('log_id', logId);
+                    formData.append('csrf_token', '<?= $csrf_token ?>');
+
+                    fetch(`/HireFlow/public/systemadmin/accesslogs/updateFlag/details/${logId}`, { // details(action) and id(value) is passed for route testing
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                showToast('Flag updated successfully!', 'success');
+                                // setTimeout(() => {
+                                //     location.reload();
+                                // }, 1000);
+                            }
+                            else {
+                                showToast('Failed to update flag', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            showToast('Failed to update flag', 'error');
+                        });
+
+
+                }
+
                 function applyFilters() {
                     const startDate = document.getElementById('startDate').value;
                     const endDate = document.getElementById('endDate').value;
                     const userFilter = document.getElementById('userFilter').value;
                     const actionFilter = document.getElementById('actionFilter').value;
+                    const flagFilter = document.getElementById('flagFilter').value;
 
                     const tableRows = document.querySelectorAll('.data-table tbody tr');
                     let visibleCount = 0;
@@ -765,12 +631,15 @@
                         }
 
                         const cells = row.querySelectorAll('td');
-                        const createdAt = cells[6]?.textContent.trim() || '';
                         const userId = cells[1]?.textContent.trim() || '';
-                        const ipAddress = cells[2]?.textContent.trim() || '';
-                        const action = cells[3]?.textContent.trim().toLowerCase() || '';
-                        const details = cells[4]?.textContent.trim().toLowerCase() || '';
-                        const userAgent = cells[5]?.textContent.trim().toLowerCase() || '';
+                        const userRole = cells[2]?.textContent.trim() || '';
+                        const ipAddress = cells[3]?.textContent.trim() || '';
+                        const action = cells[4]?.textContent.trim().toLowerCase() || '';
+                        const details = cells[5]?.textContent.trim().toLowerCase() || '';
+                        const userAgent = cells[6]?.textContent.trim().toLowerCase() || '';
+                        const flagValue = cells[7]?.querySelector('input[type="checkbox"]')?.checked ? 'flagged' : 'unflagged'
+                        const createdAt = cells[8]?.textContent.trim() || '';
+
 
                         let shouldShow = true;
 
@@ -793,6 +662,15 @@
 
                         // Action filter
                         if (actionFilter && !action.includes(actionFilter.toLowerCase())) {
+                            shouldShow = false;
+                        }
+
+                        // User filter
+                        if (userFilter && userRole.toLowerCase() !== userFilter.toLowerCase()) {
+                            shouldShow = false;
+                        }
+
+                        if (flagFilter && flagValue.toLowerCase() !== flagFilter.toLowerCase()) {
                             shouldShow = false;
                         }
 
@@ -820,8 +698,10 @@
                     document.getElementById('userFilter').value = '';
                     document.getElementById('actionFilter').value = '';
                     document.getElementById('logSearch').value = '';
+                    document.getElementById('flagFilter').value = '';
 
-                    showToast('Filters cleared', 'info');
+                    location.reload();
+                    // showToast('Filters cleared', 'info');
                 }
 
                 function searchLogs() {
@@ -830,7 +710,7 @@
                     let visibleCount = 0;
 
                     if (searchTerm.trim() === '') {
-                        showToast('Please enter a search term', 'warning');
+                        // showToast('Please enter a search term', 'warning');
                         return;
                     }
 
@@ -841,18 +721,20 @@
                         }
 
                         const cells = row.querySelectorAll('td');
-                        const createdAt = cells[6]?.textContent.trim() || '';
                         const userId = cells[1]?.textContent.trim() || '';
-                        const ipAddress = cells[2]?.textContent.trim() || '';
-                        const action = cells[3]?.textContent.trim().toLowerCase() || '';
-                        const details = cells[4]?.textContent.trim().toLowerCase() || '';
-                        const userAgent = cells[5]?.textContent.trim().toLowerCase() || '';
+                        const userRole = cells[2]?.textContent.trim() || '';
+                        const ipAddress = cells[3]?.textContent.trim() || '';
+                        const action = cells[4]?.textContent.trim().toLowerCase() || '';
+                        const details = cells[5]?.textContent.trim().toLowerCase() || '';
+                        const userAgent = cells[6]?.textContent.trim().toLowerCase() || '';
+                        const flagValue = cells[7]?.querySelector('input[type="checkbox"]')?.checked ? 'flagged' : 'unflagged'
+                        const createdAt = cells[8]?.textContent.trim() || '';
 
                         let shouldShow = true;
 
                         // Search term filter (searches across user_id, ip_address, action, details, user_agent)
                         if (searchTerm) {
-                            const searchableText = `${userId} ${ipAddress} ${action} ${details} ${userAgent}`;
+                            const searchableText = `${userId} ${userRole} ${ipAddress} ${action} ${details} ${userAgent} ${createdAt}`;
                             if (!searchableText.includes(searchTerm)) {
                                 shouldShow = false;
                             }
@@ -885,12 +767,10 @@
                         row.style.display = '';
                     });
 
-                    // Reload the page to fetch fresh data from server
                     setTimeout(() => {
                         window.location.reload();
                     }, 500);
                     showToast('Logs refreshed', 'success');
-                    // In real implementation, this would reload the log data
                 }
 
                 function exportLogs() {
@@ -909,7 +789,7 @@
                     const csvRows = [];
 
                     // Add header row
-                    const headers = ['ID', 'User ID', 'IP Address', 'Action', 'Details', 'User Agent', 'Created At'];
+                    const headers = ['ID', 'User ID', 'User Role', 'IP Address', 'Action', 'Details', 'User Agent', 'Flagged', 'Created At'];
                     csvRows.push(headers.join(','));
 
                     // Add data rows
@@ -920,10 +800,13 @@
                             cells[1]?.textContent.trim() || '',
                             cells[2]?.textContent.trim() || '',
                             cells[3]?.textContent.trim() || '',
-                            `"${(cells[4]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in details
-                            `"${(cells[5]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in user agent
-                            cells[6]?.textContent.trim() || ''
+                            cells[4]?.textContent.trim() || '',
+                            `"${(cells[5]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in details
+                            `"${(cells[6]?.textContent.trim() || '').replace(/"/g, '""')}"`, // Escape quotes in user agent
+                            cells[7]?.querySelector('input[type="checkbox"]')?.checked ? 'Yes' : 'No' || '',
+                            cells[8]?.textContent.trim() || ''
                         ];
+
                         csvRows.push(rowData.join(','));
                     });
 
@@ -954,71 +837,6 @@
                 function clearOldLogs() {
                     if (confirm('Are you sure you want to clear logs older than 90 days? This action cannot be undone.')) {
                         showToast('Old logs cleared successfully', 'success');
-                        // In real implementation, this would make an AJAX call to delete old logs
-                    }
-                }
-
-                function viewLogDetails(logId) {
-                    // Sample data - in real implementation, this would fetch from database
-                    const logData = {
-                        1: {
-                            timestamp: '2024-01-15 14:32:15',
-                            user: 'John Doe (john.doe@company.com)',
-                            role: 'System Admin',
-                            action: 'Login',
-                            ip: '192.168.1.100',
-                            location: 'New York, NY, USA',
-                            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                            session: 'sess_abc123def456',
-                            additional: 'Successful login from corporate network. No security concerns detected.'
-                        },
-                        2: {
-                            timestamp: '2024-01-15 14:30:22',
-                            user: 'Mary Smith (mary.smith@company.com)',
-                            role: 'HR Admin',
-                            action: 'Data Access',
-                            ip: '192.168.1.105',
-                            location: 'New York, NY, USA',
-                            userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-                            session: 'sess_xyz789ghi012',
-                            additional: 'Accessed candidate database. Viewed 15 candidate profiles during this session.'
-                        },
-                        3: {
-                            timestamp: '2024-01-15 14:28:45',
-                            user: 'Unknown User (test@suspicious.com)',
-                            role: 'Unknown',
-                            action: 'Failed Login',
-                            ip: '203.145.67.89',
-                            location: 'Unknown (VPN/Proxy)',
-                            userAgent: 'python-requests/2.28.1',
-                            session: 'N/A',
-                            additional: 'SECURITY ALERT: Multiple failed login attempts detected. IP address flagged as suspicious. Possible bot/automated attack.'
-                        }
-                    };
-
-                    const data = logData[logId] || logData[1];
-
-                    document.getElementById('detailTimestamp').textContent = data.timestamp;
-                    document.getElementById('detailUser').textContent = data.user;
-                    document.getElementById('detailRole').textContent = data.role;
-                    document.getElementById('detailAction').textContent = data.action;
-                    document.getElementById('detailIP').textContent = data.ip;
-                    document.getElementById('detailLocation').textContent = data.location;
-                    document.getElementById('detailUserAgent').textContent = data.userAgent;
-                    document.getElementById('detailSession').textContent = data.session;
-                    document.getElementById('detailAdditional').textContent = data.additional;
-
-                    document.getElementById('logDetailsModal').style.display = 'block';
-                }
-
-                function closeLogDetailsModal() {
-                    document.getElementById('logDetailsModal').style.display = 'none';
-                }
-
-                function flagSuspicious() {
-                    if (confirm('Are you sure you want to flag this activity as suspicious?')) {
-                        showToast('Activity flagged as suspicious. Security team has been notified.', 'warning');
-                        closeLogDetailsModal();
                     }
                 }
 

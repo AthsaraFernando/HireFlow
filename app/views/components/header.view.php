@@ -194,7 +194,7 @@
 .header-container {
     max-width: 1200px;
     margin: 0 auto;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: space-between;
     padding: 0 20px;
@@ -235,7 +235,7 @@
 
 .nav-link {
     text-decoration: none;
-    color: #555;
+    color: #ffffffff;
     font-weight: 500;
     padding: 8px 12px;
     border-radius: 5px;
