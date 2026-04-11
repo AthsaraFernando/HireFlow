@@ -71,18 +71,9 @@
     <div class="page-actions-bar">
         <div class="actions-label">Available Actions:</div>
         <div class="page-actions">
-            <a href="<?= ROOT ?>/hradmin/job-posts/duplicate/<?= $job['id'] ?? '1' ?>" class="page-action-btn">
-                <i class="icon-copy"></i>Duplicate Job
-            </a>
             <a href="<?= ROOT ?>/hradmin/interview-schedule?job=<?= $job['id'] ?? '1' ?>" class="page-action-btn primary">
                 <i class="icon-calendar"></i>Schedule Interviews
             </a>
-            <a href="<?= ROOT ?>/hradmin/reports?job=<?= $job['id'] ?? '1' ?>" class="page-action-btn">
-                <i class="icon-chart"></i>View Analytics
-            </a>
-            <button class="page-action-btn danger" onclick="confirmArchive()">
-                <i class="icon-archive"></i>Archive Job
-            </button>
         </div>
     </div>
 

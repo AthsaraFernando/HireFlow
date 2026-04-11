@@ -22,20 +22,65 @@ class InterviewSchedule extends Controller
             $postData = $_POST;
             
             if ($interviewModel->validate($postData)) {
-                if ($interviewModel->createInterview($postData)) {
-                    $data['success'] = 'Interview scheduled successfully!';
+                $result = $interviewModel->createInterview($postData);
+                if ($result) {
+                    redirect('hradmin/interview-schedule?success=Interview scheduled successfully!');
                 } else {
                     $data['errors'][] = 'Failed to schedule interview. Please try again.';
+                    // Add model errors if any
+                    if (!empty($interviewModel->errors)) {
+                        $data['errors'] = array_merge($data['errors'], $interviewModel->errors);
+                    }
                 }
             } else {
                 $data['errors'] = $interviewModel->errors;
             }
         }
         
-        // Get real interview data from database
-        $interviews = $interviewModel->getInterviewsForRecruitment();
+        // Check for success message from redirect
+        if (isset($_GET['success'])) {
+            $data['success'] = urldecode($_GET['success']);
+        }
         
-        // Transform interview data to match view format
+        // Get current week start and end for calendar display
+        $currentWeekStart = isset($_GET['week_start']) ? $_GET['week_start'] : date('Y-m-d', strtotime('monday this week'));
+        $currentWeekEnd = date('Y-m-d', strtotime($currentWeekStart . ' +6 days'));
+        
+        // Store week dates for calendar navigation
+        $data['current_week_start'] = $currentWeekStart;
+        $data['current_week_end'] = $currentWeekEnd;
+        $data['week_title'] = date('F j', strtotime($currentWeekStart)) . ' - ' . date('j, Y', strtotime($currentWeekEnd));
+        
+        // Get week days for calendar headers (Monday to Sunday)
+        $data['week_days'] = [];
+        for ($i = 0; $i < 7; $i++) {
+            $date = date('Y-m-d', strtotime($currentWeekStart . " +{$i} days"));
+            $dayOfWeek = date('N', strtotime($date)); // 1=Monday, 7=Sunday
+            $data['week_days'][] = [
+                'date' => $date,
+                'day_name' => date('D', strtotime($date)),
+                'day_number' => date('j', strtotime($date)),
+                'is_today' => ($date === date('Y-m-d')),
+                'is_weekend' => ($dayOfWeek >= 6) // Saturday=6, Sunday=7
+            ];
+        }
+        
+        // Get detailed calendar interviews using enhanced method
+        $data['calendar_interviews'] = $interviewModel->getCalendarInterviews($currentWeekStart, $currentWeekEnd);
+        
+        // Get interview statistics for dashboard - always use current week, not calendar view week
+        // Stats should always reflect the actual current week regardless of calendar navigation
+        $actualCurrentWeekStart = date('Y-m-d', strtotime('monday this week'));
+        $actualCurrentWeekEnd = date('Y-m-d', strtotime('sunday this week'));
+        $stats = $interviewModel->getInterviewStats($actualCurrentWeekStart, $actualCurrentWeekEnd);
+        $data['interviews_today'] = $stats['today_interviews'] ?? 0;
+        $data['interviews_week'] = $stats['week_interviews'] ?? 0;
+        $data['interviews_pending'] = $stats['pending_interviews'] ?? 0;
+        $data['interviews_completed'] = $stats['completed_interviews'] ?? 0;
+        $data['avg_rating'] = number_format($stats['avg_rating'] ?? 0, 1);
+        
+        // Legacy data for backward compatibility
+        $interviews = $interviewModel->getInterviewsForRecruitment();
         $data['interviews'] = [];
         if ($interviews) {
             foreach ($interviews as $interview) {
@@ -48,43 +93,90 @@ class InterviewSchedule extends Controller
                     'time' => date('g:i A', strtotime($interview['scheduled_time'])),
                     'type' => $interview['interview_type'],
                     'status' => $interview['status'],
-                    'location' => $interview['location'] ?? $interview['meeting_link'] ?? 'TBD'
+                    'location' => $interview['location'] ?? $interview['meeting_link'] ?? 'TBD',
+                    'interview_stage' => $interview['interview_stage'] ?? 'Screening',
+                    'interviewer_role' => $interview['interviewer_role'] ?? 'HR Admin',
+                    'duration_minutes' => $interview['duration_minutes'] ?? 60
                 ];
             }
         }
         
-        // Get available candidates for scheduling interviews
+        // Organize interviews by date for calendar display
+        $data['interviews_by_date'] = [];
+        if ($data['calendar_interviews']) {
+            foreach ($data['calendar_interviews'] as $interview) {
+                $interviewDate = $interview['scheduled_date'];
+                
+                if (!isset($data['interviews_by_date'][$interviewDate])) {
+                    $data['interviews_by_date'][$interviewDate] = [];
+                }
+                
+                // Calculate position for calendar block
+                $timeObj = new DateTime($interview['scheduled_time']);
+                $hour = (int)$timeObj->format('G');
+                $minute = (int)$timeObj->format('i');
+                
+                // Calculate top position (8 AM = 0, each hour = 60px)
+                $topPosition = ($hour - 8) * 60 + ($minute);
+                
+                // Calculate height based on duration
+                $duration = $interview['duration_minutes'] ?? 60;
+                $height = ($duration / 60) * 60; // 60px per hour
+                
+                $data['interviews_by_date'][$interviewDate][] = [
+                    'id' => $interview['id'],
+                    'candidate_name' => $interview['candidate_name'],
+                    'job_title' => $interview['job_title'],
+                    'interviewer_name' => $interview['interviewer_name'] ?? 'TBD',
+                    'scheduled_time' => $interview['scheduled_time'],
+                    'display_time' => date('g:i A', strtotime($interview['scheduled_time'])),
+                    'duration_minutes' => $interview['duration_minutes'] ?? 60,
+                    'interview_type' => $interview['interview_type'],
+                    'interview_stage' => $interview['interview_stage'] ?? 'Screening',
+                    'interviewer_role' => $interview['interviewer_role'] ?? 'HR Admin',
+                    'status' => $interview['status'],
+                    'location' => $interview['location'] ?? $interview['meeting_link'] ?? 'TBD',
+                    'top_position' => max(0, $topPosition),
+                    'height' => $height
+                ];
+            }
+        }
+        
+        // Get form data for scheduling
         $data['available_candidates'] = $interviewModel->getAvailableCandidates();
-        
-        // Get potential interviewers (HR admins and other staff)
         $data['interviewers'] = $userModel->query("SELECT id, full_name FROM users WHERE role_id IN (2, 3) AND status = 'active' ORDER BY full_name");
+        $data['interviewer_roles'] = $interviewModel->getInterviewerRoles();
+        $data['interview_stages'] = $interviewModel->getInterviewStages();
+        $data['interviewers_by_role'] = $interviewModel->getInterviewersByRole();
         
-        // Calculate statistics for the dashboard from database
-        $today = date('Y-m-d');
-        $weekStart = date('Y-m-d', strtotime('monday this week'));
-        $weekEnd = date('Y-m-d', strtotime('sunday this week'));
+        // Use enhanced view
+        $this->view('hradmin/enhanced-interview-schedule', $data);
+    }
+
+    /**
+     * Get interview details via AJAX
+     */
+    public function details()
+    {
+        Auth::requireRole(2);
         
-        // Today's interviews
-        $data['interviews_today'] = $interviewModel->query("SELECT COUNT(*) as count FROM interviews WHERE DATE(scheduled_date) = ?", [$today])[0]['count'] ?? 0;
+        if (!isset($_GET['id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Interview ID required']);
+            return;
+        }
         
-        // This week's interviews
-        $data['interviews_this_week'] = $interviewModel->query("SELECT COUNT(*) as count FROM interviews WHERE scheduled_date BETWEEN ? AND ?", [$weekStart, $weekEnd])[0]['count'] ?? 0;
+        $interviewModel = new Interview();
+        $interviewDetails = $interviewModel->getInterviewDetails($_GET['id']);
         
-        // Pending interviews
-        $data['interviews_pending'] = $interviewModel->query("SELECT COUNT(*) as count FROM interviews WHERE status = 'Pending' OR status = 'Scheduled'")[0]['count'] ?? 0;
+        if (!$interviewDetails) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Interview not found']);
+            return;
+        }
         
-        // Keep existing statistics for backward compatibility
-        $allInterviews = $interviews ?? [];
-        $data['total_interviews'] = count($allInterviews);
-        $data['upcoming_interviews'] = count(array_filter($allInterviews, function($int) {
-            return $int['status'] === 'Scheduled' && strtotime($int['scheduled_date']) >= strtotime('today');
-        }));
-        $data['completed_interviews'] = count(array_filter($allInterviews, function($int) {
-            return $int['status'] === 'Completed';
-        }));
-        $data['avg_rating'] = '4.2'; // This would need a rating system
-        
-        $this->view('hradmin/interview-schedule', $data);
+        header('Content-Type: application/json');
+        echo json_encode($interviewDetails);
     }
     
     public function schedule()
@@ -102,6 +194,11 @@ class InterviewSchedule extends Controller
         // Get available candidates and interviewers for the form
         $data['available_candidates'] = $interviewModel->getAvailableCandidates();
         $data['interviewers'] = $userModel->query("SELECT id, full_name FROM users WHERE role_id IN (2, 3) AND status = 'active' ORDER BY full_name");
+        
+        // Get interviewer roles and interview stages for the form
+        $data['interviewer_roles'] = $interviewModel->getInterviewerRoles();
+        $data['interview_stages'] = $interviewModel->getInterviewStages();
+        $data['interviewers_by_role'] = $interviewModel->getInterviewersByRole();
         
         if ($_POST) {
             $postData = $_POST;
