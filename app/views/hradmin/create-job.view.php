@@ -184,12 +184,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="responsibilities" class="form-label">Key Responsibilities *</label>
-                    <textarea id="responsibilities" name="responsibilities" class="form-textarea" rows="6" 
-                              placeholder="• List key responsibilities here&#10;• Use bullet points for clarity&#10;• Include main duties and expectations" required><?= $_POST['responsibilities'] ?? '' ?></textarea>
-                </div>
-
-                <div class="form-group">
                     <label for="requirements" class="form-label">Requirements *</label>
                     <textarea id="requirements" name="requirements" class="form-textarea" rows="6" 
                               placeholder="• Education requirements&#10;• Years of experience needed&#10;• Technical skills required&#10;• Soft skills preferred" required><?= $_POST['requirements'] ?? '' ?></textarea>

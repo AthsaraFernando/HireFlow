@@ -3,6 +3,9 @@
 class JobPost
 {
     use Model;
+
+    private $existingColumnsCache = null;
+
     protected $table = 'job_posts';
     protected $allowedColumns = [
         'title',
@@ -46,6 +49,102 @@ class JobPost
         }
 
         return false;
+    }
+
+    public function insert($data)
+    {
+        $data = $this->sanitizeDataForSchema($data);
+
+        if (empty($data)) {
+            $this->errors[] = 'No valid columns to insert.';
+            return false;
+        }
+
+        $keys = array_keys($data);
+        $query = "INSERT INTO $this->table (" . implode(",", $keys) . ") VALUES (:" . implode(",:", $keys) . ")";
+
+        try {
+            $con = $this->connect();
+            $stmt = $con->prepare($query);
+            $stmt->execute($data);
+            return $con->lastInsertId();
+        } catch (PDOException $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
+    }
+
+    public function update($id, $data, $id_column = 'id')
+    {
+        $data = $this->sanitizeDataForSchema($data);
+
+        if (empty($data)) {
+            $this->errors[] = 'No valid columns to update.';
+            return false;
+        }
+
+        $keys = array_keys($data);
+        $query = "UPDATE $this->table SET ";
+
+        foreach ($keys as $key) {
+            $query .= "$key = :$key, ";
+        }
+
+        $query = trim($query, ", ");
+        $query .= " WHERE $id_column = :$id_column";
+
+        $data[$id_column] = $id;
+
+        try {
+            $this->query($query, $data);
+            return true;
+        } catch (Exception $e) {
+            $this->errors[] = $e->getMessage();
+            return false;
+        }
+    }
+
+    private function sanitizeDataForSchema($data)
+    {
+        $existingColumns = $this->getExistingColumns();
+
+        foreach ($data as $key => $value) {
+            if (!in_array($key, $this->allowedColumns, true)) {
+                unset($data[$key]);
+                continue;
+            }
+
+            if (!in_array($key, $existingColumns, true)) {
+                unset($data[$key]);
+            }
+        }
+
+        return $data;
+    }
+
+    private function getExistingColumns()
+    {
+        if (is_array($this->existingColumnsCache)) {
+            return $this->existingColumnsCache;
+        }
+
+        $query = "SELECT COLUMN_NAME
+                  FROM information_schema.columns
+                  WHERE table_schema = DATABASE()
+                  AND table_name = ?";
+
+        $result = $this->query($query, [$this->table]);
+
+        if (!is_array($result) || empty($result)) {
+            $this->existingColumnsCache = $this->allowedColumns;
+            return $this->existingColumnsCache;
+        }
+
+        $this->existingColumnsCache = array_map(function ($row) {
+            return $row['COLUMN_NAME'];
+        }, $result);
+
+        return $this->existingColumnsCache;
     }
 
     public function getAllJobs()
