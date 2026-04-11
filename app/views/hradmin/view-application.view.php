@@ -241,40 +241,6 @@ John Smith')) ?>
             </div>
         </div>
 
-        <!-- Similar Candidates - Integrated -->
-        <div class="content-card">
-            <h3 class="card-title">Similar Candidates</h3>
-            <div class="candidates-grid">
-                <div class="candidate-card">
-                    <div class="candidate-avatar">SJ</div>
-                    <div class="candidate-details">
-                        <div class="candidate-name">Sarah Johnson</div>
-                        <div class="candidate-role">UI/UX Designer</div>
-                        <div class="match-score">92% match</div>
-                    </div>
-                    <a href="<?= ROOT ?>/hradmin/view-application/2" class="view-candidate-btn">View</a>
-                </div>
-                <div class="candidate-card">
-                    <div class="candidate-avatar">MW</div>
-                    <div class="candidate-details">
-                        <div class="candidate-name">Mike Wilson</div>
-                        <div class="candidate-role">Full Stack Developer</div>
-                        <div class="match-score">88% match</div>
-                    </div>
-                    <a href="<?= ROOT ?>/hradmin/view-application/3" class="view-candidate-btn">View</a>
-                </div>
-                <div class="candidate-card">
-                    <div class="candidate-avatar">AL</div>
-                    <div class="candidate-details">
-                        <div class="candidate-name">Alex Liu</div>
-                        <div class="candidate-role">Frontend Developer</div>
-                        <div class="match-score">85% match</div>
-                    </div>
-                    <a href="<?= ROOT ?>/hradmin/view-application/4" class="view-candidate-btn">View</a>
-                </div>
-            </div>
-        </div>
-
         <!-- Notes - Integrated -->
         <div class="content-card">
             <h3 class="card-title">Notes & Comments</h3>

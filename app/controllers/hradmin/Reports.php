@@ -18,6 +18,9 @@ class Reports extends Controller
         // Get recruitment funnel statistics
         $funnelStats = $reportModel->getRecruitmentFunnelStats();
         $data['funnel_stats'] = $funnelStats;
+
+        // Live KPI metrics for dashboard cards
+        $data['dashboard_metrics'] = $reportModel->getDashboardKpiMetrics();
         
         // Calculate conversion rates
         $conversionRates = $reportModel->getConversionRates();
@@ -42,6 +45,10 @@ class Reports extends Controller
         // Get status distribution
         $statusDistribution = $reportModel->getStatusDistribution();
         $data['status_distribution'] = $statusDistribution;
+
+        // Detailed dynamic table data
+        $data['top_performing_jobs'] = $reportModel->getTopPerformingJobPosts(5);
+        $data['interviewer_performance'] = $reportModel->getInterviewerPerformance(5);
         
         // Hero stats
         $data['total_hires'] = $funnelStats['successful_hires'] ?? 0;

@@ -175,10 +175,10 @@
                 <div class="metric-header">
                     <h4>Total Applications</h4>
                 </div>
-                <div class="metric-value">1,247</div>
+                <div class="metric-value"><?= number_format($dashboard_metrics['total_applications'] ?? 0) ?></div>
                 <div class="metric-change positive">
-                    <span class="change-icon">↗</span>
-                    <span>+12.5% vs last month</span>
+                    <span class="change-icon">•</span>
+                    <span>Updated from database</span>
                 </div>
             </div>
             
@@ -186,10 +186,10 @@
                 <div class="metric-header">
                     <h4>Successful Hires</h4>
                 </div>
-                <div class="metric-value">89</div>
+                <div class="metric-value"><?= number_format($dashboard_metrics['successful_hires'] ?? 0) ?></div>
                 <div class="metric-change positive">
-                    <span class="change-icon">↗</span>
-                    <span>+8.2% vs last month</span>
+                    <span class="change-icon">•</span>
+                    <span>Updated from database</span>
                 </div>
             </div>
             
@@ -197,10 +197,10 @@
                 <div class="metric-header">
                     <h4>Avg. Time to Hire</h4>
                 </div>
-                <div class="metric-value">23 days</div>
+                <div class="metric-value"><?= number_format($dashboard_metrics['avg_time_to_hire'] ?? 0) ?> days</div>
                 <div class="metric-change negative">
-                    <span class="change-icon">↘</span>
-                    <span>+2 days vs last month</span>
+                    <span class="change-icon">•</span>
+                    <span>Updated from database</span>
                 </div>
             </div>
             
@@ -208,10 +208,10 @@
                 <div class="metric-header">
                     <h4>Cost per Hire</h4>
                 </div>
-                <div class="metric-value">$3,450</div>
+                <div class="metric-value">$<?= number_format((float)($dashboard_metrics['cost_per_hire'] ?? 0), 0) ?></div>
                 <div class="metric-change positive">
-                    <span class="change-icon">↗</span>
-                    <span>-5.2% vs last month</span>
+                    <span class="change-icon">•</span>
+                    <span>Updated from database</span>
                 </div>
             </div>
         </div>
@@ -537,7 +537,6 @@
         <div class="table-card">
             <div class="table-header">
                 <h4>Top Performing Job Posts</h4>
-                <a href="<?= ROOT ?>/hradmin/jobposts" class="view-all-link">View All Jobs</a>
             </div>
             <div class="table-container">
                 <table class="data-table">
@@ -552,38 +551,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Senior Software Developer</td>
-                            <td>156</td>
-                            <td>45</td>
-                            <td>12</td>
-                            <td><span class="rate-good">26.7%</span></td>
-                            <td>18 days</td>
-                        </tr>
-                        <tr>
-                            <td>UI/UX Designer</td>
-                            <td>89</td>
-                            <td>28</td>
-                            <td>8</td>
-                            <td><span class="rate-excellent">28.6%</span></td>
-                            <td>21 days</td>
-                        </tr>
-                        <tr>
-                            <td>Marketing Manager</td>
-                            <td>67</td>
-                            <td>18</td>
-                            <td>5</td>
-                            <td><span class="rate-good">27.8%</span></td>
-                            <td>25 days</td>
-                        </tr>
-                        <tr>
-                            <td>Project Manager</td>
-                            <td>45</td>
-                            <td>12</td>
-                            <td>3</td>
-                            <td><span class="rate-average">25.0%</span></td>
-                            <td>30 days</td>
-                        </tr>
+                        <?php if (!empty($top_performing_jobs)): ?>
+                            <?php foreach ($top_performing_jobs as $job): ?>
+                                <?php
+                                $conversion = (float)($job['conversion_rate'] ?? 0);
+                                $rateClass = $conversion >= 30 ? 'rate-excellent' : ($conversion >= 20 ? 'rate-good' : 'rate-average');
+                                $avgDays = $job['avg_days_to_hire'];
+                                ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($job['job_title']) ?></td>
+                                    <td><?= number_format((int)$job['applications_count']) ?></td>
+                                    <td><?= number_format((int)$job['interviews_count']) ?></td>
+                                    <td><?= number_format((int)$job['hires_count']) ?></td>
+                                    <td><span class="<?= $rateClass ?>"><?= number_format($conversion, 1) ?>%</span></td>
+                                    <td><?= $avgDays !== null ? number_format((float)$avgDays, 0) . ' days' : 'N/A' ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="6" style="text-align: center; padding: 2rem;">No job performance data available</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -607,27 +595,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Sarah Johnson</td>
-                            <td>28</td>
-                            <td>4.3/5</td>
-                            <td><span class="rate-excellent">32%</span></td>
-                            <td>4.7/5</td>
-                        </tr>
-                        <tr>
-                            <td>Mike Wilson</td>
-                            <td>22</td>
-                            <td>4.1/5</td>
-                            <td><span class="rate-good">28%</span></td>
-                            <td>4.5/5</td>
-                        </tr>
-                        <tr>
-                            <td>Emily Chen</td>
-                            <td>19</td>
-                            <td>4.2/5</td>
-                            <td><span class="rate-good">26%</span></td>
-                            <td>4.6/5</td>
-                        </tr>
+                        <?php if (!empty($interviewer_performance)): ?>
+                            <?php foreach ($interviewer_performance as $interviewer): ?>
+                                <?php
+                                $hireRate = (float)($interviewer['hire_rate'] ?? 0);
+                                $hireRateClass = $hireRate >= 30 ? 'rate-excellent' : ($hireRate >= 20 ? 'rate-good' : 'rate-average');
+                                $avgRating = $interviewer['avg_rating'] !== null ? number_format((float)$interviewer['avg_rating'], 1) . '/5' : 'N/A';
+                                $feedbackScore = $interviewer['feedback_score'] !== null ? number_format((float)$interviewer['feedback_score'], 1) . '/5' : 'N/A';
+                                ?>
+                                <tr>
+                                    <td><?= htmlspecialchars($interviewer['interviewer_name']) ?></td>
+                                    <td><?= number_format((int)$interviewer['interviews_conducted']) ?></td>
+                                    <td><?= $avgRating ?></td>
+                                    <td><span class="<?= $hireRateClass ?>"><?= number_format($hireRate, 1) ?>%</span></td>
+                                    <td><?= $feedbackScore ?></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 2rem;">No interviewer performance data available</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>

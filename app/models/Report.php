@@ -3,6 +3,8 @@
 class Report
 {
     use Model;
+
+    private $tableSupportCache = [];
     
     /**
      * Get recruitment funnel statistics
@@ -118,6 +120,200 @@ class Report
                   ORDER BY total_applications DESC";
         
         return $this->query($query);
+    }
+
+    /**
+     * Get live KPI metrics for report dashboard cards
+     */
+    public function getDashboardKpiMetrics()
+    {
+        $totals = $this->get_row("SELECT
+                                    COUNT(*) as total_applications,
+                                    SUM(CASE WHEN status = 'Hired' THEN 1 ELSE 0 END) as successful_hires
+                                  FROM applications");
+
+        $avgTimeResult = $this->get_row("SELECT
+                                            ROUND(AVG(CASE WHEN status = 'Hired' THEN DATEDIFF(CURDATE(), DATE(applied_at)) END), 0) as avg_time_to_hire
+                                         FROM applications");
+
+        $totalApplications = (int)($totals['total_applications'] ?? 0);
+        $successfulHires = (int)($totals['successful_hires'] ?? 0);
+        $avgTimeToHire = (int)($avgTimeResult['avg_time_to_hire'] ?? 0);
+
+        $configuredCostPerHire = $this->getConfiguredCostPerHire();
+        $costPerHire = $configuredCostPerHire !== null
+            ? $configuredCostPerHire
+            : $this->getEstimatedCostPerHire($successfulHires, $totalApplications);
+
+        return [
+            'total_applications' => $totalApplications,
+            'successful_hires' => $successfulHires,
+            'avg_time_to_hire' => $avgTimeToHire,
+            'cost_per_hire' => $costPerHire
+        ];
+    }
+
+    /**
+     * Get top performing job posts for reports table
+     */
+    public function getTopPerformingJobPosts($limit = 5)
+    {
+        $limit = max(1, (int)$limit);
+
+        $query = "SELECT
+                    jp.id,
+                    jp.title as job_title,
+                    COUNT(DISTINCT a.id) as applications_count,
+                    COUNT(DISTINCT i.id) as interviews_count,
+                    SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) as hires_count,
+                    ROUND(
+                        CASE
+                            WHEN COUNT(DISTINCT i.id) = 0 THEN 0
+                            ELSE (SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) * 100.0 / COUNT(DISTINCT i.id))
+                        END,
+                        1
+                    ) as conversion_rate,
+                    ROUND(
+                        AVG(
+                            CASE
+                                WHEN a.status = 'Hired' THEN DATEDIFF(CURDATE(), DATE(a.applied_at))
+                                ELSE NULL
+                            END
+                        ),
+                        0
+                    ) as avg_days_to_hire
+                  FROM job_posts jp
+                  LEFT JOIN applications a ON a.job_id = jp.id
+                  LEFT JOIN interviews i ON i.application_id = a.id
+                  GROUP BY jp.id, jp.title
+                  HAVING COUNT(DISTINCT a.id) > 0
+                  ORDER BY conversion_rate DESC, hires_count DESC, applications_count DESC
+                  LIMIT {$limit}";
+
+        return $this->query($query);
+    }
+
+    /**
+     * Get interviewer performance for reports table
+     */
+    public function getInterviewerPerformance($limit = 10)
+    {
+        $limit = max(1, (int)$limit);
+
+        if ($this->tableExists('feedback')) {
+            $query = "SELECT
+                        u.id,
+                        u.full_name as interviewer_name,
+                        COUNT(DISTINCT i.id) as interviews_conducted,
+                        ROUND(AVG(f.overall_rating) / 2, 1) as avg_rating,
+                        ROUND(
+                            CASE
+                                WHEN COUNT(DISTINCT i.application_id) = 0 THEN 0
+                                ELSE (
+                                    COUNT(DISTINCT CASE WHEN a.status = 'Hired' THEN i.application_id END) * 100.0 /
+                                    COUNT(DISTINCT i.application_id)
+                                )
+                            END,
+                            1
+                        ) as hire_rate,
+                        ROUND(
+                            AVG((COALESCE(f.technical_rating, 0) + COALESCE(f.communication_rating, 0) + COALESCE(f.overall_rating, 0)) / 3) / 2,
+                            1
+                        ) as feedback_score
+                      FROM users u
+                      JOIN interviews i ON i.interviewer_id = u.id
+                      LEFT JOIN applications a ON a.id = i.application_id
+                      LEFT JOIN feedback f ON f.interview_id = i.id
+                      WHERE u.role_id IN (2, 3)
+                      GROUP BY u.id, u.full_name
+                      ORDER BY interviews_conducted DESC, hire_rate DESC, avg_rating DESC
+                      LIMIT {$limit}";
+        } else {
+            $query = "SELECT
+                        u.id,
+                        u.full_name as interviewer_name,
+                        COUNT(DISTINCT i.id) as interviews_conducted,
+                        NULL as avg_rating,
+                        ROUND(
+                            CASE
+                                WHEN COUNT(DISTINCT i.application_id) = 0 THEN 0
+                                ELSE (
+                                    COUNT(DISTINCT CASE WHEN a.status = 'Hired' THEN i.application_id END) * 100.0 /
+                                    COUNT(DISTINCT i.application_id)
+                                )
+                            END,
+                            1
+                        ) as hire_rate,
+                        NULL as feedback_score
+                      FROM users u
+                      JOIN interviews i ON i.interviewer_id = u.id
+                      LEFT JOIN applications a ON a.id = i.application_id
+                      WHERE u.role_id IN (2, 3)
+                      GROUP BY u.id, u.full_name
+                      ORDER BY interviews_conducted DESC, hire_rate DESC
+                      LIMIT {$limit}";
+        }
+
+        return $this->query($query);
+    }
+
+    private function tableExists($tableName)
+    {
+        if (array_key_exists($tableName, $this->tableSupportCache)) {
+            return $this->tableSupportCache[$tableName];
+        }
+
+        $query = "SELECT COUNT(*) as table_count
+                  FROM information_schema.tables
+                  WHERE table_schema = DATABASE()
+                  AND table_name = ?";
+
+        $result = $this->get_row($query, [$tableName]);
+        $this->tableSupportCache[$tableName] = (int)($result['table_count'] ?? 0) > 0;
+
+        return $this->tableSupportCache[$tableName];
+    }
+
+    private function getConfiguredCostPerHire()
+    {
+        if (!$this->tableExists('system_settings')) {
+            return null;
+        }
+
+        $query = "SELECT setting_value
+                  FROM system_settings
+                  WHERE setting_key IN ('cost_per_hire', 'avg_cost_per_hire', 'estimated_cost_per_hire')
+                  ORDER BY FIELD(setting_key, 'cost_per_hire', 'avg_cost_per_hire', 'estimated_cost_per_hire')
+                  LIMIT 1";
+
+        $result = $this->get_row($query);
+        if (!$result || !isset($result['setting_value'])) {
+            return null;
+        }
+
+        $numericValue = preg_replace('/[^0-9.]/', '', (string)$result['setting_value']);
+        if ($numericValue === '' || !is_numeric($numericValue)) {
+            return null;
+        }
+
+        return (float)$numericValue;
+    }
+
+    private function getEstimatedCostPerHire($successfulHires, $totalApplications)
+    {
+        if ($successfulHires <= 0) {
+            return 0;
+        }
+
+        $interviewCount = 0;
+        if ($this->tableExists('interviews')) {
+            $interviewStats = $this->get_row("SELECT COUNT(*) as total_interviews FROM interviews");
+            $interviewCount = (int)($interviewStats['total_interviews'] ?? 0);
+        }
+
+        $estimatedTotalCost = ($totalApplications * 25) + ($interviewCount * 100);
+
+        return round($estimatedTotalCost / $successfulHires, 0);
     }
     
     /**
