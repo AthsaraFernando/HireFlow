@@ -121,7 +121,7 @@ class Interview
                   JOIN job_posts jp ON a.job_id = jp.id
                   LEFT JOIN users interviewer ON i.interviewer_id = interviewer.id
                   LEFT JOIN roles r ON interviewer.role_id = r.id
-                  ORDER BY i.scheduled_date DESC, i.scheduled_time DESC";
+                  ORDER BY i.created_at DESC, i.scheduled_date DESC, i.scheduled_time DESC";
 
         return $this->query($query);
     }
