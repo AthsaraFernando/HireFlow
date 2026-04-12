@@ -724,7 +724,7 @@ class Applicant extends Controller
         }
 
         $filename = 'resume_' . $user_id . '_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $file_extension;
-        $file_path = $upload_dir . $filename;
+        $file_path = rtrim($upload_dir, '/') . '/' . $filename;
 
         if (!move_uploaded_file($file['tmp_name'], $file_path)) {
             return ['success' => false, 'error' => 'Failed to upload file.'];
@@ -784,7 +784,7 @@ class Applicant extends Controller
         
         // Generate unique filename
         $filename = 'resume_' . $user_id . '_' . time() . '.pdf';
-        $file_path = $upload_dir . $filename;
+        $file_path = rtrim($upload_dir, '/') . '/' . $filename;
         
         if (move_uploaded_file($file['tmp_name'], $file_path)) {
             return ['success' => true, 'path' => '/uploads/resumes/' . $filename];
@@ -1007,10 +1007,15 @@ class Applicant extends Controller
 
         $data = [];
         $userModel = new User();
+        $applicationModel = new Application();
+        $interviewModel = new Interview();
         $user_id = Auth::user_id();
         
         // Get current user data
         $current_user = Auth::user();
+        $application_stats = $applicationModel->getApplicationStats($user_id) ?: [];
+        $interview_stats = $interviewModel->getInterviewCount($user_id) ?: [];
+        $profile_picture_url = $this->getProfilePictureUrl($current_user['profile_picture'] ?? '');
         
         $data['user'] = [
             'id' => $current_user['id'],
@@ -1019,14 +1024,38 @@ class Applicant extends Controller
             'phone' => $current_user['phone'] ?? 'Not provided',
             'location' => $current_user['address'] ?? 'Not provided',
             'profile_picture' => $current_user['profile_picture'] ?? '',
+            'profile_picture_url' => $profile_picture_url,
             'created_at' => $current_user['created_at'] ?? '',
             'last_login' => $current_user['last_login'] ?? 'Never',
             'status' => $current_user['status'] ?? 'active',
+            'role_label' => 'Applicant',
+            'member_since' => !empty($current_user['created_at']) ? date('M j, Y', strtotime($current_user['created_at'])) : 'Not available',
+            'last_login_display' => !empty($current_user['last_login']) ? date('M j, Y g:i A', strtotime($current_user['last_login'])) : 'Never',
             // Default values for fields not in database
             'bio' => 'Professional seeking new opportunities in the field.',
             'skills' => [], // Could be implemented as separate table later
             'experience' => [], // Could be implemented as separate table later
             'education' => [] // Could be implemented as separate table later
+        ];
+
+        $data['form_values'] = [
+            'full_name' => $current_user['full_name'] ?? '',
+            'email' => $current_user['email'] ?? '',
+            'phone' => $current_user['phone'] ?? '',
+            'address' => $current_user['address'] ?? ''
+        ];
+
+        $data['application_stats'] = [
+            'total_applications' => (int)($application_stats['total_applications'] ?? 0),
+            'under_review_applications' => (int)($application_stats['under_review_applications'] ?? 0),
+            'shortlisted_applications' => (int)($application_stats['shortlisted_applications'] ?? 0),
+            'interview_scheduled' => (int)($application_stats['interview_scheduled'] ?? 0)
+        ];
+
+        $data['interview_stats'] = [
+            'total_interviews' => (int)($interview_stats['total_interviews'] ?? 0),
+            'upcoming_interviews' => (int)($interview_stats['upcoming_interviews'] ?? 0),
+            'completed_interviews' => (int)($interview_stats['completed_interviews'] ?? 0)
         ];
         
         // Calculate profile completion
@@ -1038,20 +1067,7 @@ class Applicant extends Controller
     public function editProfile()
     {
         Auth::requireRole(4);
-        
-        $data = [];
-        $current_user = Auth::user();
-        
-        $data['user'] = [
-            'id' => $current_user['id'],
-            'full_name' => $current_user['full_name'] ?? '',
-            'email' => $current_user['email'] ?? '',
-            'phone' => $current_user['phone'] ?? '',
-            'address' => $current_user['address'] ?? '',
-            'profile_picture' => $current_user['profile_picture'] ?? ''
-        ];
-
-        $this->view('applicant/profile-edit', $data);
+        redirect('applicant/profile');
     }
     
     public function updateProfile()
@@ -1065,18 +1081,104 @@ class Applicant extends Controller
         
         $userModel = new User();
         $user_id = Auth::user_id();
+        $existing_user = $userModel->first(['id' => $user_id], []);
+        $submit_section = $_POST['submit_section'] ?? '';
+        $photo_intent = ($_POST['photo_upload_intent'] ?? '') === '1';
+        $has_profile_picture_upload = isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK;
+        $is_photo_only_request = $has_profile_picture_upload && (
+            $submit_section === 'photo' ||
+            ($submit_section !== 'personal' && $submit_section !== 'security' && $photo_intent)
+        );
+
+        // Photo-only update should not require personal info validation.
+        if ($is_photo_only_request) {
+            if ($has_profile_picture_upload) {
+                $upload_result = $this->handleProfilePictureUpload($_FILES['profile_picture'], $user_id);
+                if ($upload_result['success']) {
+                    $photo_update = [
+                        'profile_picture' => $upload_result['path'],
+                        'updated_at' => date('Y-m-d H:i:s')
+                    ];
+
+                    if ($userModel->update($user_id, $photo_update)) {
+                        $_SESSION['USER'] = array_merge($_SESSION['USER'], $photo_update);
+                        $_SESSION['success'] = 'Profile picture updated successfully!';
+                    } else {
+                        $_SESSION['error'] = 'Failed to update profile picture. Please try again.';
+                    }
+                } else {
+                    $_SESSION['error'] = $upload_result['error'];
+                }
+            } else {
+                $_SESSION['error'] = 'Please select an image to upload.';
+            }
+
+            redirect('applicant/profile');
+            return;
+        }
         
         $data = [
-            'full_name' => $_POST['full_name'] ?? '',
-            'phone' => $_POST['phone'] ?? '',
-            'address' => $_POST['address'] ?? ''
+            'full_name' => trim($_POST['full_name'] ?? ''),
+            'email' => strtolower(trim($_POST['email'] ?? '')),
+            'phone' => trim($_POST['phone'] ?? ''),
+            'address' => trim($_POST['address'] ?? '')
         ];
+
+        $password_change_requested = !empty($_POST['new_password']) || !empty($_POST['confirm_password']);
+
+        if ($password_change_requested) {
+            $current_password = $_POST['current_password'] ?? '';
+            $new_password = $_POST['new_password'] ?? '';
+            $confirm_password = $_POST['confirm_password'] ?? '';
+
+            if (empty($current_password)) {
+                $_SESSION['error'] = 'Current password is required to change your password.';
+                redirect('applicant/profile');
+                return;
+            }
+
+            if (!$existing_user || !password_verify($current_password, $existing_user['password'])) {
+                $_SESSION['error'] = 'Current password is incorrect.';
+                redirect('applicant/profile');
+                return;
+            }
+
+            if (empty($new_password)) {
+                $_SESSION['error'] = 'New password is required.';
+                redirect('applicant/profile');
+                return;
+            }
+
+            if ($new_password !== $confirm_password) {
+                $_SESSION['error'] = 'New passwords do not match.';
+                redirect('applicant/profile');
+                return;
+            }
+
+            $data['password'] = password_hash($new_password, PASSWORD_DEFAULT);
+        }
+
+        $validation_data = $data;
+        if ($password_change_requested) {
+            $validation_data['password'] = $_POST['new_password'];
+            $validation_data['confirm_password'] = $_POST['confirm_password'];
+        }
+
+        if (!$userModel->validateProfileUpdate($validation_data, $user_id)) {
+            $_SESSION['error'] = implode(' ', $userModel->errors);
+            redirect('applicant/profile');
+            return;
+        }
         
         // Handle profile picture upload
         if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
             $upload_result = $this->handleProfilePictureUpload($_FILES['profile_picture'], $user_id);
             if ($upload_result['success']) {
                 $data['profile_picture'] = $upload_result['path'];
+            } else {
+                $_SESSION['error'] = $upload_result['error'];
+                redirect('applicant/profile');
+                return;
             }
         }
         
@@ -1102,7 +1204,7 @@ class Applicant extends Controller
     
     private function handleProfilePictureUpload($file, $user_id)
     {
-        $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/HireFlow/public/uploads/profiles/';
+        $upload_dir = $this->publicPath('uploads/profiles');
         
         // Create directory if it doesn't exist
         if (!is_dir($upload_dir)) {
@@ -1123,13 +1225,41 @@ class Applicant extends Controller
         // Generate unique filename
         $extension = pathinfo($file['name'], PATHINFO_EXTENSION);
         $filename = 'profile_' . $user_id . '_' . time() . '.' . $extension;
-        $file_path = $upload_dir . $filename;
+        $file_path = rtrim($upload_dir, '/') . '/' . $filename;
         
         if (move_uploaded_file($file['tmp_name'], $file_path)) {
             return ['success' => true, 'path' => '/uploads/profiles/' . $filename];
         } else {
             return ['success' => false, 'error' => 'Failed to upload image.'];
         }
+    }
+
+    private function getProfilePictureUrl($profile_picture)
+    {
+        $default = ROOT . '/assets/images/profiles/default-avatar.jpg';
+
+        if (empty($profile_picture)) {
+            return $default;
+        }
+
+        $relative = ltrim($profile_picture, '/');
+        $expected = $this->publicPath($relative);
+        if (file_exists($expected)) {
+            return ROOT . '/' . $relative;
+        }
+
+        $legacy = $this->publicPath('HireFlow/public/' . $relative);
+        if (file_exists($legacy)) {
+            $target_dir = dirname($expected);
+            if (!is_dir($target_dir)) {
+                mkdir($target_dir, 0755, true);
+            }
+
+            @copy($legacy, $expected);
+            return ROOT . '/' . $relative;
+        }
+
+        return $default;
     }
     
     public function notifications($action = null)
