@@ -92,8 +92,7 @@ class ApplicationForm
                     jp.salary_range,
                     jp.deadline,
                     jp.description,
-                    jp.requirements,
-                    jp.responsibilities
+                    jp.requirements
                 FROM {$this->table} af
                 INNER JOIN job_posts jp ON af.job_post_id = jp.id
                 WHERE af.job_post_id = :job_post_id

@@ -156,8 +156,18 @@
                             <span class="job-posted">📅 Posted <?= date('M d', strtotime($job['posted_date'])) ?></span>
                         </div>
                         <div class="job-actions">
-                            <a href="<?= ROOT ?>/applicant/jobs/details?id=<?= $job['id'] ?>" class="btn btn-outline">View Details</a>
-                            <a href="<?= ROOT ?>/applicant/applications/apply?job_id=<?= $job['id'] ?>" class="btn btn-primary">Apply Now</a>
+                            <a href="<?= ROOT ?>/applicant/jobs/details/<?= $job['id'] ?>" class="btn btn-outline">View Details</a>
+                            <?php if($job['form_available'] && !$job['has_applied']): ?>
+                                <a href="<?= ROOT ?>/applicant/applications/apply?job_id=<?= $job['id'] ?>" class="btn btn-primary">Apply Now</a>
+                            <?php elseif($job['has_applied']): ?>
+                                <div class="btn btn-secondary" style="cursor: default; text-align: center;">
+                                    ✓ Applied
+                                </div>
+                            <?php else: ?>
+                                <div class="btn btn-disabled" style="cursor: not-allowed; text-align: center;" title="Application form not yet available">
+                                    Opening Soon
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
