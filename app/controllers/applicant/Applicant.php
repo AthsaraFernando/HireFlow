@@ -142,12 +142,16 @@ class Applicant extends Controller
         Auth::requireRole(4);
         
         if ($action === 'details') {
+            if (!$id && isset($_GET['id'])) {
+                $id = (int)$_GET['id'];
+            }
             return $this->jobDetails($id);
         }
 
         $data = [];
         $jobModel = new JobPost();
         $applicationModel = new Application();
+        $applicationFormModel = new ApplicationForm();
         $user_id = Auth::user_id();
         
         // Get current user data for navigation
@@ -181,6 +185,10 @@ class Applicant extends Controller
                 // Check if user has already applied
                 $has_applied = $applicationModel->hasAppliedToJob($user_id, $job['id']);
                 
+                // Check if application form exists for this job
+                $applicationFormMeta = $applicationFormModel->getFormByJobPostId($job['id']);
+                $form_available = $applicationFormMeta && ($applicationFormMeta['status'] ?? 'inactive') === 'active';
+                
                 // Parse requirements from text format to array
                 $requirements = [];
                 if (!empty($job['requirements'])) {
@@ -210,7 +218,8 @@ class Applicant extends Controller
                     'description' => substr($job['description'], 0, 150) . '...', // Truncated for listing
                     'department' => $job['department'] ?? 'General',
                     'requirements' => $requirements, // Now properly formatted as array
-                    'has_applied' => $has_applied
+                    'has_applied' => $has_applied,
+                    'form_available' => $form_available
                 ];
             }
         }
@@ -256,6 +265,7 @@ class Applicant extends Controller
         $data = [];
         $jobModel = new JobPost();
         $applicationModel = new Application();
+        $applicationFormModel = new ApplicationForm();
         $user_id = Auth::user_id();
         
         // Get job details
@@ -282,6 +292,10 @@ class Applicant extends Controller
             }
         }
         
+        // Check if application form exists for this job
+        $applicationFormMeta = $applicationFormModel->getFormByJobPostId($job['id']);
+        $form_available = $applicationFormMeta && ($applicationFormMeta['status'] ?? 'inactive') === 'active';
+        
         // Parse requirements if they're stored as text
         $requirements = [];
         if (!empty($job['requirements'])) {
@@ -295,6 +309,7 @@ class Applicant extends Controller
             'company' => 'HireFlow Company',
             'location' => $job['location'] ?? 'Not specified',
             'type' => $job['employment_type'] ?? 'Full-time',
+            'experience_level' => $job['experience_level'] ?? 'Not specified',
             'remote' => false, // We don't have this field in DB
             'salary' => $job['salary_range'] ?? 'Competitive salary',
             'posted_date' => date('Y-m-d', strtotime($job['created_at'])),
@@ -305,14 +320,7 @@ class Applicant extends Controller
             'has_applied' => $has_applied,
             'application_status' => $user_application['status'] ?? null,
             'applied_at' => $user_application['applied_at'] ?? null,
-            // Default responsibilities and benefits since they're not in DB
-            'responsibilities' => [
-                'Execute job duties as per job description',
-                'Collaborate with team members effectively',
-                'Meet project deadlines and deliverables',
-                'Maintain professional standards',
-                'Contribute to team and company goals'
-            ],
+            'form_available' => $form_available,
             'benefits' => [
                 'Competitive salary package',
                 'Health and medical benefits',
@@ -404,6 +412,7 @@ class Applicant extends Controller
         
         $jobModel = new JobPost();
         $applicationModel = new Application();
+        $applicationFormModel = new ApplicationForm();
         $user_id = Auth::user_id();
         
         // Process application submission
@@ -425,6 +434,73 @@ class Applicant extends Controller
             redirect('applicant/jobs/details/' . $job_id);
             return;
         }
+
+        // Get active dynamic form configured by recruitment manager
+        $formMeta = $applicationFormModel->getFormByJobPostId($job_id);
+        if (!$formMeta || ($formMeta['status'] ?? 'inactive') !== 'active') {
+            redirect('applicant/jobs/details/' . $job_id);
+            return;
+        }
+
+        $form = $applicationFormModel->getFormWithFields($formMeta['id']);
+        if (!$form || empty($form['fields'])) {
+            redirect('applicant/jobs/details/' . $job_id);
+            return;
+        }
+
+        // Group fields by category in a stable display order
+        $grouped_fields = [];
+        foreach ($form['fields'] as $field) {
+            $category = $field['field_category'];
+            if (!isset($grouped_fields[$category])) {
+                $grouped_fields[$category] = [];
+            }
+            $grouped_fields[$category][] = $field;
+        }
+
+        $category_order = [
+            'personal_info',
+            'education',
+            'work_experience',
+            'skills',
+            'documents',
+            'availability',
+            'declarations',
+            'additional_info'
+        ];
+
+        $ordered_fields = [];
+        foreach ($category_order as $category) {
+            if (isset($grouped_fields[$category])) {
+                $ordered_fields[$category] = $grouped_fields[$category];
+            }
+        }
+        foreach ($grouped_fields as $category => $fields) {
+            if (!isset($ordered_fields[$category])) {
+                $ordered_fields[$category] = $fields;
+            }
+        }
+
+        $current_user = Auth::user();
+        $prefill = [
+            'first_name' => '',
+            'last_name' => '',
+            'email' => $current_user['email'] ?? '',
+            'phone' => $current_user['phone'] ?? '',
+            'city' => '',
+            'province' => '',
+            'nationality' => '',
+            'date_of_birth' => '',
+            'gender' => '',
+            'linkedin_url' => '',
+            'portfolio_url' => '',
+        ];
+
+        if (!empty($current_user['full_name'])) {
+            $name_parts = preg_split('/\s+/', trim($current_user['full_name']));
+            $prefill['first_name'] = $name_parts[0] ?? '';
+            $prefill['last_name'] = count($name_parts) > 1 ? implode(' ', array_slice($name_parts, 1)) : '';
+        }
         
         $data['job'] = [
             'id' => $job['id'],
@@ -432,8 +508,17 @@ class Applicant extends Controller
             'company' => 'HireFlow Company',
             'location' => $job['location'] ?? 'Not specified',
             'salary' => $job['salary_range'] ?? 'Competitive salary',
-            'department' => $job['department'] ?? 'General'
+            'department' => $job['department'] ?? 'General',
+            'description' => $job['description'] ?? '',
+            'employment_type' => $job['employment_type'] ?? 'Not specified',
+            'deadline' => $job['deadline'] ?? null
         ];
+
+        $data['user'] = $this->getUserData($user_id);
+        $data['form'] = $form;
+        $data['grouped_fields'] = $ordered_fields;
+        $data['category_labels'] = $this->getApplicationFormCategoryLabels();
+        $data['prefill'] = $prefill;
 
         $this->view('applicant/apply', $data);
     }
@@ -449,31 +534,121 @@ class Applicant extends Controller
         
         $applicationModel = new Application();
         $notificationModel = new Notification();
+        $jobModel = new JobPost();
+        $applicationFormModel = new ApplicationForm();
         $user_id = Auth::user_id();
-        
-        $data = [
-            'job_id' => $_POST['job_id'] ?? null,
-            'applicant_id' => $user_id,
-            'cover_letter' => $_POST['cover_letter'] ?? '',
-            'resume_path' => '', // Will be set after file upload
-            'status' => 'Applied'
-        ];
-        
-        // Handle file upload (resume)
-        if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
-            $upload_result = $this->handleResumeUpload($_FILES['resume'], $user_id);
-            if ($upload_result['success']) {
-                $data['resume_path'] = $upload_result['path'];
-            } else {
-                $_SESSION['error'] = $upload_result['error'];
-                redirect('applicant/applications/apply?job_id=' . $data['job_id']);
-                return;
-            }
-        } else {
-            $_SESSION['error'] = "Resume file is required.";
-            redirect('applicant/applications/apply?job_id=' . $data['job_id']);
+
+        $job_id = isset($_POST['job_id']) ? (int)$_POST['job_id'] : 0;
+        if ($job_id <= 0) {
+            $_SESSION['error'] = "Invalid job selection.";
+            redirect('applicant/jobs');
             return;
         }
+
+        $job = $jobModel->getJobById($job_id);
+        if (!$job) {
+            $_SESSION['error'] = "Job is not available.";
+            redirect('applicant/jobs');
+            return;
+        }
+
+        if ($applicationModel->hasAppliedToJob($user_id, $job_id)) {
+            $_SESSION['error'] = "You have already applied to this position.";
+            redirect('applicant/jobs/details/' . $job_id);
+            return;
+        }
+
+        $formMeta = $applicationFormModel->getFormByJobPostId($job_id);
+        if (!$formMeta || ($formMeta['status'] ?? 'inactive') !== 'active') {
+            redirect('applicant/jobs/details/' . $job_id);
+            return;
+        }
+
+        $form = $applicationFormModel->getFormWithFields($formMeta['id']);
+        if (!$form || empty($form['fields'])) {
+            redirect('applicant/jobs/details/' . $job_id);
+            return;
+        }
+
+        $submitted_fields = $_POST['form_fields'] ?? [];
+        $responses = [];
+        $resume_path = '';
+        $validation_errors = [];
+
+        foreach ($form['fields'] as $field) {
+            if (!(int)$field['is_enabled']) {
+                continue;
+            }
+
+            $field_name = $field['field_name'];
+            $field_label = $field['field_label'];
+            $field_type = $field['field_type'];
+            $is_required = (int)$field['is_required'] === 1;
+
+            if ($field_type === 'file') {
+                $file = $this->extractFormFile($_FILES['form_files'] ?? null, $field_name);
+
+                if ($file && $file['error'] === UPLOAD_ERR_OK) {
+                    $is_resume_field = stripos($field_name, 'resume') !== false;
+                    $upload_result = $this->handleDynamicFormFileUpload($file, $user_id, $is_resume_field);
+
+                    if (!$upload_result['success']) {
+                        $validation_errors[] = $upload_result['error'];
+                        continue;
+                    }
+
+                    $responses[$field_name] = $upload_result['path'];
+                    if ($is_resume_field) {
+                        $resume_path = $upload_result['path'];
+                    }
+                } elseif ($is_required) {
+                    $validation_errors[] = $field_label . " is required.";
+                }
+
+                continue;
+            }
+
+            $value = $submitted_fields[$field_name] ?? null;
+            if (is_string($value)) {
+                $value = trim($value);
+            }
+
+            if ($field_type === 'checkbox') {
+                $checked = !empty($value) ? 'Yes' : 'No';
+                if ($is_required && $checked !== 'Yes') {
+                    $validation_errors[] = $field_label . " is required.";
+                }
+                $responses[$field_name] = $checked;
+                continue;
+            }
+
+            if ($is_required && ($value === null || $value === '')) {
+                $validation_errors[] = $field_label . " is required.";
+                continue;
+            }
+
+            $responses[$field_name] = $value;
+        }
+
+        if (empty($resume_path)) {
+            $validation_errors[] = "Resume upload is required.";
+        }
+
+        if (!empty($validation_errors)) {
+            $_SESSION['error'] = implode(' ', array_unique($validation_errors));
+            redirect('applicant/applications/apply?job_id=' . $job_id);
+            return;
+        }
+
+        $cover_letter = $this->buildDynamicApplicationSummary($form, $responses);
+
+        $data = [
+            'job_id' => $job_id,
+            'applicant_id' => $user_id,
+            'cover_letter' => $cover_letter,
+            'resume_path' => $resume_path,
+            'status' => 'Applied'
+        ];
         
         // Submit application
         if ($applicationModel->submitApplication($data)) {
@@ -489,13 +664,105 @@ class Applicant extends Controller
             redirect('applicant/applications');
         } else {
             $_SESSION['error'] = "Failed to submit application. Please try again.";
-            redirect('applicant/applications/apply?job_id=' . $data['job_id']);
+            redirect('applicant/applications/apply?job_id=' . $job_id);
         }
+    }
+
+    private function getApplicationFormCategoryLabels()
+    {
+        return [
+            'personal_info' => 'Personal Information',
+            'education' => 'Education Details',
+            'work_experience' => 'Work Experience',
+            'skills' => 'Skills & Competencies',
+            'documents' => 'Resume & Documents',
+            'availability' => 'Availability & Expectations',
+            'declarations' => 'Declarations & Consent',
+            'additional_info' => 'Additional Information'
+        ];
+    }
+
+    private function extractFormFile($formFiles, $fieldName)
+    {
+        if (!$formFiles || !isset($formFiles['name'][$fieldName])) {
+            return null;
+        }
+
+        return [
+            'name' => $formFiles['name'][$fieldName],
+            'type' => $formFiles['type'][$fieldName],
+            'tmp_name' => $formFiles['tmp_name'][$fieldName],
+            'error' => $formFiles['error'][$fieldName],
+            'size' => $formFiles['size'][$fieldName],
+        ];
+    }
+
+    private function handleDynamicFormFileUpload($file, $user_id, $strict_pdf = false)
+    {
+        $upload_dir = $this->publicPath('uploads/resumes');
+
+        if (!is_dir($upload_dir)) {
+            mkdir($upload_dir, 0755, true);
+        }
+
+        $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+        $max_size = 5242880; // 5MB
+
+        if ($strict_pdf) {
+            if ($file_extension !== 'pdf') {
+                return ['success' => false, 'error' => 'Resume must be a PDF file.'];
+            }
+        } else {
+            $allowed_extensions = ['pdf', 'doc', 'docx'];
+            if (!in_array($file_extension, $allowed_extensions, true)) {
+                return ['success' => false, 'error' => 'Uploaded file type is not allowed.'];
+            }
+        }
+
+        if ($file['size'] > $max_size) {
+            return ['success' => false, 'error' => 'File size must be less than 5MB.'];
+        }
+
+        $filename = 'resume_' . $user_id . '_' . time() . '_' . bin2hex(random_bytes(3)) . '.' . $file_extension;
+        $file_path = $upload_dir . $filename;
+
+        if (!move_uploaded_file($file['tmp_name'], $file_path)) {
+            return ['success' => false, 'error' => 'Failed to upload file.'];
+        }
+
+        return ['success' => true, 'path' => '/uploads/resumes/' . $filename];
+    }
+
+    private function buildDynamicApplicationSummary($form, $responses)
+    {
+        $lines = [];
+        $lines[] = "Submitted via dynamic application form: " . ($form['form_title'] ?? 'Application Form');
+
+        foreach ($form['fields'] as $field) {
+            $name = $field['field_name'];
+            if (!isset($responses[$name])) {
+                continue;
+            }
+
+            if ($field['field_type'] === 'file') {
+                continue;
+            }
+
+            $value = is_scalar($responses[$name]) ? (string)$responses[$name] : '';
+            if ($value === '') {
+                continue;
+            }
+
+            $lines[] = $field['field_label'] . ': ' . $value;
+        }
+
+        $summary = implode("\n", $lines);
+        return mb_substr($summary, 0, 60000);
     }
     
     private function handleResumeUpload($file, $user_id)
     {
-        $upload_dir = $_SERVER['DOCUMENT_ROOT'] . '/HireFlow/public/uploads/resumes/';
+        $upload_dir = $this->publicPath('uploads/resumes');
         
         // Create directory if it doesn't exist
         if (!is_dir($upload_dir)) {
@@ -524,6 +791,119 @@ class Applicant extends Controller
         } else {
             return ['success' => false, 'error' => 'Failed to upload file.'];
         }
+    }
+
+    private function publicPath($relative = '')
+    {
+        $project_root = dirname(__DIR__, 3);
+        $public_root = rtrim($project_root . '/public', '/');
+
+        if ($relative === '' || $relative === null) {
+            return $public_root;
+        }
+
+        return $public_root . '/' . ltrim($relative, '/');
+    }
+
+    private function ensureResumeFileAccessible($web_path)
+    {
+        if (empty($web_path)) {
+            return;
+        }
+
+        $relative = ltrim($web_path, '/');
+        $expected = $this->publicPath($relative);
+
+        if (file_exists($expected)) {
+            return;
+        }
+
+        // Legacy fallback for previously uploaded files written to nested path.
+        $legacy = $this->publicPath('HireFlow/public/' . $relative);
+        if (!file_exists($legacy)) {
+            return;
+        }
+
+        $target_dir = dirname($expected);
+        if (!is_dir($target_dir)) {
+            mkdir($target_dir, 0755, true);
+        }
+
+        @copy($legacy, $expected);
+    }
+
+    private function deleteResumeFile($web_path)
+    {
+        if (empty($web_path)) {
+            return;
+        }
+
+        $relative = ltrim($web_path, '/');
+        $expected = $this->publicPath($relative);
+        $legacy = $this->publicPath('HireFlow/public/' . $relative);
+
+        if (file_exists($expected)) {
+            @unlink($expected);
+        }
+
+        if (file_exists($legacy)) {
+            @unlink($legacy);
+        }
+    }
+
+    private function parseDynamicApplicationSummary($cover_letter)
+    {
+        $values_by_label = [];
+        $lines = preg_split('/\r\n|\r|\n/', (string)$cover_letter);
+
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || stripos($line, 'Submitted via dynamic application form:') === 0) {
+                continue;
+            }
+
+            $separator_pos = strpos($line, ':');
+            if ($separator_pos === false) {
+                continue;
+            }
+
+            $label = trim(substr($line, 0, $separator_pos));
+            $value = trim(substr($line, $separator_pos + 1));
+
+            if ($label !== '') {
+                $values_by_label[$label] = $value;
+            }
+        }
+
+        return $values_by_label;
+    }
+
+    private function extractResumeFromDynamicFiles($form_files)
+    {
+        if (!$form_files || !isset($form_files['name']) || !is_array($form_files['name'])) {
+            return null;
+        }
+
+        foreach ($form_files['name'] as $field_name => $name) {
+            if (stripos((string)$field_name, 'resume') === false) {
+                continue;
+            }
+
+            $error = $form_files['error'][$field_name] ?? UPLOAD_ERR_NO_FILE;
+            if ($error !== UPLOAD_ERR_OK) {
+                continue;
+            }
+
+            return [
+                'name' => $name,
+                'type' => $form_files['type'][$field_name] ?? '',
+                'tmp_name' => $form_files['tmp_name'][$field_name] ?? '',
+                'error' => $error,
+                'size' => $form_files['size'][$field_name] ?? 0,
+            ];
+        }
+
+        return null;
     }
 
     public function interviews($action = null)
@@ -794,6 +1174,8 @@ class Applicant extends Controller
             redirect('applicant/applications');
             return;
         }
+
+        $this->ensureResumeFileAccessible($application['resume_path'] ?? '');
         
         $data = [];
         $data['user'] = $this->getUserData($user_id);
@@ -827,6 +1209,7 @@ class Applicant extends Controller
         }
         
         $applicationModel = new Application();
+        $applicationFormModel = new ApplicationForm();
         $user_id = Auth::user_id();
         
         // Handle form submission
@@ -857,6 +1240,35 @@ class Applicant extends Controller
             redirect('applicant/applications');
             return;
         }
+
+        $this->ensureResumeFileAccessible($application['resume_path'] ?? '');
+
+        $formMeta = $applicationFormModel->getFormByJobPostId($application['job_id']);
+        $form = null;
+        $grouped_fields = [];
+        $prefill_values = [];
+
+        if ($formMeta) {
+            $form = $applicationFormModel->getFormWithFields($formMeta['id']);
+        }
+
+        if ($form && !empty($form['fields'])) {
+            $saved_values = $this->parseDynamicApplicationSummary($application['cover_letter'] ?? '');
+
+            foreach ($form['fields'] as $field) {
+                if (!(int)$field['is_enabled']) {
+                    continue;
+                }
+
+                $category = $field['field_category'];
+                if (!isset($grouped_fields[$category])) {
+                    $grouped_fields[$category] = [];
+                }
+                $grouped_fields[$category][] = $field;
+
+                $prefill_values[$field['field_name']] = $saved_values[$field['field_label']] ?? '';
+            }
+        }
         
         $data = [];
         $data['user'] = $this->getUserData($user_id);
@@ -868,9 +1280,15 @@ class Applicant extends Controller
             'location' => $application['location'] ?? 'Not specified',
             'salary' => $application['salary_range'] ?? 'Not specified',
             'department' => $application['department'] ?? 'General',
+            'employment_type' => $application['employment_type'] ?? 'Not specified',
+            'deadline' => $application['deadline'] ?? null,
             'cover_letter' => $application['cover_letter'],
             'resume_path' => $application['resume_path']
         ];
+        $data['form'] = $form;
+        $data['grouped_fields'] = $grouped_fields;
+        $data['prefill_values'] = $prefill_values;
+        $data['category_labels'] = $this->getApplicationFormCategoryLabels();
         
         $this->view('applicant/edit-application', $data);
     }
@@ -881,6 +1299,7 @@ class Applicant extends Controller
         Auth::requireRole(4);
         
         $applicationModel = new Application();
+        $applicationFormModel = new ApplicationForm();
         $user_id = Auth::user_id();
         
         // Get current application
@@ -894,23 +1313,58 @@ class Applicant extends Controller
         }
         
         $update_data = [];
-        
-        // Update cover letter
-        if (!empty($_POST['cover_letter'])) {
+
+        // Support dynamic form edit values as primary source.
+        $formMeta = $applicationFormModel->getFormByJobPostId($application['job_id']);
+        if ($formMeta) {
+            $form = $applicationFormModel->getFormWithFields($formMeta['id']);
+            if ($form && !empty($form['fields']) && isset($_POST['form_fields']) && is_array($_POST['form_fields'])) {
+                $responses = [];
+                foreach ($form['fields'] as $field) {
+                    if (!(int)$field['is_enabled']) {
+                        continue;
+                    }
+
+                    $field_name = $field['field_name'];
+                    $field_type = $field['field_type'];
+
+                    if ($field_type === 'file') {
+                        continue;
+                    }
+
+                    if ($field_type === 'checkbox') {
+                        $responses[$field_name] = !empty($_POST['form_fields'][$field_name]) ? 'Yes' : 'No';
+                        continue;
+                    }
+
+                    $value = $_POST['form_fields'][$field_name] ?? '';
+                    $responses[$field_name] = is_string($value) ? trim($value) : $value;
+                }
+
+                $update_data['cover_letter'] = $this->buildDynamicApplicationSummary($form, $responses);
+            }
+        }
+
+        // Backward compatibility for legacy edit screen posts.
+        if (empty($update_data['cover_letter']) && !empty($_POST['cover_letter'])) {
             $update_data['cover_letter'] = $_POST['cover_letter'];
         }
         
-        // Handle resume upload if new file provided
+        // Handle resume upload from legacy input or dynamic form file input.
+        $resume_file = null;
         if (isset($_FILES['resume']) && $_FILES['resume']['error'] === UPLOAD_ERR_OK) {
-            $upload_result = $this->handleResumeUpload($_FILES['resume'], $user_id);
+            $resume_file = $_FILES['resume'];
+        } else {
+            $resume_file = $this->extractResumeFromDynamicFiles($_FILES['form_files'] ?? null);
+        }
+
+        if ($resume_file) {
+            $upload_result = $this->handleDynamicFormFileUpload($resume_file, $user_id, true);
             if ($upload_result['success']) {
                 $update_data['resume_path'] = $upload_result['path'];
                 
                 // Delete old resume file
-                $old_resume_path = $_SERVER['DOCUMENT_ROOT'] . '/HireFlow/public' . $application['resume_path'];
-                if (file_exists($old_resume_path)) {
-                    unlink($old_resume_path);
-                }
+                $this->deleteResumeFile($application['resume_path'] ?? '');
             } else {
                 $_SESSION['error'] = $upload_result['error'];
                 redirect('applicant/editApplication/' . $application_id);
@@ -963,10 +1417,7 @@ class Applicant extends Controller
         }
         
         // Delete resume file
-        $resume_path = $_SERVER['DOCUMENT_ROOT'] . '/HireFlow/public' . $application['resume_path'];
-        if (file_exists($resume_path)) {
-            unlink($resume_path);
-        }
+        $this->deleteResumeFile($application['resume_path'] ?? '');
         
         // Delete application from database
         if ($applicationModel->deleteApplication($application_id)) {

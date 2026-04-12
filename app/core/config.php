@@ -2,10 +2,10 @@
 if ($_SERVER['SERVER_NAME'] == 'localhost') {
     define('DB_HOST', 'localhost');
     define('DB_USER', 'root');
-    define('DB_PASS', '');
+    define('DB_PASS', 'root');
     define('DB_NAME', 'hireflow_db');
     define('DB_DRIVER', '');
-    define('ROOT', 'http://localhost/HireFlow/public');
+    define('ROOT', 'http://localhost:8888');
 } else {
     define('DB_HOST', 'localhost');
     define('DB_USER', 'root');

@@ -275,6 +275,29 @@
     font-size: 0.85rem;
 }
 
+.btn-disabled {
+    background-color: #d1d5db !important;
+    color: #6b7280 !important;
+    cursor: not-allowed !important;
+    border: 1px solid #c4c7ce !important;
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.btn-secondary {
+    background-color: #6b7280 !important;
+    color: white !important;
+    border: 1px solid #4b5563 !important;
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
 .load-more-section {
     text-align: center;
     padding: 32px 0;
