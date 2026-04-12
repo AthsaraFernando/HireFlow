@@ -137,7 +137,7 @@
                     <a href="<?= ROOT ?>/applicant/dashboard" class="nav-link">Dashboard</a>
                     <a href="<?= ROOT ?>/applicant/browse-jobs" class="nav-link">Browse Jobs</a>
                     <a href="<?= ROOT ?>/applicant/my-applications" class="nav-link">My Applications</a>
-                    <a href="<?= ROOT ?>/applicant/profile-edit" class="nav-link">Profile</a>
+                    <a href="<?= ROOT ?>/applicant/profile" class="nav-link">Profile</a>
                 <?php endif; ?>
             <?php else: ?>
                 <a href="<?= ROOT ?>/signin" class="nav-link">Sign In</a>
