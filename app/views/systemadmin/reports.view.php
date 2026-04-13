@@ -211,6 +211,15 @@
             grid-template-rows: 1fr 1fr;
             gap: 25px;
         }
+
+        .profile_picture {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            margin-left: 20px;
+        }
     </style>
 </head>
 
@@ -271,9 +280,9 @@
             </div>
 
             <div class="header-right">
-                <div class="header-notifications">
+                <!-- <div class="header-notifications">
                     <button class="notification-btn"></button>
-                </div>
+                </div> -->
 
                 <div class="header-user">
                     <div class="user-info">
@@ -281,8 +290,22 @@
                             <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
                         <span class="user-role">System Administrator</span>
                     </div>
-                    <div class="user-avatar">
-                    </div>
+                    <?php
+                    $defaultProfileImage = 'default-avatar.jpg';
+                    $profileImage = $defaultProfileImage;
+
+                    if (!empty($_SESSION['USER']['profile_picture'])) {
+                        $basePath = dirname(dirname(dirname(__DIR__)));
+                        $profileImageFile = $basePath . '/public/assets/images/profiles/' . $_SESSION['USER']['profile_picture'];
+
+                        if (file_exists($profileImageFile)) {
+                            $profileImage = $_SESSION['USER']['profile_picture'];
+                        }
+                    }
+                    ?>
+                    <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt="" class="profile_picture">
+                    <!-- <div class="user-avatar">
+                    </div> -->
                 </div>
             </div>
         </header>
@@ -371,6 +394,19 @@
                             <button class="btn btn-outline-secondary" onclick="downloadData('user_activity')">
                                 Download Data
                             </button>
+                            <form method="POST" id="filterForm" action="<?= ROOT ?>/systemadmin/reports"
+                                class="filter-form">
+                                <div class="filter-group">
+                                    <!-- <label>Filter by Duration</label> -->
+                                    <select name="duration" class="filter-select" id="actionFilter">
+                                        <!-- <select name="duration" onchange="this.form.submit()"></select> -->
+                                        <option value="10">Last 10 days</option>
+                                        <option value="20" selected>Last 20 days</option>
+                                        <option value="30">Last 30 days</option>
+                                        <option value="60">Last 60 days</option>
+                                    </select>
+                                </div>
+                            </form>
                         </div>
                         <div class="chart-container">
                             <div class="chart-placeholder">
@@ -420,10 +456,22 @@
                     <div class="reports-section">
                         <h2 class="section-title">Interviewing Progress</h2>
                         <div class="export-buttons">
-
                             <button class="btn btn-outline-secondary" onclick="downloadData('interviewing_progress')">
                                 Download Data
                             </button>
+                            <form method="POST" id="filterForm" action="<?= ROOT ?>/systemadmin/reports"
+                                class="filter-form">
+                                <div class="filter-group">
+                                    <!-- <label>Filter by Duration</label> -->
+                                    <select name="duration" class="filter-select" id="actionFilter1">
+                                        <!-- <select name="duration" onchange="this.form.submit()"></select> -->
+                                        <option value="10">Last 10 days</option>
+                                        <option value="20" selected>Last 20 days</option>
+                                        <option value="30">Last 30 days</option>
+                                        <option value="60">Last 60 days</option>
+                                    </select>
+                                </div>
+                            </form>
                         </div>
                         <div class="chart-container">
                             <div class="chart-placeholder">
@@ -463,10 +511,11 @@
                     </div>
 
                     <div class="reports-section">
-                        <h2 class="section-title">Report 3</h2>
+                        <h2 class="section-title">Application Stage Summary</h2>
                         <div class="export-buttons">
 
-                            <button class="btn btn-outline-secondary" onclick="downloadData('')">
+                            <button class="btn btn-outline-secondary"
+                                onclick="downloadData('application_status_counts')">
                                 Download Data
                             </button>
                         </div>
@@ -512,21 +561,50 @@
                     const exportFormat = document.getElementById('export_format').value;
                 }
 
+                const whiteBackgroundPlugin = {
+                    id: 'custom_canvas_background_color',
+                    beforeDraw: (chart) => {
+                        const ctx = chart.ctx;
+                        ctx.save();
+                        ctx.globalCompositeOperation = 'destination-over';
+                        ctx.fillStyle = '#f8f9fa';
+                        ctx.fillRect(0, 0, chart.width, chart.height);
+                        ctx.restore();
+                    }
+                };
+                Chart.register(whiteBackgroundPlugin);
+                Chart.defaults.devicePixelRatio = 3;
 
                 let userChart1;
                 let userChart2;
                 let userChart3;
                 let userChart4;
                 let userChart5;
+                let userChart6;
 
-                function userActivityChart() {
-                    const stats = <?= json_encode($data['user_activity']); ?>;
-                    const labels = stats.map(row => row.log_date);
-                    const logins = stats.map(row => row.logins);
-                    const registrations = stats.map(row => row.registrations);
-                    const applications = stats.map(row => row.applications_submitted);
+                function filterStatsByDays(data, days) {
+                    const now = new Date();
+                    return data.filter(row => {
+                        const date = new Date(row.log_date || row.scheduled_date);
+                        const diffDays = (now - date) / (1000 * 60 * 60 * 24);
+                        return diffDays <= days;
+                    });
+                }
+                const userActivityStats = <?= json_encode($data['user_activity']); ?>;
+                function userActivityChart(days = 20) {
+                    // console.log(stats);
+                    const filteredStats = filterStatsByDays(userActivityStats, days);
+                    const labels = filteredStats.map(row => row.log_date);
+                    const logins = filteredStats.map(row => row.logins);
+                    const registrations = filteredStats.map(row => row.registrations);
+                    const applications = filteredStats.map(row => row.applications_submitted);
 
                     const ctx = document.getElementById('myChart').getContext('2d');
+
+                    // destroy previous chart (VERY IMPORTANT)
+                    if (userChart1) {
+                        userChart1.destroy();
+                    }
 
                     userChart1 = new Chart(ctx, {   // store in global variable
                         type: 'line',
@@ -549,7 +627,13 @@
                         }
                     });
                 }
-                userActivityChart();
+                const select = document.getElementById('actionFilter');
+                userActivityChart(parseInt(select.value));
+                select.addEventListener('change', function () {
+                    const days = parseInt(this.value);
+                    userActivityChart(days);
+                });
+                // userActivityChart();
 
                 function jobPostStatChart() {
                     const stats = <?= json_encode($data['jobpost_stats']); ?>;
@@ -580,13 +664,18 @@
                 jobPostStatChart()
 
 
-                function interviewStatChart() {
-                    const stats = <?= json_encode($data['interview_stats']); ?>;
-                    const labels = stats.map(row => row.scheduled_date);
-                    const scheduledCount = stats.map(row => row.scheduledCount);
+                const interviewingStats = <?= json_encode($data['interview_stats']); ?>;
+                function interviewStatChart(days = 20) {
+                    const filteredStats = filterStatsByDays(interviewingStats, days);
+                    const labels = filteredStats.map(row => row.scheduled_date);
+                    const scheduledCount = filteredStats.map(row => row.scheduledCount);
 
 
                     const ctx = document.getElementById('myChart3').getContext('2d');
+
+                    if (userChart3) {
+                        userChart3.destroy();
+                    }
 
                     userChart3 = new Chart(ctx, {   // store in global variable
                         type: 'bar',
@@ -610,7 +699,13 @@
                         }
                     });
                 }
-                interviewStatChart()
+                const select1 = document.getElementById('actionFilter1');
+                interviewStatChart(parseInt(select1.value));
+                select1.addEventListener('change', function () {
+                    const days = parseInt(this.value);
+                    interviewStatChart(days);
+                });
+                // interviewStatChart()
 
                 function userStatusChart() {
                     const stats = <?= json_encode($data['user_status']); ?>;
@@ -620,7 +715,7 @@
 
                     const ctx = document.getElementById('myChart4').getContext('2d');
 
-                    userChart1 = new Chart(ctx, {   // store in global variable
+                    userChart4 = new Chart(ctx, {   // store in global variable
                         type: 'pie',
                         data: {
                             labels: labels,
@@ -644,7 +739,7 @@
 
                     const ctx = document.getElementById('myChart5').getContext('2d');
 
-                    userChart1 = new Chart(ctx, {
+                    userChart5 = new Chart(ctx, {
                         type: 'bar',
                         data: {
                             labels: labels,
@@ -665,6 +760,34 @@
                 }
                 jobDemandChart();
 
+                function applicationStageCountChart() {
+                    const stats = <?= json_encode($data['application_status_counts']); ?>;
+                    const labels = stats.map(row => row.status);
+                    const counts = stats.map(row => row.counts);
+
+                    const ctx = document.getElementById('myChart6').getContext('2d');
+                    userChart6 = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [
+                                { label: 'Application Count', data: counts, borderWidth: 2 },
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 }
+                                }
+                            }
+                        }
+                    });
+
+                }
+                applicationStageCountChart();
+
 
 
 
@@ -675,28 +798,60 @@
 
                 function downloadData(dataType) {
                     // showToast(`Downloading ${dataType} data...`, 'info');
+                    const select = document.getElementById('actionFilter');
+                    const select1 = document.getElementById('actionFilter1');
+                    const now = new Date();
+                    const formattedDate =
+                        now.getFullYear() +
+                        String(now.getMonth() + 1).padStart(2, '0') +
+                        String(now.getDate()).padStart(2, '0') + '_' +
+                        String(now.getHours()).padStart(2, '0') +
+                        String(now.getMinutes()).padStart(2, '0') +
+                        String(now.getSeconds()).padStart(2, '0');
+
                     if (!userChart1 || !userChart2 || !userChart3) return;
                     switch (dataType) {
                         case 'user_activity':
                             const url1 = userChart1.toBase64Image();
                             const a1 = document.createElement('a');
                             a1.href = url1;
-                            a1.download = 'user_activity.png';
+                            a1.download = `user_activity_${select.value}d_${formattedDate}.png`;
                             a1.click();
                             break;
                         case 'job_posting_overview':
                             const url2 = userChart2.toBase64Image();
                             const a2 = document.createElement('a');
                             a2.href = url2;
-                            a2.download = 'job_posting_overview.png';
+                            a2.download = `job_posting_overview_${formattedDate}.png`;
                             a2.click();
                             break;
                         case 'interviewing_progress':
                             const url3 = userChart3.toBase64Image();
                             const a3 = document.createElement('a');
                             a3.href = url3;
-                            a3.download = 'interviewing_progress.png';
+                            a3.download = `interviewing_progress_${select1.value}d_${formattedDate}.png`;
                             a3.click();
+                            break;
+                        case 'user_status':
+                            const url4 = userChart4.toBase64Image();
+                            const a4 = document.createElement('a');
+                            a4.href = url4;
+                            a4.download = `user_status_${formattedDate}.png`;
+                            a4.click();
+                            break;
+                        case 'job_demand':
+                            const url5 = userChart5.toBase64Image();
+                            const a5 = document.createElement('a');
+                            a5.href = url5;
+                            a5.download = `job_demand_${formattedDate}.png`;
+                            a5.click();
+                            break;
+                        case 'application_status_counts':
+                            const url6 = userChart6.toBase64Image();
+                            const a6 = document.createElement('a');
+                            a6.href = url6;
+                            a6.download = `application_status_counts_${formattedDate}.png`;
+                            a6.click();
                             break;
                         default:
                             console.log('Unknown data type:', dataType);
@@ -756,6 +911,10 @@
                         }
                     });
                 });
+
+                // document.getElementById('actionFilter').addEventListener('change', function () {
+                //     document.getElementById('filterForm').submit();
+                // })
             </script>
 
         </div>

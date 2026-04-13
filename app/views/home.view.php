@@ -86,7 +86,7 @@ if (!function_exists('old_value')) {
 
                         <div class="form-group mb-4">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="remember_me" class="form-checkbox">
+                                <input type="checkbox" name="remember_me" class="form-checkbox" <?= isset($_POST['remember_me']) ? 'checked' : '' ?>>
                                 <span class="checkbox-text">Remember me</span>
                             </label>
                         </div>
