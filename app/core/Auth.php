@@ -2,12 +2,19 @@
 
 class Auth
 {
+    private const REMEMBER_ME_COOKIE = 'hireflow_remember';
+    private const REMEMBER_ME_DAYS = 30;
+
     /**
      * Check if user is logged in
      */
     public static function logged_in()
     {
-        return isset($_SESSION['USER']) && !empty($_SESSION['USER']);
+        if (isset($_SESSION['USER']) && !empty($_SESSION['USER'])) {
+            return true;
+        }
+
+        return self::loginFromRememberMeCookie();
     }
 
     /**
@@ -145,11 +152,116 @@ class Auth
         unset($_SESSION['USER_ID']);
         unset($_SESSION['USER_ROLE']);
         unset($_SESSION['LOGIN_TIME']);
+
+        self::clearRememberMeCookie();
         
         // Destroy session if no other data
         if (empty($_SESSION)) {
             session_destroy();
         }
+    }
+
+    /**
+     * Enable remember me for a user
+     */
+    public static function setRememberMeCookie($userId)
+    {
+        $userId = (int) $userId;
+        if ($userId <= 0) {
+            return;
+        }
+
+        $expires = time() + (self::REMEMBER_ME_DAYS * 24 * 60 * 60);
+        $payload = $userId . '|' . $expires;
+        $signature = hash_hmac('sha256', $payload, self::rememberMeSecret());
+        $cookieValue = base64_encode($payload . '|' . $signature);
+
+        setcookie(self::REMEMBER_ME_COOKIE, $cookieValue, [
+            'expires' => $expires,
+            'path' => '/',
+            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+    }
+
+    /**
+     * Clear remember me cookie
+     */
+    public static function clearRememberMeCookie()
+    {
+        setcookie(self::REMEMBER_ME_COOKIE, '', [
+            'expires' => time() - 3600,
+            'path' => '/',
+            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+
+        unset($_COOKIE[self::REMEMBER_ME_COOKIE]);
+    }
+
+    /**
+     * Try to restore login from remember me cookie
+     */
+    private static function loginFromRememberMeCookie()
+    {
+        if (empty($_COOKIE[self::REMEMBER_ME_COOKIE])) {
+            return false;
+        }
+
+        $decoded = base64_decode($_COOKIE[self::REMEMBER_ME_COOKIE], true);
+        if ($decoded === false) {
+            self::clearRememberMeCookie();
+            return false;
+        }
+
+        $parts = explode('|', $decoded);
+        if (count($parts) !== 3) {
+            self::clearRememberMeCookie();
+            return false;
+        }
+
+        [$userId, $expires, $signature] = $parts;
+        if (!ctype_digit($userId) || !ctype_digit($expires)) {
+            self::clearRememberMeCookie();
+            return false;
+        }
+
+        if ((int) $expires < time()) {
+            self::clearRememberMeCookie();
+            return false;
+        }
+
+        $payload = $userId . '|' . $expires;
+        $expectedSignature = hash_hmac('sha256', $payload, self::rememberMeSecret());
+        if (!hash_equals($expectedSignature, $signature)) {
+            self::clearRememberMeCookie();
+            return false;
+        }
+
+        $userModel = new User();
+        $user = $userModel->first(['id' => (int) $userId], []);
+
+        if (!$user || (isset($user['status']) && $user['status'] !== 'active')) {
+            self::clearRememberMeCookie();
+            return false;
+        }
+
+        $_SESSION['USER'] = $user;
+        $_SESSION['USER_ID'] = $user['id'];
+        $_SESSION['USER_ROLE'] = $user['role_id'];
+        $_SESSION['LOGIN_TIME'] = time();
+
+        return true;
+    }
+
+    /**
+     * Generate a secret for signing remember me cookies
+     */
+    private static function rememberMeSecret()
+    {
+        return hash('sha256', APP_NAME . '|' . DB_NAME . '|' . DB_USER . '|hireflow-remember');
     }
 
     /**
