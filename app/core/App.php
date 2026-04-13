@@ -15,6 +15,37 @@ class App
         // e.g., "job-posts" -> "JobPosts", "create-job" -> "CreateJob"
         return str_replace(' ', '', ucwords(str_replace('-', ' ', $url)));
     }
+
+    private function resolveControllerFile($directory, $expectedClassName)
+    {
+        $directory = rtrim($directory, '/');
+        $exactFile = $directory . '/' . $expectedClassName . '.php';
+
+        if (file_exists($exactFile)) {
+            return [$exactFile, $expectedClassName];
+        }
+
+        if (!is_dir($directory)) {
+            return [null, null];
+        }
+
+        foreach (scandir($directory) as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            if (strtolower(pathinfo($file, PATHINFO_EXTENSION)) !== 'php') {
+                continue;
+            }
+
+            $stem = pathinfo($file, PATHINFO_FILENAME);
+            if (strtolower($stem) === strtolower($expectedClassName)) {
+                return [$directory . '/' . $file, $stem];
+            }
+        }
+
+        return [null, null];
+    }
     
     public function loadController()
     {
@@ -26,20 +57,20 @@ class App
         // show($URL);
         
         // First check for direct controller files (e.g., Home.php, Signin.php)
-        $fileName = "../app/controllers/" . ucfirst($URL[0]) . ".php";
-        if (file_exists($fileName)) {
+        list($fileName, $controllerName) = $this->resolveControllerFile("../app/controllers", ucfirst($URL[0]));
+        if ($fileName) {
             require $fileName;
-            $this->controller = ucfirst($URL[0]);
+            $this->controller = $controllerName;
             unset($URL[0]);
         } else {
             // Check for folder-based controllers (e.g., systemadmin/Dashboard.php, applicant/Applicant.php)
             
             // Special handling for applicant routes - all go to main Applicant controller
             if ($URL[0] === 'applicant') {
-                $fileName = "../app/controllers/applicant/Applicant.php";
-                if (file_exists($fileName)) {
+                list($fileName, $controllerName) = $this->resolveControllerFile("../app/controllers/applicant", 'Applicant');
+                if ($fileName) {
                     require $fileName;
-                    $this->controller = 'Applicant';
+                    $this->controller = $controllerName;
                     unset($URL[0]); // Remove 'applicant' from URL array
                 } else {
                     $fileName = "../app/controllers/_404.php";
@@ -50,10 +81,10 @@ class App
                 // For systemadmin and other folder-based controllers
                 if (isset($URL[1])) {
                     $controllerName = $this->convertUrlToClassName($URL[1]);
-                    $fileName = "../app/controllers/" . $URL[0] . "/" . $controllerName . ".php";
-                    if (file_exists($fileName)) {
+                    list($fileName, $matchedControllerName) = $this->resolveControllerFile("../app/controllers/" . $URL[0], $controllerName);
+                    if ($fileName) {
                         require $fileName;
-                        $this->controller = $controllerName;
+                        $this->controller = $matchedControllerName;
                         unset($URL[0]); // Remove folder name from URL
                         unset($URL[1]); // Remove controller name from URL
                     } else {
@@ -64,10 +95,10 @@ class App
                 } else {
                     // If no second segment, try the main controller for that folder
                     $folderControllerName = ucfirst($URL[0]);
-                    $fileName = "../app/controllers/" . $URL[0] . "/" . $folderControllerName . ".php";
-                    if (file_exists($fileName)) {
+                    list($fileName, $matchedFolderControllerName) = $this->resolveControllerFile("../app/controllers/" . $URL[0], $folderControllerName);
+                    if ($fileName) {
                         require $fileName;
-                        $this->controller = $folderControllerName;
+                        $this->controller = $matchedFolderControllerName;
                         unset($URL[0]);
                     } else {
                         $fileName = "../app/controllers/_404.php";
