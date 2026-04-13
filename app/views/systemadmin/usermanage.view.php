@@ -315,6 +315,15 @@
             grid-template-columns: 1fr;
         }
     }
+
+    .profile_picture {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        margin-left: 20px;
+    }
 </style>
 
 <body>
@@ -374,9 +383,9 @@
             </div>
 
             <div class="header-right">
-                <div class="header-notifications">
+                <!-- <div class="header-notifications">
                     <button class="notification-btn"></button>
-                </div>
+                </div> -->
 
                 <div class="header-user">
                     <div class="user-info">
@@ -384,8 +393,23 @@
                             <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
                         <span class="user-role">System Administrator</span>
                     </div>
-                    <div class="user-avatar">
-                    </div>
+                    <?php
+                    $defaultProfileImage = 'default-avatar.jpg';
+                    $profileImage = $defaultProfileImage;
+
+                    if (!empty($_SESSION['USER']['profile_picture'])) {
+                        $basePath = dirname(dirname(dirname(__DIR__)));
+                        $profileImageFile = $basePath . '/public/assets/images/profiles/' . $_SESSION['USER']['profile_picture'];
+
+                        if (file_exists($profileImageFile)) {
+                            $profileImage = $_SESSION['USER']['profile_picture'];
+                        }
+                    }
+                    ?>
+                    <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt=""
+                            class="profile_picture">
+                    <!-- <div class="user-avatar">
+                    </div> -->
                 </div>
             </div>
         </header>
@@ -729,8 +753,8 @@
                         button.textContent = 'Create Staff Account';
                         button.onclick = saveUser;
                     } else if (action === 'edit') {
-                        document.querySelector('input[name="password"]').setAttribute('disabled',true);
-                        document.querySelector('input[name="confirmPassword"]').setAttribute('disabled',true);
+                        document.querySelector('input[name="password"]').setAttribute('disabled', true);
+                        document.querySelector('input[name="confirmPassword"]').setAttribute('disabled', true);
                         title.textContent = 'Edit User';
                         button.textContent = 'Update User';
                         modal.setAttribute('data-user-id', userId);
@@ -895,7 +919,26 @@
                                 }, 1000);
                             } else {
                                 console.log(data.message)
-                                showToast(data.message || 'Failed to create user', 'error');
+                                if (data.errors) {
+                                    if (data.errors.firstName) {
+                                        showToast(data.errors.firstName, 'error');
+                                    }
+                                    else if (data.errors.lastName) {
+                                        showToast(data.errors.lastName, 'error');
+                                    }
+                                    else if (data.errors.email) {
+                                        showToast(data.errors.email, 'error');
+                                    }
+                                    else if (data.errors.role) {
+                                        showToast(data.errors.role, 'error');
+                                    }
+                                    else {
+                                        showToast(data.errors.password, 'error');
+                                    }
+                                }
+                                else {
+                                    showToast(data.message || 'Failed to create user', 'error');
+                                }
                             }
                         })
                         .catch(error => {
