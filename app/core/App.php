@@ -15,6 +15,41 @@ class App
         // e.g., "job-posts" -> "JobPosts", "create-job" -> "CreateJob"
         return str_replace(' ', '', ucwords(str_replace('-', ' ', $url)));
     }
+
+    private function normalizeControllerToken($value)
+    {
+        return strtolower(preg_replace('/[^a-z0-9]/i', '', (string)$value));
+    }
+
+    private function resolveFolderController($folder, $segment)
+    {
+        $controllerDir = "../app/controllers/" . $folder;
+        if (!is_dir($controllerDir)) {
+            return null;
+        }
+
+        $controllerName = $this->convertUrlToClassName($segment);
+        $directPath = $controllerDir . "/" . $controllerName . ".php";
+        if (file_exists($directPath)) {
+            return [
+                'controller' => $controllerName,
+                'file' => $directPath,
+            ];
+        }
+
+        $targetToken = $this->normalizeControllerToken($segment);
+        foreach (glob($controllerDir . "/*.php") as $candidatePath) {
+            $candidateController = pathinfo($candidatePath, PATHINFO_FILENAME);
+            if ($this->normalizeControllerToken($candidateController) === $targetToken) {
+                return [
+                    'controller' => $candidateController,
+                    'file' => $candidatePath,
+                ];
+            }
+        }
+
+        return null;
+    }
     
     public function loadController()
     {
@@ -49,11 +84,10 @@ class App
             } else {
                 // For systemadmin and other folder-based controllers
                 if (isset($URL[1])) {
-                    $controllerName = $this->convertUrlToClassName($URL[1]);
-                    $fileName = "../app/controllers/" . $URL[0] . "/" . $controllerName . ".php";
-                    if (file_exists($fileName)) {
-                        require $fileName;
-                        $this->controller = $controllerName;
+                    $resolvedController = $this->resolveFolderController($URL[0], $URL[1]);
+                    if ($resolvedController) {
+                        require $resolvedController['file'];
+                        $this->controller = $resolvedController['controller'];
                         unset($URL[0]); // Remove folder name from URL
                         unset($URL[1]); // Remove controller name from URL
                     } else {
