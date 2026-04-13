@@ -34,6 +34,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                        <span class="nav-text">Saved Jobs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/applicant/interviews" class="nav-link">
                         <span class="nav-text">Interview Schedule</span>
                     </a>
@@ -76,6 +81,18 @@
             </div>
         </header>
 
+        <?php if(isset($_SESSION['success'])): ?>
+            <div class="alert alert-success" style="margin: 20px 32px 0; padding: 15px; background-color: #d4edda; color: #155724; border-radius: 8px;">
+                <?= $_SESSION['success']; unset($_SESSION['success']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if(isset($_SESSION['error'])): ?>
+            <div class="alert alert-error" style="margin: 20px 32px 0; padding: 15px; background-color: #f8d7da; color: #721c24; border-radius: 8px;">
+                <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
+
         <div class="job-details-content">
             <div class="job-main">
                 <!-- Job Header Card -->
@@ -99,6 +116,15 @@
                             <span class="salary-label">Salary Range</span>
                             <span class="salary-value"><?= $job['salary'] ?></span>
                         </div>
+                        <?php if(!$job['is_saved']): ?>
+                            <form method="POST" action="<?= ROOT ?>/applicant/savedJobs/save" class="details-save-form">
+                                <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
+                                <input type="hidden" name="return_to" value="applicant/jobs/details/<?= (int)$job['id'] ?>">
+                                <button type="submit" class="btn btn-outline btn-large">Save Job</button>
+                            </form>
+                        <?php else: ?>
+                            <a href="<?= ROOT ?>/applicant/savedJobs" class="btn btn-outline btn-large">Saved Job</a>
+                        <?php endif; ?>
                         <?php if($job['has_applied']): ?>
                             <div class="btn btn-secondary btn-large" style="cursor: default; text-align: center;">
                                 ✓ Already Applied

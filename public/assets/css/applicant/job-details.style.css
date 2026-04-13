@@ -113,6 +113,10 @@
     gap: 16px;
 }
 
+.details-save-form {
+    margin: 0;
+}
+
 .salary-info {
     text-align: right;
 }
