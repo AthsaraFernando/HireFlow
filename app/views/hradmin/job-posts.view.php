@@ -30,11 +30,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/interview-schedule" class="nav-link">
-                        <span class="nav-text">Interviews</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/hradmin/reports" class="nav-link">
                         <span class="nav-text">Reports</span>
                     </a>
@@ -195,9 +190,9 @@
                                     <a href="<?= ROOT ?>/hradmin/view-job/<?= $job['id'] ?>" class="action-btn view-btn" title="View">
                                         View
                                     </a>
-                                    <a href="<?= ROOT ?>/hradmin/edit-job/<?= $job['id'] ?>" class="action-btn edit-btn" title="Edit">
+                                    <button type="button" class="action-btn edit-btn js-open-edit-modal" data-job-id="<?= $job['id'] ?>" title="Edit">
                                         Edit
-                                    </a>
+                                    </button>
                                     <button class="action-btn delete-btn" title="Delete" onclick="confirmDelete(<?= $job['id'] ?>)">
                                         Delete
                                     </button>
@@ -242,6 +237,18 @@
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
             <button class="btn btn-danger" onclick="deleteJob()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<div id="editJobModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content edit-modal-content">
+        <div class="modal-header">
+            <h3>Edit Job Post</h3>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="editJobModalBody">
+            <p>Loading...</p>
         </div>
     </div>
 </div>
@@ -318,6 +325,22 @@
 
 .search-btn:hover {
     background: #3d2687;
+}
+
+.edit-modal-content {
+    width: min(980px, 96vw);
+    max-height: 90vh;
+    overflow: auto;
+}
+
+#editJobModal .modal-body {
+    max-height: calc(90vh - 80px);
+    overflow-y: auto;
+}
+
+.modal-loading {
+    text-align: center;
+    padding: 2rem;
 }
 </style>
 
@@ -478,6 +501,44 @@
 
 <script>
 let deleteJobId = null;
+let editModalOpen = false;
+
+function openEditModal(jobId) {
+    const modal = document.getElementById('editJobModal');
+    const modalBody = document.getElementById('editJobModalBody');
+
+    if (!modal || !modalBody) {
+        return;
+    }
+
+    modalBody.innerHTML = '<div class="modal-loading"><p>Loading...</p></div>';
+    modal.style.display = 'flex';
+    editModalOpen = true;
+
+    fetch('<?= ROOT ?>/hradmin/edit-job/' + jobId + '?modal=1', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => response.text())
+        .then(html => {
+            modalBody.innerHTML = html;
+        })
+        .catch(() => {
+            modalBody.innerHTML = '<div class="alert alert-error"><p>Failed to load edit form. Please try again.</p></div>';
+        });
+}
+
+function closeEditModal() {
+    const modal = document.getElementById('editJobModal');
+    const modalBody = document.getElementById('editJobModalBody');
+    if (!modal || !modalBody) {
+        return;
+    }
+    modal.style.display = 'none';
+    modalBody.innerHTML = '<div class="modal-loading"><p>Loading...</p></div>';
+    editModalOpen = false;
+}
 
 function confirmDelete(jobId) {
     deleteJobId = jobId;
@@ -503,6 +564,12 @@ document.getElementById('deleteModal').addEventListener('click', function(e) {
     }
 });
 
+document.getElementById('editJobModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditModal();
+    }
+});
+
 // Sidebar toggle functionality
 document.getElementById('sidebarToggle').addEventListener('click', function () {
     document.querySelector('.sidebar').classList.toggle('collapsed');
@@ -518,6 +585,71 @@ document.querySelector('.sidebar-toggle').addEventListener('click', function (e)
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.js-open-edit-modal').forEach(function(button) {
+        button.addEventListener('click', function() {
+            openEditModal(this.getAttribute('data-job-id'));
+        });
+    });
+
+    const modalBody = document.getElementById('editJobModalBody');
+    if (modalBody) {
+        modalBody.addEventListener('submit', function(event) {
+            const form = event.target.closest('.js-edit-job-form');
+            if (!form || !editModalOpen) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Updating...';
+            }
+
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        window.location.reload();
+                        return;
+                    }
+
+                    const errors = Array.isArray(result.errors) ? result.errors : ['Failed to update job post.'];
+                    const errorHtml = '<div class="alert alert-error">' +
+                        errors.map(function(error) {
+                            return '<p>' + error + '</p>';
+                        }).join('') +
+                        '</div>';
+                    const existingError = form.querySelector('.alert.alert-error');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+                    form.insertAdjacentHTML('afterbegin', errorHtml);
+                })
+                .catch(() => {
+                    const existingError = form.querySelector('.alert.alert-error');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+                    form.insertAdjacentHTML('afterbegin', '<div class="alert alert-error"><p>Failed to update job post. Please try again.</p></div>');
+                })
+                .finally(() => {
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Update Job';
+                    }
+                });
+        });
+    }
+
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-link');
 

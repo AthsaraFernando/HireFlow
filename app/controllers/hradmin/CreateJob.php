@@ -63,6 +63,7 @@ class CreateJob extends Controller
                     'department_id' => $_POST['department_id'] ?? null,
                     'description' => $_POST['summary'] ?? '',
                     'requirements' => $_POST['requirements'] ?? '',
+                    'benefits' => $_POST['benefits'] ?? '',
                     'responsibilities' => $_POST['responsibilities'] ?? '',
                     'salary_range' => $_POST['salary_range'] ?? '',
                     'location' => $_POST['location'] ?? '',
