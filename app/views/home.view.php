@@ -30,13 +30,34 @@ if (!function_exists('old_value')) {
                 <div class="form-container">
                     <h2 class="form-title text-center mb-3">Sign In</h2>
 
+                    <?php if (!empty($show_logout_prompt)): ?>
+                        <div class="alert alert-info mb-3 flex-col">
+                            <h4>Already Logged In</h4>
+                            <p>You are currently logged in as <strong><?= esc($current_user['full_name'] ?? 'Unknown') ?></strong> (<?= esc($current_role) ?>).</p>
+                            <p>To login as a different user, please logout first:</p>
+                            <div class="button-group">
+                                <a href="<?= ROOT ?>/signin?logout=1" class="btn btn-secondary">Logout & Login Again</a>
+                                <a href="<?= ROOT ?>/<?= Auth::user_role() == 1 ? 'systemadmin/dashboard' : (Auth::user_role() == 2 ? 'hradmin/dashboard' : (Auth::user_role() == 3 ? 'recruitment/dashboard' : 'applicant')) ?>" class="btn btn-primary">Go to Dashboard</a>
+                            </div>
+                        </div>
+                    <?php else: ?>
+
+                    <?php if (!empty($success)): ?>
+                        <div class="alert alert-success mb-3">
+                            <?= esc($success) ?>
+                        </div>
+                    <?php endif; ?>
+
                     <?php if (!empty($errors)): ?>
                         <div class="alert alert-error mb-3">
-                            <?= implode('<br>', $errors) ?>
+                            <?php foreach ($errors as $error): ?>
+                                <?= esc($error) ?><br>
+                            <?php endforeach; ?>
                         </div>
                     <?php endif; ?>
 
                     <form method="POST" action="<?= ROOT ?>/signin" class="signin-form">
+                        <?= csrf_token_input() ?>
                         <div class="form-group mb-3">
                             <label for="email" class="form-label">Email Address</label>
                             <input type="email" id="email" name="email" class="form-input w-full"
@@ -53,15 +74,14 @@ if (!function_exists('old_value')) {
                             <label for="role_id" class="form-label">User Type</label>
                             <select id="role_id" name="role_id" class="form-select w-full" required>
                                 <option value="">Select your role</option>
-                                <option value="1" <?= old_value('role_id') == '1' ? 'selected' : '' ?>>System Admin
-                                </option>
-                                <option value="2" <?= old_value('role_id') == '2' ? 'selected' : '' ?>>HR
-                                    Admin</option>
-                                <option value="3" <?= old_value('role_id') == '3' ? 'selected' : '' ?>>Recruitment Manager
-                                </option>
-                                <option value="4" <?= old_value('role_id') == '4' ? 'selected' : '' ?>>
-                                    Applicant</option>
+                                <option value="1" <?= old_value('role_id') == '1' ? 'selected' : '' ?>>System Admin</option>
+                                <option value="2" <?= old_value('role_id') == '2' ? 'selected' : '' ?>>HR Admin</option>
+                                <option value="3" <?= old_value('role_id') == '3' ? 'selected' : '' ?>>Recruitment Manager</option>
+                                <option value="4" <?= old_value('role_id') == '4' ? 'selected' : '' ?>>Applicant</option>
                             </select>
+                            <small class="form-text">
+                                <strong>Note:</strong> HR Admin & Recruitment Manager accounts are created by System Admin only.
+                            </small>
                         </div>
 
                         <div class="form-group mb-4">
@@ -79,18 +99,23 @@ if (!function_exists('old_value')) {
 
                         <div class="form-links text-center">
                             <p class="mb-2">
-                                <a href="<?= ROOT ?>/forgot-password" class="link link-secondary">
+                                <a href="<?= ROOT ?>/passwordreset" class="link link-secondary">
                                     Forgot your password?
                                 </a>
                             </p>
                             <p class="text-muted">
-                                New applicant?
+                                Job seeker looking for opportunities?
                                 <a href="<?= ROOT ?>/signup" class="link link-primary">
-                                    Create an account
+                                    Create Applicant Account
                                 </a>
+                            </p>
+                            <p class="text-muted small mt-2">
+                                <strong>Staff Access:</strong> HR Admin & Recruitment Manager accounts are created by System Admin.
                             </p>
                         </div>
                     </form>
+                    
+                    <?php endif; ?>
                 </div>
 
                 <div class="signin-footer text-center mt-4">

@@ -49,6 +49,15 @@ body {
     color: #4E31AA;
 }
 
+.info-box {
+    background: #e7f3ff;
+    border: 1px solid #b8daff;
+    border-radius: 6px;
+    padding: 0.75rem;
+    color: #004085;
+    margin-bottom: 1rem;
+}
+
 .brand-subtitle {
     color: #6b7280;
     font-size: 1rem;
