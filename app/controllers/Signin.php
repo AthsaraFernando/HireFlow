@@ -71,6 +71,11 @@ class Signin extends Controller
         if (isset($_GET['registered'])) {
             $data['success'] = "Registration successful! Please login with your credentials.";
         }
+
+        // Check for account deletion success
+        if (isset($_GET['deleted'])) {
+            $data['success'] = "Your account was deactivated successfully.";
+        }
         
         // Check if authentication was required
         if (isset($_GET['required'])) {
