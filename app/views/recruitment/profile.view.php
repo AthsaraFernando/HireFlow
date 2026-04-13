@@ -35,11 +35,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/candidate-evaluation" class="nav-link">
-                        <span class="nav-text">Evaluations</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/recruitment/reports" class="nav-link">
                         <span class="nav-text">Reports</span>
                     </a>

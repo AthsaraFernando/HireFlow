@@ -35,11 +35,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/candidate-evaluation" class="nav-link">
-                        <span class="nav-text">Evaluations</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/recruitment/reports" class="nav-link">
                         <span class="nav-text">Reports</span>
                     </a>
@@ -163,14 +158,6 @@
             <a href="<?= ROOT ?>/recruitment/interview-feedback" class="metric-action">Submit</a>
         </div>
 
-        <div class="metric-card secondary">
-            <div class="metric-icon">✅</div>
-            <div class="metric-info">
-                <div class="metric-value"><?= $metrics['candidates_evaluated'] ?></div>
-                <div class="metric-label">Evaluated</div>
-            </div>
-            <a href="<?= ROOT ?>/recruitment/candidate-evaluation" class="metric-action">View</a>
-        </div>
     </div>
 
     <!-- Main Content Layout -->
