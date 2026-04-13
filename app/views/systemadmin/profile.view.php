@@ -81,7 +81,7 @@
                     }
                     ?>
                     <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt=""
-                            class="profile_picture">
+                            class="profile_picture_header">
                     <!-- <div class="user-avatar">
                     </div> -->
                 </div>
@@ -650,7 +650,7 @@
             }
         }
 
-        .profile_picture {
+        .profile_picture_header {
             width: 60px;
             height: 60px;
             border-radius: 50%;
