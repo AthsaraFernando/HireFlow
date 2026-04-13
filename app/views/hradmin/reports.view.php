@@ -35,6 +35,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/categories" class="nav-link">
+                        <span class="nav-text">Categories</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/hradmin/reports" class="nav-link active">
                         <span class="nav-text">Reports</span>
                     </a>

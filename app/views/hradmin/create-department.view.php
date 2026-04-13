@@ -14,6 +14,7 @@
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/job-posts" class="nav-link"><span class="nav-text">Job Posts</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link"><span class="nav-text">Applicants & Applications</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/departments" class="nav-link active"><span class="nav-text">Departments</span></a></li>
+            <li class="nav-item"><a href="<?= ROOT ?>/hradmin/categories" class="nav-link"><span class="nav-text">Categories</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/reports" class="nav-link"><span class="nav-text">Reports</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/profile" class="nav-link"><span class="nav-text">My Profile</span></a></li>
         </ul>

@@ -13,8 +13,8 @@
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/create-job" class="nav-link"><span class="nav-text">Create Job</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/job-posts" class="nav-link"><span class="nav-text">Job Posts</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link"><span class="nav-text">Applicants & Applications</span></a></li>
-            <li class="nav-item"><a href="<?= ROOT ?>/hradmin/departments" class="nav-link active"><span class="nav-text">Departments</span></a></li>
-            <li class="nav-item"><a href="<?= ROOT ?>/hradmin/categories" class="nav-link"><span class="nav-text">Categories</span></a></li>
+            <li class="nav-item"><a href="<?= ROOT ?>/hradmin/departments" class="nav-link"><span class="nav-text">Departments</span></a></li>
+            <li class="nav-item"><a href="<?= ROOT ?>/hradmin/categories" class="nav-link active"><span class="nav-text">Categories</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/reports" class="nav-link"><span class="nav-text">Reports</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/profile" class="nav-link"><span class="nav-text">My Profile</span></a></li>
         </ul>
@@ -29,14 +29,14 @@
     <header class="top-header">
         <div class="header-left">
             <button class="sidebar-toggle" id="sidebarToggle"><</button>
-            <h1 class="page-title">Edit Department</h1>
+            <h1 class="page-title">Create Category</h1>
         </div>
     </header>
 
     <div class="dashboard-content">
         <div class="main-container">
             <div class="hero-actions" style="margin-bottom: 1rem;">
-                <a href="<?= ROOT ?>/hradmin/departments" class="btn btn-secondary">Back to Departments</a>
+                <a href="<?= ROOT ?>/hradmin/categories" class="btn btn-secondary">Back to Categories</a>
             </div>
 
             <?php if (!empty($errors)): ?>
@@ -48,31 +48,33 @@
             <?php endif; ?>
 
             <div class="form-container" style="background:#fff; border-radius:12px; padding:1.5rem;">
-                <form method="POST" action="<?= ROOT ?>/hradmin/departments/edit/<?= $department['id'] ?>">
+                <form method="POST" action="<?= ROOT ?>/hradmin/categories/create">
                     <div class="form-group" style="margin-bottom:1rem;">
-                        <label class="form-label">Department Name *</label>
-                        <input type="text" name="name" class="form-input" required value="<?= htmlspecialchars($department['name'] ?? '') ?>">
+                        <label class="form-label">Category Name *</label>
+                        <input type="text" name="name" class="form-input" required value="<?= htmlspecialchars($form_data['name'] ?? '') ?>">
                     </div>
 
                     <div class="form-group" style="margin-bottom:1rem;">
-                        <label class="form-label">Description</label>
-                        <textarea name="description" class="form-textarea" rows="4"><?= htmlspecialchars($department['description'] ?? '') ?></textarea>
-                    </div>
-
-                    <div class="form-group" style="margin-bottom:1rem;">
-                        <label class="form-label">Head of Department</label>
-                        <select name="head_of_department" class="form-select">
-                            <option value="">Select Head</option>
-                            <?php foreach (($managers ?? []) as $manager): ?>
-                                <option value="<?= $manager['id'] ?>" <?= (string)($department['head_of_department'] ?? '') === (string)$manager['id'] ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($manager['full_name']) ?>
+                        <label class="form-label">Department *</label>
+                        <select name="department" class="form-select" required>
+                            <option value="">Select Department</option>
+                            <?php foreach (($departments ?? []) as $department): ?>
+                                <option value="<?= $department['id'] ?>" <?= (string)($form_data['department'] ?? '') === (string)$department['id'] ? 'selected' : '' ?>>
+                                    <?= htmlspecialchars($department['name']) ?>
                                 </option>
                             <?php endforeach; ?>
                         </select>
                     </div>
 
+                    <div class="form-group" style="margin-bottom:1rem;">
+                        <label class="form-label">
+                            <input type="checkbox" name="status" value="active" <?= !isset($form_data['status']) || !empty($form_data['status']) ? 'checked' : '' ?>>
+                            Active
+                        </label>
+                    </div>
+
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Update Department</button>
+                        <button type="submit" class="btn btn-primary">Create Category</button>
                     </div>
                 </form>
             </div>

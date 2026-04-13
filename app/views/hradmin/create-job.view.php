@@ -35,6 +35,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/categories" class="nav-link">
+                        <span class="nav-text">Categories</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/hradmin/reports" class="nav-link">
                         <span class="nav-text">Reports</span>
                     </a>
@@ -119,8 +124,16 @@
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="job_title" class="form-label">Job Title *</label>
-                        <input type="text" id="job_title" name="job_title" class="form-input" 
-                               value="<?= $_POST['job_title'] ?? '' ?>" placeholder="e.g. Senior Software Developer" required>
+                        <select id="job_title" name="job_title" class="form-select" required>
+                            <option value="">Select Job Title</option>
+                            <?php if (!empty($job_categories)): ?>
+                                <?php foreach ($job_categories as $category): ?>
+                                    <option value="<?= htmlspecialchars($category['name']) ?>" <?= ($_POST['job_title'] ?? '') === $category['name'] ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($category['name']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </select>
                     </div>
                     
                     <div class="form-group">

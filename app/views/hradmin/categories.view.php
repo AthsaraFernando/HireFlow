@@ -13,8 +13,8 @@
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/create-job" class="nav-link"><span class="nav-text">Create Job</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/job-posts" class="nav-link"><span class="nav-text">Job Posts</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/applicant-database" class="nav-link"><span class="nav-text">Applicants & Applications</span></a></li>
-            <li class="nav-item"><a href="<?= ROOT ?>/hradmin/departments" class="nav-link active"><span class="nav-text">Departments</span></a></li>
-            <li class="nav-item"><a href="<?= ROOT ?>/hradmin/categories" class="nav-link"><span class="nav-text">Categories</span></a></li>
+            <li class="nav-item"><a href="<?= ROOT ?>/hradmin/departments" class="nav-link"><span class="nav-text">Departments</span></a></li>
+            <li class="nav-item"><a href="<?= ROOT ?>/hradmin/categories" class="nav-link active"><span class="nav-text">Categories</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/reports" class="nav-link"><span class="nav-text">Reports</span></a></li>
             <li class="nav-item"><a href="<?= ROOT ?>/hradmin/profile" class="nav-link"><span class="nav-text">My Profile</span></a></li>
         </ul>
@@ -29,14 +29,14 @@
     <header class="top-header">
         <div class="header-left">
             <button class="sidebar-toggle" id="sidebarToggle"><</button>
-            <h1 class="page-title">Departments</h1>
+            <h1 class="page-title">Job Categories / Roles</h1>
         </div>
     </header>
 
     <div class="dashboard-content">
         <div class="main-container">
             <div class="hero-actions" style="margin-bottom: 1rem;">
-                <a href="<?= ROOT ?>/hradmin/departments/create" class="btn btn-primary">Create Department</a>
+                <a href="<?= ROOT ?>/hradmin/categories/create" class="btn btn-primary">Create Category</a>
             </div>
 
             <?php if (!empty($success)): ?>
@@ -55,25 +55,25 @@
                 <table class="data-table">
                     <thead>
                     <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Head</th>
+                        <th>Name (Job Title)</th>
+                        <th>Department (Responsible Department)</th>
                         <th>Jobs</th>
+                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <?php if (!empty($departments)): ?>
-                        <?php foreach ($departments as $department): ?>
+                    <?php if (!empty($categories)): ?>
+                        <?php foreach ($categories as $category): ?>
                             <tr>
-                                <td><?= htmlspecialchars($department['name']) ?></td>
-                                <td><?= htmlspecialchars($department['description'] ?? '—') ?></td>
-                                <td><?= htmlspecialchars($department['head_name'] ?? '—') ?></td>
-                                <td><?= (int)($department['jobs_count'] ?? 0) ?></td>
+                                <td><?= htmlspecialchars($category['name']) ?></td>
+                                <td><?= htmlspecialchars($category['department_name'] ?? '—') ?></td>
+                                <td><?= (int)($category['jobs_count'] ?? 0) ?></td>
+                                <td><?= htmlspecialchars(ucfirst($category['status'] ?? 'inactive')) ?></td>
                                 <td>
                                     <div class="action-buttons">
-                                        <a href="<?= ROOT ?>/hradmin/departments/edit/<?= $department['id'] ?>" class="action-btn edit-btn">Edit</a>
-                                        <form method="POST" action="<?= ROOT ?>/hradmin/departments/delete/<?= $department['id'] ?>" style="display:inline;" onsubmit="return confirm('Delete this department?');">
+                                        <a href="<?= ROOT ?>/hradmin/categories/edit/<?= $category['id'] ?>" class="action-btn edit-btn">Edit</a>
+                                        <form method="POST" action="<?= ROOT ?>/hradmin/categories/delete/<?= $category['id'] ?>" style="display:inline;" onsubmit="return confirm('Delete this category?');">
                                             <button type="submit" class="action-btn delete-btn">Delete</button>
                                         </form>
                                     </div>
@@ -81,7 +81,7 @@
                             </tr>
                         <?php endforeach; ?>
                     <?php else: ?>
-                        <tr><td colspan="5" style="text-align:center; padding:1.5rem;">No departments found.</td></tr>
+                        <tr><td colspan="5" style="text-align:center; padding:1.5rem;">No categories found.</td></tr>
                     <?php endif; ?>
                     </tbody>
                 </table>
