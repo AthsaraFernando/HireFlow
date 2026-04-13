@@ -275,4 +275,19 @@ class JobPost
         
         return $result ? (int)$result['total'] : 0;
     }
+     public function getJobPostStats()
+    {
+        $query = "SELECT
+                    d.id AS department_id,
+                    d.name AS department_name,
+                    COUNT(jp.id) as job_count
+                  FROM departments d 
+                  LEFT JOIN job_posts jp
+                    ON jp.department_id = d.id
+                  GROUP BY d.id
+                  ORDER BY d.id ASC";
+
+        $result = $this->query($query);
+        return $result ?: [];
+    }
 }
