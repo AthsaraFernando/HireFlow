@@ -1348,11 +1348,7 @@ class Applicant extends Controller
         $pdo = null;
 
         try {
-            $dsn = 'mysql:host=' . DB_HOST . ';port=8889;dbname=' . DB_NAME;
-            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            ]);
+            $pdo = $this->createDatabaseConnection();
 
             $pdo->beginTransaction();
 
@@ -1519,6 +1515,32 @@ class Applicant extends Controller
         ]);
 
         return (bool)$stmt->fetchColumn();
+    }
+
+    private function createDatabaseConnection()
+    {
+        $attempts = [
+            ['port' => 8889, 'pass' => 'root'],
+            ['port' => 8889, 'pass' => ''],
+            ['port' => 3306, 'pass' => ''],
+            ['port' => 3306, 'pass' => 'root'],
+        ];
+
+        $last_exception = null;
+
+        foreach ($attempts as $attempt) {
+            try {
+                $dsn = 'mysql:host=' . DB_HOST . ';port=' . $attempt['port'] . ';dbname=' . DB_NAME;
+                return new PDO($dsn, DB_USER, $attempt['pass'], [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                ]);
+            } catch (PDOException $exception) {
+                $last_exception = $exception;
+            }
+        }
+
+        throw $last_exception ?: new RuntimeException('Unable to connect to the database.');
     }
 
     private function deleteUploadedAsset($web_path)
