@@ -32,11 +32,13 @@ class Reports extends Controller
         $data['interview_stats'] = $interviews->getInterviewStats();
         $data['user_status'] = $user->getUserStatus();
         $data['job_demand'] = $application->jobDemandStat();
+        $data['application_status_counts'] = $application->applicationStatusCounts();
 
 
         if ($_POST) {
             // Handle report generation
             // Send data to the frontend based on the parameters sent in the fetch request
+            // logger($_GET['duration']);
             $data['success'] = 'Report generated successfully!';
         }
 
