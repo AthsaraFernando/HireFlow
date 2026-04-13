@@ -4,25 +4,8 @@ trait Database
 {
     private function connect()
     {
-        $connection_attempts = [
-            ['host' => DB_HOST, 'port' => 8889, 'user' => DB_USER, 'pass' => 'root'],
-            ['host' => DB_HOST, 'port' => 8889, 'user' => DB_USER, 'pass' => ''],
-            ['host' => DB_HOST, 'port' => 3306, 'user' => DB_USER, 'pass' => ''],
-            ['host' => DB_HOST, 'port' => 3306, 'user' => DB_USER, 'pass' => 'root'],
-        ];
-
-        $lastException = null;
-
-        foreach ($connection_attempts as $attempt) {
-            try {
-                $string = 'mysql:host=' . $attempt['host'] . ';port=' . $attempt['port'] . ';dbname=' . DB_NAME;
-                return new PDO($string, $attempt['user'], $attempt['pass']);
-            } catch (PDOException $exception) {
-                $lastException = $exception;
-            }
-        }
-
-        throw $lastException ?: new PDOException('Unable to connect to the database.');
+        $string = 'mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME;
+        return new PDO($string, DB_USER, DB_PASS);
     }
     public function query($query, $data = [])
     {

@@ -1,7 +1,20 @@
 <?php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', $_SERVER['SERVER_NAME'] === 'localhost' ? 'root' : '');
+if (!function_exists('hireflow_env')) {
+    function hireflow_env($key, $default = null)
+    {
+        $value = getenv($key);
+        return $value !== false && $value !== '' ? $value : $default;
+    }
+}
+
+$document_root = strtolower($_SERVER['DOCUMENT_ROOT'] ?? '');
+$is_mamp = strpos($document_root, '/applications/mamp') !== false;
+$is_xampp = strpos($document_root, 'xampp') !== false;
+
+define('DB_HOST', hireflow_env('DB_HOST', 'localhost'));
+define('DB_PORT', (int) hireflow_env('DB_PORT', $is_mamp ? 8889 : 3306));
+define('DB_USER', hireflow_env('DB_USER', 'root'));
+define('DB_PASS', hireflow_env('DB_PASS', $is_mamp ? 'root' : ''));
 define('DB_NAME', 'hireflow_db');
 define('DB_DRIVER', '');
 

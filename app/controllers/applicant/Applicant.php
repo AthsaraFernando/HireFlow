@@ -1519,28 +1519,11 @@ class Applicant extends Controller
 
     private function createDatabaseConnection()
     {
-        $attempts = [
-            ['port' => 8889, 'pass' => 'root'],
-            ['port' => 8889, 'pass' => ''],
-            ['port' => 3306, 'pass' => ''],
-            ['port' => 3306, 'pass' => 'root'],
-        ];
-
-        $last_exception = null;
-
-        foreach ($attempts as $attempt) {
-            try {
-                $dsn = 'mysql:host=' . DB_HOST . ';port=' . $attempt['port'] . ';dbname=' . DB_NAME;
-                return new PDO($dsn, DB_USER, $attempt['pass'], [
-                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                ]);
-            } catch (PDOException $exception) {
-                $last_exception = $exception;
-            }
-        }
-
-        throw $last_exception ?: new RuntimeException('Unable to connect to the database.');
+        $dsn = 'mysql:host=' . DB_HOST . ';port=' . DB_PORT . ';dbname=' . DB_NAME;
+        return new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        ]);
     }
 
     private function deleteUploadedAsset($web_path)
