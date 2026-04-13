@@ -270,6 +270,14 @@
     gap: 12px;
 }
 
+.inline-action-form {
+    margin: 0;
+}
+
+.inline-action-form .btn {
+    height: 100%;
+}
+
 .job-actions .btn {
     padding: 8px 16px;
     font-size: 0.85rem;

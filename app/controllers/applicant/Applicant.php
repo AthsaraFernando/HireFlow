@@ -152,7 +152,9 @@ class Applicant extends Controller
         $jobModel = new JobPost();
         $applicationModel = new Application();
         $applicationFormModel = new ApplicationForm();
+        $savedJobModel = new SavedJob();
         $user_id = Auth::user_id();
+        $saved_job_ids = $savedJobModel->getSavedJobIdsByApplicant($user_id);
         
         // Get current user data for navigation
         $data['user'] = $this->getUserData($user_id);
@@ -219,7 +221,8 @@ class Applicant extends Controller
                     'department' => $job['department'] ?? 'General',
                     'requirements' => $requirements, // Now properly formatted as array
                     'has_applied' => $has_applied,
-                    'form_available' => $form_available
+                    'form_available' => $form_available,
+                    'is_saved' => in_array((int)$job['id'], $saved_job_ids, true)
                 ];
             }
         }
@@ -266,6 +269,7 @@ class Applicant extends Controller
         $jobModel = new JobPost();
         $applicationModel = new Application();
         $applicationFormModel = new ApplicationForm();
+        $savedJobModel = new SavedJob();
         $user_id = Auth::user_id();
         
         // Get job details
@@ -321,6 +325,7 @@ class Applicant extends Controller
             'application_status' => $user_application['status'] ?? null,
             'applied_at' => $user_application['applied_at'] ?? null,
             'form_available' => $form_available,
+            'is_saved' => $savedJobModel->isJobSaved($user_id, $job['id']),
             'benefits' => [
                 'Competitive salary package',
                 'Health and medical benefits',
@@ -331,6 +336,110 @@ class Applicant extends Controller
         ];
 
         $this->view('applicant/job-details', $data);
+    }
+
+    public function savedJobs($action = null, $id = null)
+    {
+        Auth::requireRole(4);
+
+        $savedJobModel = new SavedJob();
+        $user_id = Auth::user_id();
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            if ($action === 'save') {
+                $job_id = (int)($_POST['job_id'] ?? $id ?? 0);
+                $note = trim($_POST['note'] ?? '');
+
+                if ($job_id <= 0) {
+                    $_SESSION['error'] = 'Invalid job selected.';
+                } elseif ($savedJobModel->saveJob($user_id, $job_id, $note)) {
+                    $_SESSION['success'] = 'Job saved successfully.';
+                } else {
+                    $_SESSION['error'] = 'Unable to save this job right now.';
+                }
+
+                $return_to = $_POST['return_to'] ?? '';
+                if (!empty($return_to) && preg_match('/^applicant\//', $return_to)) {
+                    redirect($return_to);
+                }
+
+                redirect('applicant/savedJobs');
+                return;
+            }
+
+            if ($action === 'updateNote') {
+                $saved_job_id = (int)($id ?? $_POST['saved_job_id'] ?? 0);
+                $note = trim($_POST['note'] ?? '');
+
+                if ($saved_job_id <= 0) {
+                    $_SESSION['error'] = 'Invalid saved job selected.';
+                    redirect('applicant/savedJobs');
+                    return;
+                }
+
+                if ($savedJobModel->updateNote($saved_job_id, $user_id, $note)) {
+                    $_SESSION['success'] = 'Saved job note updated.';
+                } else {
+                    $_SESSION['error'] = 'Failed to update note. Please try again.';
+                }
+
+                redirect('applicant/savedJobs');
+                return;
+            }
+
+            if ($action === 'delete') {
+                $saved_job_id = (int)($id ?? $_POST['saved_job_id'] ?? 0);
+
+                if ($saved_job_id <= 0) {
+                    $_SESSION['error'] = 'Invalid saved job selected.';
+                    redirect('applicant/savedJobs');
+                    return;
+                }
+
+                if ($savedJobModel->removeSavedJob($saved_job_id, $user_id)) {
+                    $_SESSION['success'] = 'Saved job removed.';
+                } else {
+                    $_SESSION['error'] = 'Unable to remove saved job.';
+                }
+
+                redirect('applicant/savedJobs');
+                return;
+            }
+        }
+
+        $data = [];
+        $applicationModel = new Application();
+        $applicationFormModel = new ApplicationForm();
+        $data['user'] = $this->getUserData($user_id);
+
+        $saved_jobs = $savedJobModel->getSavedJobsWithDetails($user_id);
+        $data['saved_jobs'] = [];
+
+        if ($saved_jobs && is_array($saved_jobs)) {
+            foreach ($saved_jobs as $saved_job) {
+                $data['saved_jobs'][] = [
+                    'id' => (int)$saved_job['id'],
+                    'job_id' => (int)$saved_job['job_id'],
+                    'title' => $saved_job['title'] ?? 'Untitled Job',
+                    'company' => 'HireFlow Company',
+                    'location' => $saved_job['location'] ?? 'Not specified',
+                    'employment_type' => $saved_job['employment_type'] ?? 'Not specified',
+                    'department' => $saved_job['department'] ?? 'General',
+                    'salary_range' => $saved_job['salary_range'] ?? 'Not specified',
+                    'description' => $saved_job['description'] ?? '',
+                    'job_status' => $saved_job['job_status'] ?? 'Draft',
+                    'deadline' => $saved_job['deadline'] ?? null,
+                    'note' => $saved_job['note'] ?? '',
+                    'has_applied' => $applicationModel->hasAppliedToJob($user_id, (int)$saved_job['job_id']),
+                    'form_available' => (function() use ($applicationFormModel, $saved_job) {
+                        $form = $applicationFormModel->getFormByJobPostId((int)$saved_job['job_id']);
+                        return $form && ($form['status'] ?? 'inactive') === 'active';
+                    })()
+                ];
+            }
+        }
+
+        $this->view('applicant/saved-jobs', $data);
     }
 
     public function applications($action = null)
@@ -1302,6 +1411,11 @@ class Applicant extends Controller
 
             if ($soft_delete_stmt->rowCount() !== 1) {
                 throw new RuntimeException('Unable to deactivate applicant profile.');
+            }
+
+            if ($this->tableExists($pdo, 'saved_jobs')) {
+                $saved_jobs_stmt = $pdo->prepare('DELETE FROM saved_jobs WHERE applicant_id = :user_id');
+                $saved_jobs_stmt->execute(['user_id' => $user_id]);
             }
 
             $pdo->commit();

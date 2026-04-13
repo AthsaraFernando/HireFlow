@@ -34,6 +34,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                        <span class="nav-text">Saved Jobs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/applicant/interviews" class="nav-link active">
                         <span class="nav-text">Interview Schedule</span>
                     </a>
