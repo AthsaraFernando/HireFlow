@@ -160,6 +160,25 @@
         .stat-label { font-size: 0.8rem; color: #6b7280; margin: 0; text-transform: uppercase; font-weight: 500; }
         .btn-large { padding: 12px 18px; font-size: 0.92rem; font-weight: 600; }
         .btn-outline { background: transparent; color: #374151; border: 1px solid #d1d5db; }
+        .danger-zone {
+            border-top-color: #dc2626;
+            background: #fff7f7;
+        }
+        .danger-note {
+            margin: 0 0 12px 0;
+            color: #7f1d1d;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+            border: 1px solid #dc2626;
+        }
+        .btn-danger:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
+        }
         .alert {
             padding: 14px 16px;
             border-radius: 10px;
@@ -340,6 +359,35 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="profile-section danger-zone">
+                            <div class="section-header">
+                                <h3>Danger Zone</h3>
+                            </div>
+                            <p class="danger-note">
+                                Deleting your profile will deactivate your account immediately.
+                                Your personal details are anonymized for privacy while related records are retained for auditing.
+                            </p>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="delete_current_password" class="form-label">Current Password</label>
+                                    <input type="password" id="delete_current_password" name="delete_current_password" class="form-input" autocomplete="off">
+                                </div>
+                                <div class="form-group">
+                                    <label for="delete_confirmation" class="form-label">Type DELETE to confirm</label>
+                                    <input type="text" id="delete_confirmation" name="delete_confirmation" class="form-input" placeholder="DELETE">
+                                </div>
+                            </div>
+                            <div class="section-actions">
+                                <button
+                                    type="submit"
+                                    id="deleteProfileButton"
+                                    class="btn btn-danger btn-large"
+                                    formaction="<?= ROOT ?>/applicant/deleteProfile"
+                                    formmethod="POST"
+                                >Delete My Profile</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </form>
@@ -388,9 +436,30 @@
         const currentPassword = document.getElementById('current_password');
         const newPassword = document.getElementById('new_password');
         const confirmPassword = document.getElementById('confirm_password');
+        const deleteProfileButton = document.getElementById('deleteProfileButton');
+        const deleteConfirmation = document.getElementById('delete_confirmation');
+        const deleteCurrentPassword = document.getElementById('delete_current_password');
         if (currentPassword) currentPassword.value = '';
         if (newPassword) newPassword.value = '';
         if (confirmPassword) confirmPassword.value = '';
+
+        if (deleteProfileButton) {
+            deleteProfileButton.addEventListener('click', function(event) {
+                const hasPassword = deleteCurrentPassword && deleteCurrentPassword.value.trim() !== '';
+                const hasDeleteWord = deleteConfirmation && deleteConfirmation.value.trim().toUpperCase() === 'DELETE';
+
+                if (!hasPassword || !hasDeleteWord) {
+                    event.preventDefault();
+                    alert('Enter your current password and type DELETE to continue.');
+                    return;
+                }
+
+                const confirmed = confirm('Are you sure? This will permanently delete your profile and all related application/interview data.');
+                if (!confirmed) {
+                    event.preventDefault();
+                }
+            });
+        }
     </script>
 </body>
 </html>

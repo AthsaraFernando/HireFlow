@@ -1201,6 +1201,126 @@ class Applicant extends Controller
         
         redirect('applicant/profile');
     }
+
+    public function deleteProfile()
+    {
+        Auth::requireRole(4);
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            redirect('applicant/profile');
+            return;
+        }
+
+        $user_id = Auth::user_id();
+        $userModel = new User();
+        $existing_user = $userModel->first(['id' => $user_id], []);
+
+        if (!$existing_user) {
+            Auth::logout();
+            redirect('signin');
+            return;
+        }
+
+        $delete_confirmation = strtoupper(trim($_POST['delete_confirmation'] ?? ''));
+        $delete_password = $_POST['delete_current_password'] ?? '';
+
+        if ($delete_confirmation !== 'DELETE') {
+            $_SESSION['error'] = 'Type DELETE to confirm profile deletion.';
+            redirect('applicant/profile');
+            return;
+        }
+
+        if (empty($delete_password) || !password_verify($delete_password, $existing_user['password'])) {
+            $_SESSION['error'] = 'Current password is required to delete your profile.';
+            redirect('applicant/profile');
+            return;
+        }
+
+        $pdo = null;
+
+        try {
+            $dsn = 'mysql:host=' . DB_HOST . ';port=8889;dbname=' . DB_NAME;
+            $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            ]);
+
+            $pdo->beginTransaction();
+
+            $now = date('Y-m-d H:i:s');
+            $stamp = date('YmdHis');
+            $anonymized_email = 'deleted+' . $user_id . '.' . $stamp . '@deleted.local';
+            $replacement_password = password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT);
+
+            $update_data = [
+                'full_name' => 'Deleted Applicant #' . $user_id,
+                'email' => $anonymized_email,
+                'password' => $replacement_password,
+                'status' => 'inactive',
+                'phone' => null,
+                'address' => null,
+                'profile_picture' => null,
+                'last_login' => null,
+                'updated_at' => $now,
+            ];
+
+            if ($this->columnExists($pdo, 'users', 'password_reset_token')) {
+                $update_data['password_reset_token'] = null;
+            }
+
+            if ($this->columnExists($pdo, 'users', 'password_reset_expires')) {
+                $update_data['password_reset_expires'] = null;
+            }
+
+            if ($this->columnExists($pdo, 'users', 'deleted_at')) {
+                $update_data['deleted_at'] = $now;
+            }
+
+            if ($this->columnExists($pdo, 'users', 'deleted_by')) {
+                $update_data['deleted_by'] = $user_id;
+            }
+
+            if ($this->columnExists($pdo, 'users', 'deleted_email')) {
+                $update_data['deleted_email'] = $existing_user['email'] ?? null;
+            }
+
+            if ($this->columnExists($pdo, 'users', 'delete_reason')) {
+                $update_data['delete_reason'] = 'Self-service account closure';
+            }
+
+            $set_clauses = [];
+            $params = ['user_id' => $user_id];
+
+            foreach ($update_data as $column => $value) {
+                $set_clauses[] = "$column = :$column";
+                $params[$column] = $value;
+            }
+
+            $soft_delete_sql = 'UPDATE users SET ' . implode(', ', $set_clauses) . ' WHERE id = :user_id AND role_id = 4';
+            $soft_delete_stmt = $pdo->prepare($soft_delete_sql);
+            $soft_delete_stmt->execute($params);
+
+            if ($soft_delete_stmt->rowCount() !== 1) {
+                throw new RuntimeException('Unable to deactivate applicant profile.');
+            }
+
+            $pdo->commit();
+
+            AccessLog::log('account_soft_deleted', 'Applicant self-deactivated account', $user_id);
+
+            Auth::logout();
+            redirect('signin?deleted=1');
+            return;
+        } catch (Throwable $e) {
+            if ($pdo && $pdo->inTransaction()) {
+                $pdo->rollBack();
+            }
+
+            $_SESSION['error'] = 'Failed to deactivate profile. Please try again or contact support.';
+            redirect('applicant/profile');
+            return;
+        }
+    }
     
     private function handleProfilePictureUpload($file, $user_id)
     {
@@ -1260,6 +1380,50 @@ class Applicant extends Controller
         }
 
         return $default;
+    }
+
+    private function tableExists(PDO $pdo, $table_name)
+    {
+        $query = 'SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = :schema_name AND TABLE_NAME = :table_name LIMIT 1';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([
+            'schema_name' => DB_NAME,
+            'table_name' => $table_name
+        ]);
+
+        return (bool)$stmt->fetchColumn();
+    }
+
+    private function columnExists(PDO $pdo, $table_name, $column_name)
+    {
+        $query = 'SELECT 1 FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = :schema_name AND TABLE_NAME = :table_name AND COLUMN_NAME = :column_name LIMIT 1';
+        $stmt = $pdo->prepare($query);
+        $stmt->execute([
+            'schema_name' => DB_NAME,
+            'table_name' => $table_name,
+            'column_name' => $column_name
+        ]);
+
+        return (bool)$stmt->fetchColumn();
+    }
+
+    private function deleteUploadedAsset($web_path)
+    {
+        if (empty($web_path)) {
+            return;
+        }
+
+        $relative = ltrim($web_path, '/');
+        $expected = $this->publicPath($relative);
+        $legacy = $this->publicPath('HireFlow/public/' . $relative);
+
+        if (file_exists($expected)) {
+            @unlink($expected);
+        }
+
+        if (file_exists($legacy)) {
+            @unlink($legacy);
+        }
     }
     
     public function notifications($action = null)
