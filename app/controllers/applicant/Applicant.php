@@ -683,6 +683,7 @@ class Applicant extends Controller
         $responses = [];
         $resume_path = '';
         $validation_errors = [];
+        $resume_upload_failed = false;
 
         foreach ($form['fields'] as $field) {
             if (!(int)$field['is_enabled']) {
@@ -703,12 +704,20 @@ class Applicant extends Controller
 
                     if (!$upload_result['success']) {
                         $validation_errors[] = $upload_result['error'];
+                        if ($is_resume_field) {
+                            $resume_upload_failed = true;
+                        }
                         continue;
                     }
 
                     $responses[$field_name] = $upload_result['path'];
                     if ($is_resume_field) {
                         $resume_path = $upload_result['path'];
+                    }
+                } elseif ($file && $file['error'] !== UPLOAD_ERR_NO_FILE) {
+                    $validation_errors[] = $this->getUploadErrorMessage($file['error'], $field_label);
+                    if (stripos($field_name, 'resume') !== false) {
+                        $resume_upload_failed = true;
                     }
                 } elseif ($is_required) {
                     $validation_errors[] = $field_label . " is required.";
@@ -739,7 +748,7 @@ class Applicant extends Controller
             $responses[$field_name] = $value;
         }
 
-        if (empty($resume_path)) {
+        if (empty($resume_path) && !$resume_upload_failed) {
             $validation_errors[] = "Resume upload is required.";
         }
 
@@ -810,8 +819,16 @@ class Applicant extends Controller
     {
         $upload_dir = $this->publicPath('uploads/resumes');
 
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0755, true);
+        if (!is_dir($upload_dir) && !@mkdir($upload_dir, 0755, true)) {
+            return ['success' => false, 'error' => 'Failed to create resume upload directory. Please contact support.'];
+        }
+
+        if (!is_dir($upload_dir) || !is_writable($upload_dir)) {
+            return ['success' => false, 'error' => 'Resume upload directory is not writable on this server.'];
+        }
+
+        if (empty($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+            return ['success' => false, 'error' => 'Temporary upload file is not available. Check PHP upload_tmp_dir settings.'];
         }
 
         $file_extension = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
@@ -836,10 +853,31 @@ class Applicant extends Controller
         $file_path = rtrim($upload_dir, '/') . '/' . $filename;
 
         if (!move_uploaded_file($file['tmp_name'], $file_path)) {
-            return ['success' => false, 'error' => 'Failed to upload file.'];
+            return ['success' => false, 'error' => 'Failed to upload file. Server blocked moving uploaded file.'];
         }
 
         return ['success' => true, 'path' => '/uploads/resumes/' . $filename];
+    }
+
+    private function getUploadErrorMessage($errorCode, $fieldLabel = 'File')
+    {
+        switch ((int)$errorCode) {
+            case UPLOAD_ERR_INI_SIZE:
+            case UPLOAD_ERR_FORM_SIZE:
+                return $fieldLabel . ' exceeds the maximum upload size.';
+            case UPLOAD_ERR_PARTIAL:
+                return $fieldLabel . ' was only partially uploaded. Please retry.';
+            case UPLOAD_ERR_NO_FILE:
+                return $fieldLabel . ' is required.';
+            case UPLOAD_ERR_NO_TMP_DIR:
+                return 'Temporary upload directory is missing on server.';
+            case UPLOAD_ERR_CANT_WRITE:
+                return 'Server cannot write uploaded files to disk.';
+            case UPLOAD_ERR_EXTENSION:
+                return 'A PHP extension blocked the file upload.';
+            default:
+                return 'Failed to upload ' . strtolower($fieldLabel) . '.';
+        }
     }
 
     private function buildDynamicApplicationSummary($form, $responses)
@@ -874,8 +912,16 @@ class Applicant extends Controller
         $upload_dir = $this->publicPath('uploads/resumes');
         
         // Create directory if it doesn't exist
-        if (!is_dir($upload_dir)) {
-            mkdir($upload_dir, 0755, true);
+        if (!is_dir($upload_dir) && !@mkdir($upload_dir, 0755, true)) {
+            return ['success' => false, 'error' => 'Failed to create resume upload directory.'];
+        }
+
+        if (!is_dir($upload_dir) || !is_writable($upload_dir)) {
+            return ['success' => false, 'error' => 'Resume upload directory is not writable on this server.'];
+        }
+
+        if (empty($file['tmp_name']) || !is_uploaded_file($file['tmp_name'])) {
+            return ['success' => false, 'error' => 'Temporary upload file is not available. Check PHP upload settings.'];
         }
         
         // Validate file type - Only PDF allowed
