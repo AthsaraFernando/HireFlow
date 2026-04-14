@@ -100,6 +100,7 @@
                 <p class="page-subtitle"><?= esc($application['company']) ?> • <?= esc($application['location']) ?></p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name"><?= esc($user['name'] ?? 'Applicant') ?></span>
                     <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'A', 0, 1)) ?></div>

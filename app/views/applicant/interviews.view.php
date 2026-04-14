@@ -51,6 +51,7 @@
                 <p class="page-subtitle">Track upcoming interviews and review completed sessions.</p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name"><?= htmlspecialchars($user['name'] ?? 'User') ?></span>
                     <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'U', 0, 2)) ?></div>
@@ -72,7 +73,7 @@
 
             <div class="cards-grid" id="interviewsContainer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(390px,1fr));gap:20px;">
                 <?php foreach (($interviews ?? []) as $interview): ?>
-                    <article class="interview-card" data-status="<?= htmlspecialchars($interview['status']) ?>">
+                    <article id="interview-<?= (int)$interview['id'] ?>" class="interview-card" data-status="<?= htmlspecialchars($interview['status']) ?>" style="scroll-margin-top:96px;">
                         <div class="card-header">
                             <div class="company-info">
                                 <div class="company-logo"><?= strtoupper(substr($interview['job_title'] ?? 'IN', 0, 2)) ?></div>

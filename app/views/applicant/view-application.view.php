@@ -146,6 +146,7 @@
             </div>
         </header>
 
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
         <div class="applications-content">
             <div class="application-detail-card">
                 <div class="detail-section">
