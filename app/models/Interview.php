@@ -47,6 +47,7 @@ class Interview
     public function getUserInterviews($user_id)
     {
         $query = "SELECT i.*, 
+                         a.id as application_id,
                          a.job_id,
                          jp.title as job_title, 
                          jp.department,
@@ -64,6 +65,7 @@ class Interview
     public function getUpcomingInterviews($user_id)
     {
         $query = "SELECT i.*, 
+                         a.id as application_id,
                          a.job_id,
                          jp.title as job_title, 
                          jp.department,

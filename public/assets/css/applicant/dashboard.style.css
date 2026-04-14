@@ -365,6 +365,13 @@ body {
     color: white;
 }
 
+a.btn-primary,
+a.btn-primary:visited,
+a.btn-primary:hover,
+a.btn-primary:active {
+    color: #fff !important;
+}
+
 .btn-primary:hover {
     background-color: #1d4ed8;
 }
@@ -452,13 +459,13 @@ body {
     color: #6b7280;
 }
 
-.empty-state a {
+.empty-state a:not(.btn) {
     color: #3b82f6;
     text-decoration: none;
     font-weight: 500;
 }
 
-.empty-state a:hover {
+.empty-state a:not(.btn):hover {
     color: #1d4ed8;
 }
 

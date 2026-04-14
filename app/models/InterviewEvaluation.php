@@ -216,4 +216,38 @@ class InterviewEvaluation
             'updated_at' => date('Y-m-d H:i:s')
         ]);
     }
+
+    public function getFeedbackForApplicant($applicantId)
+    {
+        $query = "SELECT ie.id,
+                         ie.interview_id,
+                         ie.technical_skills,
+                         ie.problem_solving,
+                         ie.communication,
+                         ie.cultural_fit,
+                         ie.experience_relevance,
+                         ie.manager_points,
+                         ie.interview_notes,
+                         ie.recommendation,
+                         ie.created_at,
+                         ie.updated_at,
+                         i.interview_type,
+                         i.status AS interview_status,
+                         i.scheduled_date,
+                         i.scheduled_time,
+                         a.id AS application_id,
+                         jp.title AS job_title,
+                         reviewer.full_name AS reviewer_name,
+                         (ie.technical_skills + ie.problem_solving + ie.communication + ie.cultural_fit + ie.experience_relevance + ie.manager_points) AS total_points
+                  FROM interview_evaluations ie
+                  JOIN interviews i ON i.id = ie.interview_id
+                  JOIN applications a ON a.id = i.application_id
+                  JOIN job_posts jp ON jp.id = a.job_id
+                  LEFT JOIN users reviewer ON reviewer.id = ie.updated_by
+                  WHERE a.applicant_id = :applicant_id
+                  AND ie.is_deleted = 0
+                  ORDER BY ie.updated_at DESC";
+
+        return $this->query($query, ['applicant_id' => $applicantId]);
+    }
 }

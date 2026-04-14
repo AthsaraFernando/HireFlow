@@ -1082,16 +1082,22 @@ class Applicant extends Controller
         $data['interviews'] = [];
         if ($interviews && is_array($interviews)) {
             foreach ($interviews as $interview) {
+                $raw_status = trim((string)($interview['status'] ?? 'Scheduled'));
+                $normalized_status = strtolower(str_replace(' ', '-', $raw_status));
+
                 $data['interviews'][] = [
                     'id' => $interview['id'],
+                    'application_id' => (int)($interview['application_id'] ?? 0),
                     'job_title' => $interview['job_title'] ?? 'Unknown Position',
                     'company' => 'HireFlow Company',
                     'date' => date('Y-m-d', strtotime($interview['scheduled_date'])),
                     'time' => date('g:i A', strtotime($interview['scheduled_time'])),
                     'type' => $interview['interview_type'] ?? 'Interview',
                     'interviewer' => $interview['interviewer_name'] ?? 'TBD',
-                    'status' => strtolower($interview['status']),
+                    'status' => $normalized_status,
+                    'status_display' => $raw_status,
                     'location' => $interview['location'] ?? $interview['meeting_link'] ?? 'TBD',
+                    'meeting_link' => $interview['meeting_link'] ?? '',
                     'duration' => ($interview['duration_minutes'] ?? 60) . ' minutes',
                     'department' => $interview['department'] ?? 'General',
                     'notes' => $interview['notes'] ?? ''
@@ -1140,10 +1146,42 @@ class Applicant extends Controller
         // Get current user data for navigation
         $data['user'] = $this->getUserData($user_id);
         
-        // For now, since we don't have feedback table implemented in current schema,
-        // we'll show a placeholder message
+        $evaluationModel = new InterviewEvaluation();
+        $feedbackRows = $evaluationModel->getFeedbackForApplicant($user_id);
+
         $data['feedbacks'] = [];
-        $data['message'] = "Interview feedback will be available after your interviews are completed.";
+        if ($feedbackRows && is_array($feedbackRows)) {
+            foreach ($feedbackRows as $row) {
+                $data['feedbacks'][] = [
+                    'id' => (int)$row['id'],
+                    'interview_id' => (int)$row['interview_id'],
+                    'application_id' => (int)($row['application_id'] ?? 0),
+                    'job_title' => $row['job_title'] ?? 'Unknown Position',
+                    'company' => 'HireFlow Company',
+                    'interview_date' => $row['scheduled_date'] ?? null,
+                    'interview_time' => $row['scheduled_time'] ?? null,
+                    'interview_type' => $row['interview_type'] ?? 'Interview',
+                    'interview_status' => strtolower((string)($row['interview_status'] ?? 'completed')),
+                    'reviewer' => $row['reviewer_name'] ?? 'Recruitment Team',
+                    'feedback_date' => $row['updated_at'] ?? $row['created_at'] ?? null,
+                    'recommendation' => $row['recommendation'] ?? 'Pending',
+                    'technical_skills' => (int)($row['technical_skills'] ?? 0),
+                    'problem_solving' => (int)($row['problem_solving'] ?? 0),
+                    'communication' => (int)($row['communication'] ?? 0),
+                    'cultural_fit' => (int)($row['cultural_fit'] ?? 0),
+                    'experience_relevance' => (int)($row['experience_relevance'] ?? 0),
+                    'manager_points' => (int)($row['manager_points'] ?? 0),
+                    'total_points' => (int)($row['total_points'] ?? 0),
+                    'interview_notes' => $row['interview_notes'] ?? ''
+                ];
+            }
+        }
+
+        $data['stats'] = [
+            'total_feedbacks' => count($data['feedbacks']),
+            'hire_recommendations' => count(array_filter($data['feedbacks'], fn($item) => ($item['recommendation'] ?? '') === 'Hire')),
+            'pending_recommendations' => count(array_filter($data['feedbacks'], fn($item) => ($item['recommendation'] ?? '') === 'Pending'))
+        ];
 
         $this->view('applicant/feedback', $data);
     }
