@@ -167,9 +167,9 @@ class Interview
             $data['interview_type'] = 'Video';
         }
 
-        // Call parent insert and explicitly return true if successful
-        $this->insert($data);
-        return true; // Override the false return from Model trait
+        // Return real insert result so callers can detect DB failures.
+        $insertId = $this->insert($data);
+        return $insertId !== false;
     }
 
     /**
@@ -178,9 +178,8 @@ class Interview
      */
     public function updateInterview($id, $data)
     {
-        // Call parent update and explicitly return true if successful
-        $this->update($id, $data);
-        return true; // Override the false return from Model trait
+        // Return real update result so callers can detect DB failures.
+        return $this->update($id, $data);
     }
 
     /**
@@ -191,8 +190,7 @@ class Interview
     {
         // Use direct query instead of the buggy Model trait delete
         $query = "DELETE FROM {$this->table} WHERE id = :id";
-        $this->query($query, ['id' => $id]);
-        return true;
+        return $this->query($query, ['id' => $id]);
     }
 
     /**

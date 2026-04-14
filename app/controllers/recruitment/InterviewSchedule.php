@@ -123,11 +123,23 @@ class InterviewSchedule extends Controller
                     if ($result) {
                         // Update application status to 'Interview Scheduled'
                         $application = new Application();
-                        $application->update($application_id, ['status' => 'Interview Scheduled']);
-                        
-                        echo json_encode(['success' => true, 'message' => 'Interview scheduled successfully']);
+                        $statusUpdated = $application->update($application_id, ['status' => 'Interview Scheduled']);
+
+                        if ($statusUpdated) {
+                            echo json_encode(['success' => true, 'message' => 'Interview scheduled successfully']);
+                        } else {
+                            $errorMessage = 'Interview was created, but application status update failed.';
+                            if (!empty($application->errors)) {
+                                $errorMessage .= ' ' . implode(' | ', $application->errors);
+                            }
+                            echo json_encode(['success' => false, 'message' => $errorMessage]);
+                        }
                     } else {
-                        echo json_encode(['success' => false, 'message' => 'Failed to schedule interview']);
+                        $errorMessage = 'Failed to schedule interview.';
+                        if (!empty($interview->errors)) {
+                            $errorMessage .= ' ' . implode(' | ', $interview->errors);
+                        }
+                        echo json_encode(['success' => false, 'message' => $errorMessage]);
                     }
                 } else {
                     echo json_encode(['success' => false, 'message' => 'Validation failed', 'errors' => $interview->errors]);
@@ -216,7 +228,11 @@ class InterviewSchedule extends Controller
                 if ($result) {
                     echo json_encode(['success' => true, 'message' => 'Interview rescheduled successfully']);
                 } else {
-                    echo json_encode(['success' => false, 'message' => 'Failed to reschedule interview']);
+                    $errorMessage = 'Failed to reschedule interview.';
+                    if (!empty($interview->errors)) {
+                        $errorMessage .= ' ' . implode(' | ', $interview->errors);
+                    }
+                    echo json_encode(['success' => false, 'message' => $errorMessage]);
                 }
             } catch (Exception $e) {
                 echo json_encode(['success' => false, 'message' => 'Server error: ' . $e->getMessage()]);

@@ -106,8 +106,26 @@ class ConductInterview extends Controller
             exit;
         }
 
-        $interviewModel->updateInterview((int) $interview_id, ['status' => 'Completed']);
-        $applicationModel->update($interview['application_id'], ['status' => 'Interview Completed']);
+        $warnings = [];
+
+        try {
+            $interviewUpdated = $interviewModel->updateInterview((int) $interview_id, ['status' => 'Completed']);
+            if (!$interviewUpdated) {
+                $warnings[] = 'Interview status was not updated to Completed.';
+            }
+        } catch (Exception $e) {
+            $warnings[] = 'Interview status update failed.';
+        }
+
+        try {
+            // applications.status enum does not include "Interview Completed".
+            $applicationUpdated = $applicationModel->update($interview['application_id'], ['status' => 'Under Review']);
+            if (!$applicationUpdated) {
+                $warnings[] = 'Application status was not updated.';
+            }
+        } catch (Exception $e) {
+            $warnings[] = 'Application status update failed.';
+        }
 
         $totalPoints = (int) $payload['technical_skills']
             + (int) $payload['problem_solving']
@@ -119,7 +137,8 @@ class ConductInterview extends Controller
         echo json_encode([
             'success' => true,
             'message' => 'Interview feedback submitted successfully.',
-            'total_points' => $totalPoints
+            'total_points' => $totalPoints,
+            'warnings' => $warnings
         ]);
         exit;
     }
