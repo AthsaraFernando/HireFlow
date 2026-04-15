@@ -28,7 +28,7 @@ class Categories extends Controller
                 (SELECT COUNT(*) FROM job_posts jp WHERE jp.title = jc.name) AS jobs_count
              FROM job_categories jc
              LEFT JOIN departments d ON d.id = jc.department
-             ORDER BY jc.name ASC"
+             ORDER BY d.name ASC, jc.name ASC"
         );
 
         $this->view('hradmin/categories', $data);

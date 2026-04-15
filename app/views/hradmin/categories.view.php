@@ -51,44 +51,145 @@
                 </div>
             <?php endif; ?>
 
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th>Name (Job Title)</th>
-                        <th>Department (Responsible Department)</th>
-                        <th>Jobs</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php if (!empty($categories)): ?>
-                        <?php foreach ($categories as $category): ?>
-                            <tr>
-                                <td><?= htmlspecialchars($category['name']) ?></td>
-                                <td><?= htmlspecialchars($category['department_name'] ?? '—') ?></td>
-                                <td><?= (int)($category['jobs_count'] ?? 0) ?></td>
-                                <td><?= htmlspecialchars(ucfirst($category['status'] ?? 'inactive')) ?></td>
-                                <td>
-                                    <div class="action-buttons">
-                                        <a href="<?= ROOT ?>/hradmin/categories/edit/<?= $category['id'] ?>" class="action-btn edit-btn">Edit</a>
-                                        <form method="POST" action="<?= ROOT ?>/hradmin/categories/delete/<?= $category['id'] ?>" style="display:inline;" onsubmit="return confirm('Delete this category?');">
-                                            <button type="submit" class="action-btn delete-btn">Delete</button>
-                                        </form>
+            <?php if (!empty($categories)): ?>
+                <?php
+                $groupedCategories = [];
+                foreach ($categories as $category) {
+                    $departmentName = trim((string)($category['department_name'] ?? ''));
+                    if ($departmentName === '') {
+                        $departmentName = 'Unassigned Department';
+                    }
+                    $groupedCategories[$departmentName][] = $category;
+                }
+                ?>
+
+                <div class="categories-department-grid">
+                    <?php foreach ($groupedCategories as $departmentName => $departmentCategories): ?>
+                        <section class="dashboard-card department-box">
+                            <div class="department-box-header">
+                                <h3 class="department-title"><?= htmlspecialchars($departmentName) ?></h3>
+                                <span class="department-count"><?= count($departmentCategories) ?> Job Title<?= count($departmentCategories) !== 1 ? 's' : '' ?></span>
+                            </div>
+
+                            <div class="department-jobs-list">
+                                <?php foreach ($departmentCategories as $category): ?>
+                                    <?php $status = strtolower((string)($category['status'] ?? 'inactive')); ?>
+                                    <div class="department-job-row">
+                                        <div class="department-job-main">
+                                            <p class="department-job-title"><?= htmlspecialchars($category['name']) ?></p>
+                                            <div class="department-job-meta">
+                                                <span class="job-meta-item">Job Count: <?= (int)($category['jobs_count'] ?? 0) ?></span>
+                                                <span class="status-badge <?= $status === 'active' ? 'active' : 'draft' ?>">
+                                                    <?= htmlspecialchars(ucfirst($status)) ?>
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        <div class="action-buttons">
+                                            <a href="<?= ROOT ?>/hradmin/categories/edit/<?= $category['id'] ?>" class="btn btn-secondary btn-sm">Edit</a>
+                                            <form method="POST" action="<?= ROOT ?>/hradmin/categories/delete/<?= $category['id'] ?>" style="display:inline;" onsubmit="return confirm('Delete this category?');">
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                            </form>
+                                        </div>
                                     </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <tr><td colspan="5" style="text-align:center; padding:1.5rem;">No categories found.</td></tr>
-                    <?php endif; ?>
-                    </tbody>
-                </table>
-            </div>
+                                <?php endforeach; ?>
+                            </div>
+                        </section>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="table-container">
+                    <div style="text-align:center; padding:1.5rem;">No categories found.</div>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </div>
+
+<style>
+.categories-department-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 1rem;
+}
+
+.department-box {
+    padding: 1.25rem;
+}
+
+.department-box-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.department-title {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.department-count {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+}
+
+.department-jobs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.department-job-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.department-job-row:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.department-job-main {
+    min-width: 0;
+}
+
+.department-job-title {
+    margin: 0 0 0.35rem;
+    font-weight: 600;
+}
+
+.department-job-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.job-meta-item {
+    font-size: 0.8rem;
+    color: var(--muted-foreground);
+}
+
+@media (max-width: 768px) {
+    .categories-department-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .department-job-row {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
+</style>
 
 <script>
 document.getElementById('sidebarToggle').addEventListener('click', function () {
