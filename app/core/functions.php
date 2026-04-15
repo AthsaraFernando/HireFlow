@@ -9,7 +9,15 @@ function show($stuff)
 
 function esc($str)
 {
-    return htmlspecialchars($str);
+    if ($str === null) {
+        return '';
+    }
+
+    if (!is_scalar($str)) {
+        return '';
+    }
+
+    return htmlspecialchars((string)$str, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
 function redirect($path)
