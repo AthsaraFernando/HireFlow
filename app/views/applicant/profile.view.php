@@ -385,7 +385,7 @@
                                     type="submit"
                                     id="deleteProfileButton"
                                     class="btn btn-danger btn-large"
-                                    formaction="<?= ROOT ?>/applicant/deleteProfile"
+                                    formaction="<?= ROOT ?>/applicant/profile/delete"
                                     formmethod="POST"
                                 >Delete My Profile</button>
                             </div>
