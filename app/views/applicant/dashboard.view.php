@@ -69,6 +69,7 @@
                 <p class="page-subtitle">Welcome back, <?= $user['name'] ?>! Here's your application overview</p>
             </div>
             <div class="header-right">
+                <a href="<?= ROOT ?>/announcements" class="action-btn" style="text-decoration:none;">Announcements</a>
                 <div class="user-info">
                     <span class="user-name"><?= $user['name'] ?></span>
                     <div class="user-avatar"><?= strtoupper(substr($user['name'], 0, 2)) ?></div>
