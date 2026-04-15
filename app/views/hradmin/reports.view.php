@@ -92,26 +92,18 @@
                         <p class="hero-description">Get comprehensive insights into your recruitment performance with detailed analytics and custom reports.</p>
                         <div class="hero-stats">
                             <div class="hero-stat">
-                                <span class="stat-number"><?= $total_hires ?? '45' ?></span>
+                                <span class="stat-number" id="hero-total-hires"><?= (int)($total_hires ?? 0) ?></span>
                                 <span class="stat-label">Total Hires</span>
                             </div>
                             <div class="hero-stat">
-                                <span class="stat-number"><?= $avg_time_to_hire ?? '23' ?></span>
+                                <span class="stat-number" id="hero-avg-time"><?= (int)($avg_time_to_hire ?? 0) ?></span>
                                 <span class="stat-label">Days to Hire</span>
                             </div>
                             <div class="hero-stat">
-                                <span class="stat-number"><?= $success_rate ?? '76' ?>%</span>
+                                <span class="stat-number" id="hero-success-rate"><?= (float)($success_rate ?? 0) ?>%</span>
                                 <span class="stat-label">Success Rate</span>
                             </div>
                         </div>
-                    </div>
-                    <div class="hero-actions">
-                        <button class="btn btn-primary" onclick="exportReport()">
-                            <i class="icon-download"></i>Export Report
-                        </button>
-                        <button class="btn btn-outline" onclick="scheduleReport()">
-                            <i class="icon-calendar"></i>Schedule Report
-                        </button>
                     </div>
                 </div>
 
@@ -180,7 +172,7 @@
                 <div class="metric-header">
                     <h4>Total Applications</h4>
                 </div>
-                <div class="metric-value"><?= number_format($dashboard_metrics['total_applications'] ?? 0) ?></div>
+                <div class="metric-value" id="metric-total-applications"><?= number_format($dashboard_metrics['total_applications'] ?? 0) ?></div>
                 <div class="metric-change positive">
                     <span class="change-icon">•</span>
                     <span>Updated from database</span>
@@ -191,7 +183,7 @@
                 <div class="metric-header">
                     <h4>Successful Hires</h4>
                 </div>
-                <div class="metric-value"><?= number_format($dashboard_metrics['successful_hires'] ?? 0) ?></div>
+                <div class="metric-value" id="metric-successful-hires"><?= number_format($dashboard_metrics['successful_hires'] ?? 0) ?></div>
                 <div class="metric-change positive">
                     <span class="change-icon">•</span>
                     <span>Updated from database</span>
@@ -202,7 +194,7 @@
                 <div class="metric-header">
                     <h4>Avg. Time to Hire</h4>
                 </div>
-                <div class="metric-value"><?= number_format($dashboard_metrics['avg_time_to_hire'] ?? 0) ?> days</div>
+                <div class="metric-value" id="metric-avg-time"><?= number_format($dashboard_metrics['avg_time_to_hire'] ?? 0) ?> days</div>
                 <div class="metric-change negative">
                     <span class="change-icon">•</span>
                     <span>Updated from database</span>
@@ -213,7 +205,7 @@
                 <div class="metric-header">
                     <h4>Cost per Hire</h4>
                 </div>
-                <div class="metric-value">$<?= number_format((float)($dashboard_metrics['cost_per_hire'] ?? 0), 0) ?></div>
+                <div class="metric-value" id="metric-cost-per-hire">$<?= number_format((float)($dashboard_metrics['cost_per_hire'] ?? 0), 0) ?></div>
                 <div class="metric-change positive">
                     <span class="change-icon">•</span>
                     <span>Updated from database</span>
@@ -233,7 +225,7 @@
                 <div class="stage-info">
                     <div class="stage-details">
                         <h4>Applications Received</h4>
-                        <p class="stage-number"><?= number_format($funnel_stats['total_applications'] ?? 0) ?></p>
+                        <p class="stage-number" id="funnel-total-applications"><?= number_format($funnel_stats['total_applications'] ?? 0) ?></p>
                         <p class="stage-percentage">100% of funnel</p>
                     </div>
                 </div>
@@ -247,13 +239,13 @@
                 <div class="stage-info">
                     <div class="stage-details">
                         <h4>In Screening</h4>
-                        <p class="stage-number"><?= number_format($funnel_stats['screening_passed'] ?? 0) ?></p>
-                        <p class="stage-percentage"><?= $conversion_rates['screening_rate'] ?? 0 ?>% pass rate</p>
+                        <p class="stage-number" id="funnel-screening-pass"><?= number_format($funnel_stats['screening_passed'] ?? 0) ?></p>
+                        <p class="stage-percentage" id="funnel-screening-rate"><?= $conversion_rates['screening_rate'] ?? 0 ?>% pass rate</p>
                     </div>
                 </div>
                 <div class="stage-stats">
                     <span class="stat-label">Pass Through</span>
-                    <span class="stat-value"><?= $funnel_stats['screening_passed'] ?? 0 ?> / <?= $funnel_stats['total_applications'] ?? 0 ?></span>
+                    <span class="stat-value" id="funnel-pass-through"><?= $funnel_stats['screening_passed'] ?? 0 ?> / <?= $funnel_stats['total_applications'] ?? 0 ?></span>
                 </div>
             </div>
 
@@ -261,13 +253,13 @@
                 <div class="stage-info">
                     <div class="stage-details">
                         <h4>Interviews Scheduled</h4>
-                        <p class="stage-number"><?= number_format($funnel_stats['interviews_scheduled'] ?? 0) ?></p>
-                        <p class="stage-percentage"><?= round((($funnel_stats['interviews_scheduled'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% of applications</p>
+                        <p class="stage-number" id="funnel-interviews"><?= number_format($funnel_stats['interviews_scheduled'] ?? 0) ?></p>
+                        <p class="stage-percentage" id="funnel-interviews-pct"><?= round((($funnel_stats['interviews_scheduled'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% of applications</p>
                     </div>
                 </div>
                 <div class="stage-stats">
                     <span class="stat-label">Conversion</span>
-                    <span class="stat-value"><?= $conversion_rates['interview_rate'] ?? 0 ?>% from screening</span>
+                    <span class="stat-value" id="funnel-interview-rate"><?= $conversion_rates['interview_rate'] ?? 0 ?>% from screening</span>
                 </div>
             </div>
 
@@ -275,13 +267,13 @@
                 <div class="stage-info">
                     <div class="stage-details">
                         <h4>Offers Extended</h4>
-                        <p class="stage-number"><?= number_format($funnel_stats['offers_extended'] ?? 0) ?></p>
-                        <p class="stage-percentage"><?= round((($funnel_stats['offers_extended'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% of applications</p>
+                        <p class="stage-number" id="funnel-offers"><?= number_format($funnel_stats['offers_extended'] ?? 0) ?></p>
+                        <p class="stage-percentage" id="funnel-offers-pct"><?= round((($funnel_stats['offers_extended'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% of applications</p>
                     </div>
                 </div>
                 <div class="stage-stats">
                     <span class="stat-label">Offer Rate</span>
-                    <span class="stat-value"><?= $conversion_rates['offer_rate'] ?? 0 ?>% from interviews</span>
+                    <span class="stat-value" id="funnel-offer-rate"><?= $conversion_rates['offer_rate'] ?? 0 ?>% from interviews</span>
                 </div>
             </div>
 
@@ -289,13 +281,13 @@
                 <div class="stage-info">
                     <div class="stage-details">
                         <h4>Successful Hires</h4>
-                        <p class="stage-number"><?= number_format($funnel_stats['successful_hires'] ?? 0) ?></p>
-                        <p class="stage-percentage"><?= round((($funnel_stats['successful_hires'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% overall success</p>
+                        <p class="stage-number" id="funnel-hires"><?= number_format($funnel_stats['successful_hires'] ?? 0) ?></p>
+                        <p class="stage-percentage" id="funnel-hires-pct"><?= round((($funnel_stats['successful_hires'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% overall success</p>
                     </div>
                 </div>
                 <div class="stage-stats">
                     <span class="stat-label">Acceptance</span>
-                    <span class="stat-value"><?= $conversion_rates['hire_rate'] ?? 0 ?>% offer acceptance</span>
+                    <span class="stat-value" id="funnel-hire-rate"><?= $conversion_rates['hire_rate'] ?? 0 ?>% offer acceptance</span>
                 </div>
             </div>
         </div>
@@ -320,7 +312,7 @@
                         <th>Hires</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="timeline-table-body">
                     <?php if (!empty($applications_timeline)): ?>
                         <?php 
                         $previousCount = null;
@@ -382,7 +374,7 @@
                             <th>% of Total</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="department-table-body">
                         <?php 
                         $total_apps = 0;
                         $total_hires_count = 0;
@@ -422,9 +414,9 @@
                     <tfoot>
                         <tr>
                             <td><strong>Total</strong></td>
-                            <td><strong><?= number_format($total_apps) ?></strong></td>
-                            <td><strong><?= number_format($total_hires_count) ?></strong></td>
-                            <td><strong><?= $total_apps > 0 ? number_format(($total_hires_count / $total_apps) * 100, 1) : 0 ?>%</strong></td>
+                            <td><strong id="department-total-applications"><?= number_format($total_apps) ?></strong></td>
+                            <td><strong id="department-total-hires"><?= number_format($total_hires_count) ?></strong></td>
+                            <td><strong id="department-total-rate"><?= $total_apps > 0 ? number_format(($total_hires_count / $total_apps) * 100, 1) : 0 ?>%</strong></td>
                             <td><strong>100%</strong></td>
                         </tr>
                     </tfoot>
@@ -435,7 +427,7 @@
         <!-- Application Sources -->
         <div class="table-card">
             <div class="table-header">
-                <h4>Application Sources <span style="font-size: 0.8rem; color: #666; font-weight: normal;">(Sample Data - No Source Tracking)</span></h4>
+                <h4>Application Sources <span style="font-size: 0.8rem; color: #666; font-weight: normal;">(Live from tracked application records)</span></h4>
                 <button class="btn btn-outline btn-sm" onclick="exportData('sources')">Export</button>
             </div>
             <div class="table-container">
@@ -449,49 +441,46 @@
                             <th>% of Total</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td><strong>Company Website</strong></td>
-                            <td>425</td>
-                            <td>32</td>
-                            <td><span class="rate-good">7.5%</span></td>
-                            <td>34.1%</td>
-                        </tr>
-                        <tr>
-                            <td><strong>LinkedIn</strong></td>
-                            <td>312</td>
-                            <td>24</td>
-                            <td><span class="rate-excellent">7.7%</span></td>
-                            <td>25.0%</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Indeed</strong></td>
-                            <td>187</td>
-                            <td>13</td>
-                            <td><span class="rate-average">7.0%</span></td>
-                            <td>15.0%</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Referrals</strong></td>
-                            <td>123</td>
-                            <td>12</td>
-                            <td><span class="rate-excellent">9.8%</span></td>
-                            <td>9.9%</td>
-                        </tr>
-                        <tr>
-                            <td><strong>Other Sources</strong></td>
-                            <td>200</td>
-                            <td>8</td>
-                            <td><span class="rate-average">4.0%</span></td>
-                            <td>16.0%</td>
-                        </tr>
+                    <tbody id="sources-table-body">
+                        <?php if (!empty($application_sources)): ?>
+                            <?php foreach ($application_sources as $source): ?>
+                                <?php
+                                $sourceRate = (float)($source['success_rate'] ?? 0);
+                                $sourceRateClass = $sourceRate >= 8 ? 'rate-excellent' : ($sourceRate >= 5 ? 'rate-good' : 'rate-average');
+                                ?>
+                                <tr>
+                                    <td><strong><?= htmlspecialchars($source['source']) ?></strong></td>
+                                    <td><?= number_format((int)($source['applications'] ?? 0)) ?></td>
+                                    <td><?= number_format((int)($source['hires'] ?? 0)) ?></td>
+                                    <td><span class="<?= $sourceRateClass ?>"><?= number_format($sourceRate, 1) ?>%</span></td>
+                                    <td><?= number_format((float)($source['percent_total'] ?? 0), 1) ?>%</td>
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 2rem;">No source data available</td>
+                            </tr>
+                        <?php endif; ?>
                     </tbody>
                     <tfoot>
+                        <?php
+                        $sourcesTotalApplications = 0;
+                        $sourcesTotalHires = 0;
+                        if (!empty($application_sources)) {
+                            foreach ($application_sources as $source) {
+                                $sourcesTotalApplications += (int)($source['applications'] ?? 0);
+                                $sourcesTotalHires += (int)($source['hires'] ?? 0);
+                            }
+                        }
+                        $sourcesTotalRate = $sourcesTotalApplications > 0
+                            ? number_format(($sourcesTotalHires / $sourcesTotalApplications) * 100, 1)
+                            : number_format(0, 1);
+                        ?>
                         <tr>
                             <td><strong>Total</strong></td>
-                            <td><strong>1,247</strong></td>
-                            <td><strong>89</strong></td>
-                            <td><strong>7.1%</strong></td>
+                            <td><strong id="sources-total-applications"><?= number_format($sourcesTotalApplications) ?></strong></td>
+                            <td><strong id="sources-total-hires"><?= number_format($sourcesTotalHires) ?></strong></td>
+                            <td><strong id="sources-total-rate"><?= $sourcesTotalRate ?>%</strong></td>
                             <td><strong>100%</strong></td>
                         </tr>
                     </tfoot>
@@ -519,7 +508,7 @@
                             <th>Avg. Time to Hire</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="top-jobs-table-body">
                         <?php if (!empty($top_performing_jobs)): ?>
                             <?php foreach ($top_performing_jobs as $job): ?>
                                 <?php
@@ -563,7 +552,7 @@
                             <th>Feedback Score</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="interviewer-table-body">
                         <?php if (!empty($interviewer_performance)): ?>
                             <?php foreach ($interviewer_performance as $interviewer): ?>
                                 <?php
@@ -593,66 +582,209 @@
 </div>
 
 <style>
-.filter-section {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+:root {
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --card-border: #e7e9f3;
+    --card-shadow: 0 8px 24px rgba(86, 76, 207, 0.08);
+    --hover-shadow: 0 14px 28px rgba(86, 76, 207, 0.14);
+    --text-primary: #2f3552;
+    --text-secondary: #6d7485;
 }
 
-.filter-header {
+.dashboard-content {
+    background: var(--background-gradient);
+    min-height: 100vh;
+    padding: 1.5rem;
+}
+
+.main-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.hero-section {
+    background: var(--primary-gradient);
+    border-radius: 18px;
+    padding: 2rem;
+    margin-bottom: 1.1rem;
+    color: #fff;
+    box-shadow: 0 14px 28px rgba(86, 76, 207, 0.22);
+}
+
+.hero-title {
+    margin: 0 0 0.5rem;
+    font-size: 2rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+.hero-description {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.hero-stats {
     display: flex;
-    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 1rem;
+}
+
+.hero-stat {
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    border-radius: 12px;
+    padding: 0.7rem 1rem;
+    min-width: 130px;
+}
+
+.hero-stat .stat-number {
+    display: block;
+    font-size: 1.7rem;
+    line-height: 1;
+    font-weight: 800;
+    color: #fff;
+}
+
+.hero-stat .stat-label {
+    display: block;
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.alert {
+    border-radius: 10px;
+    margin-bottom: 0.9rem;
+    padding: 0.85rem 1rem;
+}
+
+.alert-error {
+    background: #ffe9ee;
+    color: #a03a57;
+    border: 1px solid #ffd2dc;
+}
+
+.alert-success {
+    background: #eafbf2;
+    color: #1f8d56;
+    border: 1px solid #c9efd9;
+}
+
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    display: inline-flex;
     align-items: center;
+    gap: 0.5rem;
+    padding: 0.64rem 1rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.25s ease;
+}
+
+.btn-sm {
+    padding: 0.45rem 0.72rem;
+    font-size: 0.8rem;
+}
+
+.btn-outline {
+    background: #edf1ff;
+    color: #4052b5;
+    border: 1px solid #dbe3ff;
+}
+
+.btn-outline:hover {
+    background: #e5ebff;
+}
+
+.filter-section,
+.metrics-dashboard,
+.data-section,
+.table-card {
+    background: #fff;
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    box-shadow: var(--card-shadow);
+}
+
+.filter-section,
+.data-section,
+.table-card {
+    padding: 1.15rem;
     margin-bottom: 1rem;
 }
 
-.filter-header h3 {
+.metrics-dashboard {
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.filter-header,
+.section-header,
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.filter-header,
+.section-header,
+.table-header {
+    border-bottom: 1px solid #ececf5;
+    padding-bottom: 0.75rem;
+    margin-bottom: 0.9rem;
+}
+
+.filter-header h3,
+.section-header h3,
+.table-header h4 {
     margin: 0;
-    color: #2c3e50;
+    color: #3d3e8e;
 }
 
 .filter-controls {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.45rem;
 }
 
 .filter-group label {
     font-weight: 600;
-    color: #2c3e50;
-    font-size: 0.875rem;
+    color: #4d5470;
+    font-size: 0.84rem;
 }
 
 .filter-select {
-    padding: 0.75rem;
-    border: 1px solid #ced4da;
-    border-radius: 6px;
-    font-size: 0.875rem;
-}
-
-.metrics-dashboard {
-    margin-bottom: 1.5rem;
+    padding: 0.62rem 0.7rem;
+    border: 1px solid #d8def2;
+    border-radius: 8px;
+    font-size: 0.86rem;
+    color: var(--text-primary);
+    background: #fafbff;
 }
 
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.8rem;
 }
 
 .metric-card {
-    background: white;
-    border: 1px solid #e9ecef;
+    background: #fff;
+    border: 1px solid #ebeef8;
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1rem;
+    box-shadow: 0 4px 14px rgba(86, 76, 207, 0.06);
     position: relative;
     overflow: hidden;
 }
@@ -660,435 +792,240 @@
 .metric-card::before {
     content: '';
     position: absolute;
-    top: 0;
     left: 0;
-    right: 0;
-    height: 4px;
+    top: 0;
+    bottom: 0;
+    width: 4px;
 }
 
-.metric-card.primary::before { background: #4e31aa; }
-.metric-card.success::before { background: #28a745; }
-.metric-card.warning::before { background: #ffc107; }
-.metric-card.info::before { background: #17a2b8; }
-
-.metric-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
+.metric-card.primary::before { background: #5848cb; }
+.metric-card.success::before { background: #1f8d56; }
+.metric-card.warning::before { background: #b96a11; }
+.metric-card.info::before { background: #2879c6; }
 
 .metric-header h4 {
     margin: 0;
-    color: #6c757d;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.metric-icon {
-    font-size: 1.25rem;
+    color: var(--text-secondary);
+    font-size: 0.84rem;
+    font-weight: 600;
 }
 
 .metric-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #3d3e8e;
+    margin: 0.3rem 0 0.5rem;
 }
 
 .metric-change {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    gap: 0.28rem;
+    padding: 0.18rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.77rem;
+    font-weight: 600;
 }
 
 .metric-change.positive {
-    color: #28a745;
+    background: #e9f8ef;
+    color: #1f8d56;
 }
 
 .metric-change.negative {
-    color: #dc3545;
-}
-
-.change-icon {
-    font-weight: bold;
-}
-
-/* Data Section Styles */
-.data-section {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
-    border-bottom: 2px solid #f1f3f4;
-}
-
-.section-header h3 {
-    margin: 0;
-    color: #2c3e50;
-    font-size: 1.25rem;
-    font-weight: 700;
+    background: #fff4e5;
+    color: #b96a11;
 }
 
 .data-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem;
+    gap: 0.8rem;
 }
 
 .data-summary-card {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    border: 1px solid #dee2e6;
-    border-radius: 10px;
-    padding: 1.25rem;
-    transition: all 0.3s ease;
+    background: #fafbff;
+    border: 1px solid #eceff9;
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.25s ease;
 }
 
-.data-summary-card:hover {
+.data-summary-card:hover,
+.table-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-}
-
-.stage-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    box-shadow: var(--hover-shadow);
 }
 
 .stage-details h4 {
-    margin: 0 0 0.5rem;
-    color: #495057;
-    font-size: 0.875rem;
-    font-weight: 600;
+    margin: 0 0 0.45rem;
+    color: #515870;
+    font-size: 0.78rem;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.04em;
 }
 
 .stage-number {
-    font-size: 2rem;
-    font-weight: 700;
-    color: #2c3e50;
-    margin: 0.25rem 0;
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0.2rem 0;
     line-height: 1;
 }
 
 .stage-percentage {
-    font-size: 0.875rem;
-    color: #6c757d;
-    margin: 0.25rem 0 0;
+    margin: 0.18rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.82rem;
 }
 
 .stage-stats {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 0.75rem;
-    border-top: 1px solid #dee2e6;
+    gap: 0.5rem;
+    border-top: 1px solid #edf0f8;
+    padding-top: 0.55rem;
+    margin-top: 0.6rem;
+}
+
+.stat-label,
+.stat-value,
+.stat-change {
+    font-size: 0.78rem;
 }
 
 .stat-label {
-    font-size: 0.8125rem;
-    color: #6c757d;
-    font-weight: 500;
-}
-
-.stat-value {
-    font-size: 0.8125rem;
-    color: #495057;
+    color: #687087;
     font-weight: 600;
 }
 
+.stat-value,
 .stat-change {
-    font-size: 0.8125rem;
-    font-weight: 600;
+    color: #3f4560;
+    font-weight: 700;
 }
 
-.stat-change.positive {
-    color: #28a745;
-}
-
-/* Timeline Table */
-.timeline-table tbody tr {
+.timeline-table tbody tr,
+.data-table tbody tr {
     transition: background-color 0.2s ease;
 }
 
-.timeline-table tbody tr:hover {
-    background-color: #f8f9fa;
+.timeline-table tbody tr:hover,
+.data-table tbody tr:hover {
+    background-color: #f8f9ff;
 }
 
 .trend-up {
-    color: #28a745;
-    font-weight: 600;
+    color: #1f8d56;
+    font-weight: 700;
 }
 
 .trend-down {
-    color: #dc3545;
-    font-weight: 600;
+    color: #b63858;
+    font-weight: 700;
 }
 
-.trend-neutral {
-    color: #6c757d;
-}
-
-/* Tables Grid */
-.tables-grid {
+.tables-grid,
+.tables-section {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(440px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
 }
 
-/* Department Colors */
+.table-container {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead th {
+    text-align: left;
+    background: #f7f8ff;
+    color: #4e5395;
+    padding: 0.68rem;
+    border-bottom: 1px solid #ececf5;
+    font-size: 0.82rem;
+}
+
+.data-table tbody td,
+.data-table tfoot td {
+    padding: 0.68rem;
+    border-bottom: 1px solid #f0f2f9;
+    color: var(--text-primary);
+    font-size: 0.84rem;
+}
+
+.data-table tfoot {
+    background: #f9faff;
+    font-weight: 700;
+}
+
 .dept-name {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
+    gap: 0.45rem;
+    font-weight: 700;
 }
 
 .dept-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 3px;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
     display: inline-block;
 }
 
-.dept-color.engineering { background: #4e31aa; }
-.dept-color.design { background: #7b1fa2; }
-.dept-color.marketing { background: #388e3c; }
-.dept-color.sales { background: #f57c00; }
+.dept-color.engineering { background: #5848cb; }
+.dept-color.design { background: #7b4ccf; }
+.dept-color.marketing { background: #1f8d56; }
+.dept-color.sales { background: #b96a11; }
 
-.tables-section {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
-}
+.rate-excellent { color: #1f8d56; font-weight: 700; }
+.rate-good { color: #2879c6; font-weight: 700; }
+.rate-average { color: #b96a11; font-weight: 700; }
+.rate-poor { color: #b63858; font-weight: 700; }
 
-.table-card {
-    background: white;
-    border: 1px solid #e9ecef;
-    border-radius: 12px;
-    padding: 1.5rem;
-}
-
-.table-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #f1f3f4;
-}
-
-.table-header h4 {
-    margin: 0;
-    color: #2c3e50;
-}
-
-.view-all-link {
-    color: #4e31aa;
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.view-all-link:hover {
-    text-decoration: underline;
-}
-
-.rate-excellent { color: #28a745; font-weight: 600; }
-.rate-good { color: #17a2b8; font-weight: 600; }
-.rate-average { color: #ffc107; font-weight: 600; }
-.rate-poor { color: #dc3545; font-weight: 600; }
-
-/* Additional Table Styles */
-.data-table tfoot {
-    font-weight: 700;
-    background-color: #f8f9fa;
-    border-top: 2px solid #dee2e6;
-}
-
-.data-table tfoot td {
-    padding: 1rem;
-}
-
-/* Responsive design */
 @media (max-width: 768px) {
-    .filter-controls {
-        grid-template-columns: 1fr;
-    }
-    
-    .metrics-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .data-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .tables-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .tables-section {
-        grid-template-columns: 1fr;
-    }
-    
-    .data-summary-card {
-        padding: 1rem;
-    }
-    
-    .stage-number {
-        font-size: 1.5rem;
-    }
-    
-    .table-container {
-        overflow-x: auto;
-    }
-    
-    .data-table {
-        font-size: 0.875rem;
-    }
-    
-    .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-    }
-}
-</style>
-
-/* Modern HR Admin Design System */
-<style>
-    :root {
-        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        --background-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        --card-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        --border-radius: 16px;
-        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
     .dashboard-content {
-        background: var(--background-gradient);
-        min-height: 100vh;
-        padding: 2rem;
+        padding: 1rem;
     }
 
     .hero-section {
-        background: linear-gradient(135deg, #4c63d2 0%, #5a67d8 50%, #667eea 100%);
-        color: white;
-        padding: 3rem 2.5rem;
-        border-radius: var(--border-radius);
-        margin-bottom: 2.5rem;
-        box-shadow: var(--card-shadow);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 2rem;
-        position: relative;
-    }
-
-    .hero-section::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0,0,0,0.1);
-        border-radius: var(--border-radius);
-        pointer-events: none;
+        padding: 1.25rem;
     }
 
     .hero-title {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin-bottom: 1rem;
-        color: #ffffff;
-        text-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        position: relative;
-        z-index: 1;
+        font-size: 1.6rem;
     }
 
-    .hero-description {
-        font-size: 1.125rem;
-        opacity: 1;
-        margin-bottom: 1.5rem;
-        color: rgba(255,255,255,0.95);
-        text-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        position: relative;
-        z-index: 1;
+    .filter-controls,
+    .metrics-grid,
+    .data-grid,
+    .tables-grid,
+    .tables-section {
+        grid-template-columns: 1fr;
     }
 
-    .hero-stats {
-        display: flex;
-        gap: 2rem;
-        flex-wrap: wrap;
+    .section-header,
+    .table-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
-
-    .stat-number {
-        display: block;
-        font-size: 2.5rem;
-        font-weight: 700;
-    }
-
-    .btn {
-        padding: 0.875rem 2rem;
-        border-radius: 12px;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.75rem;
-        transition: var(--transition);
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-    }
-
-    .btn-primary {
-        background: white;
-        color: #667eea;
-    }
-
-    .btn-outline {
-        background: rgba(255,255,255,0.1);
-        color: white;
-        border: 2px solid rgba(255,255,255,0.3);
-    }
-
-    /* Icons */
-    .icon-download::before { content: '⬇'; }
-    .icon-calendar::before { content: '📅'; }
-
-    @media (max-width: 768px) {
-        .hero-section { flex-direction: column; }
-        .dashboard-content { padding: 1rem; }
-    }
+}
 </style>
 
 <script>
 function exportReport() {
     alert('Exporting current report as PDF...');
-    // Implement export functionality
 }
 
 function scheduleReport() {
     alert('Opening report scheduling dialog...');
-    // Implement report scheduling
 }
 
 function resetFilters() {
@@ -1100,33 +1037,23 @@ function resetFilters() {
 
 function changeReportType(type) {
     alert(`Switching to ${type} report view...`);
-    // Implement report type switching
 }
 
 function exportData(dataType) {
     alert(`Exporting ${dataType} data as CSV...`);
-    // Implement data export functionality
 }
 
 function viewInterviewerDetails() {
     alert('Opening detailed interviewer performance...');
-    // Implement detailed view
 }
 
 function generateReport() {
     alert('Regenerating report with current filters...');
-    // Implement report generation
 }
 
-// Auto-refresh data every 5 minutes
-setInterval(() => {
-    console.log('Refreshing report data...');
-    // Implement data refresh
-}, 300000);
-
-// Animate data cards on load
 document.addEventListener('DOMContentLoaded', function() {
-    // Animate summary cards
+    const rootUrl = '<?= ROOT ?>';
+
     document.querySelectorAll('.data-summary-card').forEach((card, index) => {
         card.style.opacity = '0';
         card.style.transform = 'translateY(20px)';
@@ -1137,31 +1064,318 @@ document.addEventListener('DOMContentLoaded', function() {
         }, index * 100);
     });
 
-// Sidebar toggle functionality
-document.getElementById('sidebarToggle').addEventListener('click', function () {
-    document.querySelector('.sidebar').classList.toggle('collapsed');
-    document.querySelector('.main-content').classList.toggle('expanded');
-});
+    document.getElementById('sidebarToggle').addEventListener('click', function () {
+        document.querySelector('.sidebar').classList.toggle('collapsed');
+        document.querySelector('.main-content').classList.toggle('expanded');
+    });
 
-document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
-    if (e.target.textContent.trim() === ">") {
-        e.target.textContent = "<";
-    } else {
-        e.target.textContent = ">";
-    }
-});
+    document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
+        if (e.target.textContent.trim() === ">") {
+            e.target.textContent = "<";
+        } else {
+            e.target.textContent = ">";
+        }
+    });
 
-document.addEventListener('DOMContentLoaded', function () {
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-link');
-
     navLinks.forEach(link => {
         if (link.getAttribute('href').includes(currentPath)) {
             navLinks.forEach(l => l.classList.remove('active'));
             link.classList.add('active');
         }
     });
-});
+
+    const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.textContent = value;
+        }
+    };
+
+    const escapeHtml = (value) => {
+        const text = String(value ?? '');
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
+    const formatNumber = (value) => Number(value || 0).toLocaleString();
+
+    const formatDateRange = (start, end) => {
+        const format = (dateValue) => {
+            const date = new Date(dateValue);
+            if (Number.isNaN(date.getTime())) {
+                return '';
+            }
+            return date.toLocaleDateString(undefined, { month: 'short', day: '2-digit' });
+        };
+
+        return `${format(start)} - ${format(end)}`.trim();
+    };
+
+    const getRateClass = (value) => {
+        const rate = Number(value || 0);
+        if (rate >= 30) {
+            return 'rate-excellent';
+        }
+        if (rate >= 20) {
+            return 'rate-good';
+        }
+        return 'rate-average';
+    };
+
+    const renderTimeline = (rows) => {
+        const body = document.getElementById('timeline-table-body');
+        if (!body) {
+            return;
+        }
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            body.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:30px;"><p style="color:#6c757d;">No application data available for the selected period.</p></td></tr>';
+            return;
+        }
+
+        let previousCount = null;
+        body.innerHTML = rows.map((week) => {
+            const current = Number(week.total_applications || 0);
+            let changeHtml = '<span>-</span>';
+            if (previousCount !== null && previousCount > 0) {
+                const change = ((current - previousCount) / previousCount) * 100;
+                const changeClass = change >= 0 ? 'trend-up' : 'trend-down';
+                changeHtml = `<span class="${changeClass}">${change >= 0 ? '+' : ''}${change.toFixed(1)}%</span>`;
+            }
+            previousCount = current;
+
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(week.period || '')}</strong><br><small>${escapeHtml(formatDateRange(week.week_start, week.week_end))}</small></td>
+                    <td>${formatNumber(week.total_applications)}</td>
+                    <td>${changeHtml}</td>
+                    <td>${formatNumber(week.screenings)}</td>
+                    <td>${formatNumber(week.interviews)}</td>
+                    <td>${formatNumber(week.offers)}</td>
+                    <td>${formatNumber(week.hires)}</td>
+                </tr>
+            `;
+        }).join('');
+    };
+
+    const renderDepartmentStats = (rows) => {
+        const body = document.getElementById('department-table-body');
+        if (!body) {
+            return;
+        }
+
+        let totalApplications = 0;
+        let totalHires = 0;
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">No department data available</td></tr>';
+            setText('department-total-applications', '0');
+            setText('department-total-hires', '0');
+            setText('department-total-rate', '0.0%');
+            return;
+        }
+
+        const allApplications = rows.reduce((sum, dept) => sum + Number(dept.total_applications || 0), 0);
+
+        body.innerHTML = rows.map((dept) => {
+            const applications = Number(dept.total_applications || 0);
+            const hires = Number(dept.hires || 0);
+            totalApplications += applications;
+            totalHires += hires;
+            const successRate = applications > 0 ? (hires / applications) * 100 : 0;
+            const rateClass = successRate >= 8 ? 'rate-excellent' : (successRate >= 5 ? 'rate-good' : 'rate-average');
+            const percentTotal = allApplications > 0 ? (applications / allApplications) * 100 : 0;
+
+            return `
+                <tr>
+                    <td><div class="dept-name"><span class="dept-color engineering"></span>${escapeHtml(dept.department_name || '')}</div></td>
+                    <td>${formatNumber(applications)}</td>
+                    <td>${formatNumber(hires)}</td>
+                    <td><span class="${rateClass}">${successRate.toFixed(1)}%</span></td>
+                    <td>${percentTotal.toFixed(1)}%</td>
+                </tr>
+            `;
+        }).join('');
+
+        const overallRate = totalApplications > 0 ? ((totalHires / totalApplications) * 100).toFixed(1) : '0.0';
+        setText('department-total-applications', formatNumber(totalApplications));
+        setText('department-total-hires', formatNumber(totalHires));
+        setText('department-total-rate', `${overallRate}%`);
+    };
+
+    const renderSourceStats = (rows) => {
+        const body = document.getElementById('sources-table-body');
+        if (!body) {
+            return;
+        }
+
+        let totalApplications = 0;
+        let totalHires = 0;
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">No source data available</td></tr>';
+            setText('sources-total-applications', '0');
+            setText('sources-total-hires', '0');
+            setText('sources-total-rate', '0.0%');
+            return;
+        }
+
+        body.innerHTML = rows.map((source) => {
+            const applications = Number(source.applications || 0);
+            const hires = Number(source.hires || 0);
+            const rate = Number(source.success_rate || 0);
+            totalApplications += applications;
+            totalHires += hires;
+            const rateClass = rate >= 8 ? 'rate-excellent' : (rate >= 5 ? 'rate-good' : 'rate-average');
+
+            return `
+                <tr>
+                    <td><strong>${escapeHtml(source.source || '')}</strong></td>
+                    <td>${formatNumber(applications)}</td>
+                    <td>${formatNumber(hires)}</td>
+                    <td><span class="${rateClass}">${rate.toFixed(1)}%</span></td>
+                    <td>${Number(source.percent_total || 0).toFixed(1)}%</td>
+                </tr>
+            `;
+        }).join('');
+
+        const totalRate = totalApplications > 0 ? ((totalHires / totalApplications) * 100).toFixed(1) : '0.0';
+        setText('sources-total-applications', formatNumber(totalApplications));
+        setText('sources-total-hires', formatNumber(totalHires));
+        setText('sources-total-rate', `${totalRate}%`);
+    };
+
+    const renderTopJobs = (rows) => {
+        const body = document.getElementById('top-jobs-table-body');
+        if (!body) {
+            return;
+        }
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            body.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:2rem;">No job performance data available</td></tr>';
+            return;
+        }
+
+        body.innerHTML = rows.map((job) => {
+            const conversion = Number(job.conversion_rate || 0);
+            const rateClass = getRateClass(conversion);
+            const avgDays = job.avg_days_to_hire === null ? 'N/A' : `${Number(job.avg_days_to_hire).toFixed(0)} days`;
+
+            return `
+                <tr>
+                    <td>${escapeHtml(job.job_title || '')}</td>
+                    <td>${formatNumber(job.applications_count)}</td>
+                    <td>${formatNumber(job.interviews_count)}</td>
+                    <td>${formatNumber(job.hires_count)}</td>
+                    <td><span class="${rateClass}">${conversion.toFixed(1)}%</span></td>
+                    <td>${avgDays}</td>
+                </tr>
+            `;
+        }).join('');
+    };
+
+    const renderInterviewerPerformance = (rows) => {
+        const body = document.getElementById('interviewer-table-body');
+        if (!body) {
+            return;
+        }
+
+        if (!Array.isArray(rows) || rows.length === 0) {
+            body.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:2rem;">No interviewer performance data available</td></tr>';
+            return;
+        }
+
+        body.innerHTML = rows.map((interviewer) => {
+            const hireRate = Number(interviewer.hire_rate || 0);
+            const rateClass = getRateClass(hireRate);
+            const avgRating = interviewer.avg_rating === null ? 'N/A' : `${Number(interviewer.avg_rating).toFixed(1)}/5`;
+            const feedbackScore = interviewer.feedback_score === null ? 'N/A' : `${Number(interviewer.feedback_score).toFixed(1)}/5`;
+
+            return `
+                <tr>
+                    <td>${escapeHtml(interviewer.interviewer_name || '')}</td>
+                    <td>${formatNumber(interviewer.interviews_conducted)}</td>
+                    <td>${avgRating}</td>
+                    <td><span class="${rateClass}">${hireRate.toFixed(1)}%</span></td>
+                    <td>${feedbackScore}</td>
+                </tr>
+            `;
+        }).join('');
+    };
+
+    const applyReportData = (data) => {
+        const funnel = data.funnel_stats || {};
+        const conversion = data.conversion_rates || {};
+        const metrics = data.dashboard_metrics || {};
+
+        setText('hero-total-hires', Number(data.total_hires || 0));
+        setText('hero-avg-time', Number(data.avg_time_to_hire || 0));
+        setText('hero-success-rate', `${Number(data.success_rate || 0).toFixed(1)}%`);
+
+        setText('metric-total-applications', formatNumber(metrics.total_applications));
+        setText('metric-successful-hires', formatNumber(metrics.successful_hires));
+        setText('metric-avg-time', `${formatNumber(metrics.avg_time_to_hire)} days`);
+        setText('metric-cost-per-hire', `$${formatNumber(Math.round(Number(metrics.cost_per_hire || 0)))}`);
+
+        const totalApplications = Number(funnel.total_applications || 0);
+        const screening = Number(funnel.screening_passed || 0);
+        const interviews = Number(funnel.interviews_scheduled || 0);
+        const offers = Number(funnel.offers_extended || 0);
+        const hires = Number(funnel.successful_hires || 0);
+
+        setText('funnel-total-applications', formatNumber(totalApplications));
+        setText('funnel-screening-pass', formatNumber(screening));
+        setText('funnel-screening-rate', `${Number(conversion.screening_rate || 0).toFixed(1)}% pass rate`);
+        setText('funnel-pass-through', `${screening} / ${totalApplications}`);
+        setText('funnel-interviews', formatNumber(interviews));
+        setText('funnel-interviews-pct', `${totalApplications > 0 ? ((interviews / totalApplications) * 100).toFixed(1) : '0.0'}% of applications`);
+        setText('funnel-interview-rate', `${Number(conversion.interview_rate || 0).toFixed(1)}% from screening`);
+        setText('funnel-offers', formatNumber(offers));
+        setText('funnel-offers-pct', `${totalApplications > 0 ? ((offers / totalApplications) * 100).toFixed(1) : '0.0'}% of applications`);
+        setText('funnel-offer-rate', `${Number(conversion.offer_rate || 0).toFixed(1)}% from interviews`);
+        setText('funnel-hires', formatNumber(hires));
+        setText('funnel-hires-pct', `${totalApplications > 0 ? ((hires / totalApplications) * 100).toFixed(1) : '0.0'}% overall success`);
+        setText('funnel-hire-rate', `${Number(conversion.hire_rate || 0).toFixed(1)}% offer acceptance`);
+
+        renderTimeline(data.applications_timeline || []);
+        renderDepartmentStats(data.department_stats || []);
+        renderSourceStats(data.application_sources || []);
+        renderTopJobs(data.top_performing_jobs || []);
+        renderInterviewerPerformance(data.interviewer_performance || []);
+    };
+
+    const refreshReportData = async () => {
+        try {
+            const response = await fetch(`${rootUrl}/hradmin/reports/liveData`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const payload = await response.json();
+            if (!payload || payload.success !== true || !payload.data) {
+                return;
+            }
+
+            applyReportData(payload.data);
+        } catch (error) {
+        }
+    };
+
+    refreshReportData();
+    setInterval(refreshReportData, 30000);
 });
 </script>
 

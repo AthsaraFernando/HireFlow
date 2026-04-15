@@ -99,6 +99,13 @@ class ApplicantDatabase extends Controller
                     u.phone,
                     u.address,
                     u.status,
+                                        (
+                                                SELECT a2.status
+                                                FROM applications a2
+                                                WHERE a2.applicant_id = u.id
+                                                ORDER BY a2.applied_at DESC, a2.id DESC
+                                                LIMIT 1
+                                        ) AS latest_application_status,
                     MAX(a.applied_at) AS last_application
                   FROM users u
                   INNER JOIN applications a ON u.id = a.applicant_id
@@ -120,6 +127,7 @@ class ApplicantDatabase extends Controller
                     'location' => $user['address'] ?? 'N/A',
                     'last_application' => !empty($user['last_application']) ? date('Y-m-d H:i:s', strtotime((string)$user['last_application'])) : 'Never',
                     'status' => ucfirst((string)($user['status'] ?? 'inactive')),
+                    'latest_application_status' => (string)($user['latest_application_status'] ?? 'Applied'),
                     'rating' => 0
                 ];
             }

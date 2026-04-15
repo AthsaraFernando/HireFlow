@@ -8,12 +8,6 @@
             <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications" class="btn btn-secondary">
                 <i class="icon-back"></i>Back to Applications
             </a>
-            <button class="btn btn-primary" onclick="scheduleInterview()">
-                <i class="icon-calendar"></i>Schedule Interview
-            </button>
-            <button class="btn btn-success" onclick="shortlistCandidate()">
-                <i class="icon-star"></i>Shortlist
-            </button>
         </div>
     </div>
 
@@ -24,55 +18,6 @@
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-
-    <!-- Application Status -->
-    <div class="status-section">
-        <div class="status-card">
-            <div class="status-info">
-                <span class="status-badge <?= strtolower($application['status'] ?? 'pending') ?>"><?= ucfirst($application['status'] ?? 'Pending Review') ?></span>
-                <div class="status-details">
-                    <span>Applied: <?= $application['applied_date'] ?? 'Jan 18, 2024' ?></span>
-                    <span>Last Updated: <?= $application['updated_date'] ?? 'Jan 19, 2024' ?></span>
-                </div>
-            </div>
-            <div class="rating-section">
-                <div class="current-rating">
-                    <span class="rating-label">Rating:</span>
-                    <div class="rating">
-                        <span class="star">⭐</span>
-                        <span class="star">⭐</span>
-                        <span class="star">⭐</span>
-                        <span class="star">⭐</span>
-                        <span class="star empty">⭐</span>
-                        <span class="rating-text">4/5</span>
-                    </div>
-                </div>
-                <button class="btn btn-outline btn-sm" onclick="editRating()">Edit Rating</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Quick Actions Bar - Integrated into main content -->
-    <div class="page-actions-bar">
-        <div class="actions-label">Application Actions:</div>
-        <div class="page-actions">
-            <a href="#" class="page-action-btn primary" onclick="scheduleInterview(); return false;">
-                <i class="icon-calendar"></i>Schedule Interview
-            </a>
-            <a href="#" class="page-action-btn success" onclick="shortlistCandidate(); return false;">
-                <i class="icon-check"></i>Shortlist Candidate
-            </a>
-            <a href="<?= ROOT ?>/hradmin/applications/download-resume/<?= $application['id'] ?? '1' ?>" class="page-action-btn">
-                <i class="icon-download"></i>Download Resume
-            </a>
-            <a href="#" class="page-action-btn" onclick="sendEmail(); return false;">
-                <i class="icon-mail"></i>Send Email
-            </a>
-            <a href="#" class="page-action-btn danger" onclick="rejectCandidate(); return false;">
-                <i class="icon-close"></i>Reject Application
-            </a>
-        </div>
-    </div>
 
     <!-- Main Content -->
     <div class="single-column-layout">

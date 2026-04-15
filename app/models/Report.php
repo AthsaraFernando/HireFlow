@@ -114,7 +114,7 @@ class Report
                     COUNT(a.id) as total_applications,
                     SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) as hires
                   FROM departments d
-                  LEFT JOIN job_posts jp ON d.id = jp.department_id AND jp.status = 'Active'
+                                    LEFT JOIN job_posts jp ON d.id = jp.department_id AND jp.status IN ('Open', 'Active')
                   LEFT JOIN applications a ON jp.id = a.job_id
                   GROUP BY d.id, d.name
                   ORDER BY total_applications DESC";

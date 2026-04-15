@@ -27,7 +27,7 @@ class Profile extends Controller
                     if (!password_verify($_POST['current_password'], $userData['password'])) {
                         $data['errors'][] = "Current password is incorrect";
                     } else {
-                        $updateData['password'] = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+                        $updateData['password'] = $_POST['new_password'];
                     }
                 }
 
@@ -93,6 +93,6 @@ class Profile extends Controller
             return $errors;
         }
         
-        return true;
+        return [];
     }
 }
