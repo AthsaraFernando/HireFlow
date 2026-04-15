@@ -45,6 +45,46 @@
     flex-wrap: wrap;
 }
 
+/* Shared tab styles for recruitment pages */
+.tabs-container {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0 1rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.tab-button {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    text-decoration: none;
+}
+
+.tab-button:hover {
+    color: #3b82f6;
+    background: #f3f4f6;
+}
+
+.tab-button.active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
 /* Filters Section */
 .filters-section {
     background: white;
