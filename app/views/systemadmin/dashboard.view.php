@@ -33,7 +33,7 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
-            <p class="brand-subtitle">System Admin</p>
+
         </div>
 
         <nav class="sidebar-nav">
@@ -64,6 +64,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/announcements" class="nav-link">
+                        <span class="nav-text">Announcements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -86,9 +91,7 @@
             </div>
 
             <div class="header-right">
-                <!-- <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div> -->
+              
 
                 <div class="header-user">
                     <div class="user-info">
@@ -111,8 +114,8 @@
                     ?>  
                     <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt=""
                             class="profile_picture">
-                    <!-- <div class="user-avatar">
-                    </div> -->
+                    
+                    
                 </div>
             </div>
         </header>
@@ -135,7 +138,7 @@
                     </div>
                 </div>
 
-                <div class="stat-card stat-success">
+                <div class="stat-card stat-primary">
                     <div class="stat-icon">
                     </div>
                     <div class="stat-content">
@@ -144,12 +147,21 @@
                     </div>
                 </div>
 
-                <div class="stat-card stat-warning">
+                <div class="stat-card stat-primary">
+                    <div class="stat-icon">
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-number"><?= $data['applicants'] ?? 0 ?></h3>
+                        <p class="stat-label">Applicants</p>
+                    </div>
+                </div>
+
+                <div class="stat-card stat-info">
                     <div class="stat-icon">
                     </div>
                     <div class="stat-content">
                         <h3 class="stat-number"><?= $data['recent_registrations'] ?? 0 ?></h3>
-                        <p class="stat-label">New This Week</p>
+                        <p class="stat-label">Registrations This Week</p>
                     </div>
                 </div>
 
@@ -170,9 +182,9 @@
                         <h2 class="section-title">Recent Activities</h2>
                         <a href="<?= ROOT ?>/systemadmin/accesslogs" class="section-link">View All</a>
                     </div>
-                    <!-- <div class="activity-list"> -->
+                    
                     <?php if (!empty($recent_logins)): ?>
-                        <?php //  logger($recent_logins) ?>
+                        
                         <div class="table-container">
                             <table class="data-table activity-table">
                                 <thead>
@@ -213,7 +225,7 @@
                     <div class="quick-actions">
                         <a href="<?= ROOT ?>/systemadmin/usermanage" class="action-card">
                             <div class="action-icon">
-                                👤
+                                
                             </div>
                             <div class="action-content">
                                 <h3>Add New User</h3>
@@ -223,7 +235,7 @@
 
                         <a href="<?= ROOT ?>/systemadmin/reports" class="action-card">
                             <div class="action-icon">
-                                📄
+                                
                             </div>
                             <div class="action-content">
                                 <h3>View Reports</h3>
@@ -233,7 +245,7 @@
 
                         <a href="<?= ROOT ?>/systemadmin/accesslogs" class="action-card">
                             <div class="action-icon">
-                                🪪
+                                
                             </div>
                             <div class="action-content">
                                 <h3>Security Logs</h3>
