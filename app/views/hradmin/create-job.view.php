@@ -226,7 +226,8 @@
                     <div class="form-group">
                         <label for="application_deadline" class="form-label">Application Deadline</label>
                         <input type="date" id="application_deadline" name="application_deadline" class="form-input" 
-                               value="<?= $_POST['application_deadline'] ?? '' ?>">
+                               value="<?= $_POST['application_deadline'] ?? '' ?>"
+                               min="<?= date('Y-m-d') ?>">
                     </div>
 
                     <div class="form-group">

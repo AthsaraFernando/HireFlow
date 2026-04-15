@@ -249,30 +249,150 @@ class Report
 
         return $map[$normalized] ?? "{$statusColumn} IN ('Applied', 'Shortlisted', 'Interview Scheduled', 'Offered', 'Rejected')";
     }
+
+    private function normalizeAnalyticsFilters($filters = [])
+    {
+        $normalized = [
+            'start_date' => null,
+            'end_date' => null,
+            'department_id' => null,
+            'level' => '',
+        ];
+
+        if (!is_array($filters)) {
+            return $normalized;
+        }
+
+        $startDate = trim((string)($filters['start_date'] ?? ''));
+        $endDate = trim((string)($filters['end_date'] ?? ''));
+        if ($startDate !== '' && $endDate !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate) && $startDate <= $endDate) {
+            $normalized['start_date'] = $startDate;
+            $normalized['end_date'] = $endDate;
+        }
+
+        $departmentId = (int)($filters['department_id'] ?? 0);
+        if ($departmentId > 0) {
+            $normalized['department_id'] = $departmentId;
+        }
+
+        $level = strtolower(trim((string)($filters['level'] ?? '')));
+        if (in_array($level, ['entry', 'mid', 'senior', 'lead', 'executive'], true)) {
+            $normalized['level'] = $level;
+        }
+
+        return $normalized;
+    }
+
+    private function getExperienceLevelVariants($level)
+    {
+        $map = [
+            'entry' => ['entry', 'Entry', 'Entry Level'],
+            'mid' => ['mid', 'Mid', 'Mid Level'],
+            'senior' => ['senior', 'Senior', 'Senior Level'],
+            'lead' => ['lead', 'Lead', 'Lead Level', 'Lead/Principal', 'Principal'],
+            'executive' => ['executive', 'Executive', 'Executive Level'],
+        ];
+
+        return $map[$level] ?? [];
+    }
+
+    private function applyAnalyticsFilters(&$whereClauses, &$params, $filters, $options = [])
+    {
+        $normalized = $this->normalizeAnalyticsFilters($filters);
+
+        $applicationAlias = $options['application_alias'] ?? 'a';
+        $jobAlias = $options['job_alias'] ?? 'jp';
+        $dateColumn = $options['date_column'] ?? 'applied_at';
+        $useDate = $options['use_date'] ?? true;
+        $defaultDays = isset($options['default_days']) ? (int)$options['default_days'] : null;
+        $useDepartment = $options['use_department'] ?? true;
+        $useLevel = $options['use_level'] ?? true;
+        $paramPrefix = $options['param_prefix'] ?? 'flt';
+
+        if ($useDate) {
+            if (!empty($normalized['start_date']) && !empty($normalized['end_date'])) {
+                $startKey = $paramPrefix . '_start';
+                $endKey = $paramPrefix . '_end';
+                $whereClauses[] = "DATE({$applicationAlias}.{$dateColumn}) BETWEEN :{$startKey} AND :{$endKey}";
+                $params[$startKey] = $normalized['start_date'];
+                $params[$endKey] = $normalized['end_date'];
+            } elseif ($defaultDays !== null && $defaultDays > 0) {
+                $whereClauses[] = "{$applicationAlias}.{$dateColumn} >= DATE_SUB(NOW(), INTERVAL {$defaultDays} DAY)";
+            }
+        }
+
+        if ($useDepartment && !empty($normalized['department_id'])) {
+            $deptKey = $paramPrefix . '_department_id';
+            $whereClauses[] = "{$jobAlias}.department_id = :{$deptKey}";
+            $params[$deptKey] = (int)$normalized['department_id'];
+        }
+
+        if ($useLevel && !empty($normalized['level'])) {
+            $variants = $this->getExperienceLevelVariants($normalized['level']);
+            if (!empty($variants)) {
+                $levelPlaceholders = [];
+                foreach ($variants as $index => $variant) {
+                    $key = $paramPrefix . '_level_' . $index;
+                    $levelPlaceholders[] = ':' . $key;
+                    $params[$key] = $variant;
+                }
+                $whereClauses[] = "{$jobAlias}.experience_level IN (" . implode(', ', $levelPlaceholders) . ')';
+            }
+        }
+
+        return $normalized;
+    }
     
     /**
      * Get recruitment funnel statistics
      */
-    public function getRecruitmentFunnelStats()
+    public function getRecruitmentFunnelStats($filters = [])
     {
+        $whereClauses = [];
+        $params = [];
+        $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'a',
+            'job_alias' => 'jp',
+            'date_column' => 'applied_at',
+            'default_days' => 90,
+            'param_prefix' => 'funnel'
+        ]);
+
         $query = "SELECT 
                     COUNT(*) as total_applications,
-                    SUM(CASE WHEN status IN ('Under Review', 'Shortlisted', 'Interview Scheduled', 'Offered', 'Hired') THEN 1 ELSE 0 END) as screening_passed,
-                    SUM(CASE WHEN status IN ('Interview Scheduled', 'Offered', 'Hired') THEN 1 ELSE 0 END) as interviews_scheduled,
-                    SUM(CASE WHEN status = 'Offered' OR status = 'Hired' THEN 1 ELSE 0 END) as offers_extended,
-                    SUM(CASE WHEN status = 'Hired' THEN 1 ELSE 0 END) as successful_hires
-                  FROM applications
-                  WHERE applied_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)";
+                    SUM(CASE WHEN a.status IN ('Under Review', 'Shortlisted', 'Interview Scheduled', 'Offered', 'Hired') THEN 1 ELSE 0 END) as screening_passed,
+                    SUM(CASE WHEN a.status IN ('Interview Scheduled', 'Offered', 'Hired') THEN 1 ELSE 0 END) as interviews_scheduled,
+                    SUM(CASE WHEN a.status = 'Offered' OR a.status = 'Hired' THEN 1 ELSE 0 END) as offers_extended,
+                    SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) as successful_hires
+                  FROM applications a
+                  LEFT JOIN job_posts jp ON jp.id = a.job_id";
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
         
-        return $this->get_row($query);
+        return $this->get_row($query, $params);
     }
     
     /**
      * Get applications over time (weekly data)
      */
-    public function getApplicationsOverTime($weeks = 12)
+    public function getApplicationsOverTime($weeks = 12, $filters = [])
     {
         $weeks = (int)$weeks; // Ensure it's an integer
+        $whereClauses = [];
+        $params = [];
+        $normalized = $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'a',
+            'job_alias' => 'jp',
+            'date_column' => 'applied_at',
+            'default_days' => null,
+            'param_prefix' => 'timeline'
+        ]);
+
+        if (empty($normalized['start_date'])) {
+            $whereClauses[] = "a.applied_at >= DATE_SUB(NOW(), INTERVAL {$weeks} WEEK)";
+        }
         
         $query = "SELECT 
                     CONCAT('Week ', WEEK(a.applied_at, 1)) as period,
@@ -285,100 +405,225 @@ class Report
                     DATE(MIN(a.applied_at)) as week_start,
                     DATE(MAX(a.applied_at)) as week_end
                   FROM applications a
-                  WHERE a.applied_at >= DATE_SUB(NOW(), INTERVAL {$weeks} WEEK)
+                  LEFT JOIN job_posts jp ON jp.id = a.job_id";
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
+
+        $query .= "
                   GROUP BY YEARWEEK(a.applied_at, 1)
                   ORDER BY year_week DESC
                   LIMIT {$weeks}";
         
-        return $this->query($query);
+        return $this->query($query, $params);
     }
     
     /**
      * Get monthly application trends
      */
-    public function getMonthlyApplicationTrends($months = 6)
+    public function getMonthlyApplicationTrends($months = 6, $filters = [])
     {
         $months = (int)$months; // Ensure it's an integer
+        $whereClauses = [];
+        $params = [];
+        $normalized = $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'a',
+            'job_alias' => 'jp',
+            'date_column' => 'applied_at',
+            'default_days' => null,
+            'param_prefix' => 'monthly'
+        ]);
+
+        if (empty($normalized['start_date'])) {
+            $whereClauses[] = "a.applied_at >= DATE_SUB(NOW(), INTERVAL {$months} MONTH)";
+        }
         
         $query = "SELECT 
-                    DATE_FORMAT(applied_at, '%Y-%m') as month,
-                    DATE_FORMAT(applied_at, '%b %Y') as month_name,
+                    DATE_FORMAT(a.applied_at, '%Y-%m') as month,
+                    DATE_FORMAT(a.applied_at, '%b %Y') as month_name,
                     COUNT(*) as total_applications,
-                    SUM(CASE WHEN status = 'Hired' THEN 1 ELSE 0 END) as hires
-                  FROM applications
-                  WHERE applied_at >= DATE_SUB(NOW(), INTERVAL {$months} MONTH)
-                  GROUP BY DATE_FORMAT(applied_at, '%Y-%m')
+                    SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) as hires
+                  FROM applications a
+                  LEFT JOIN job_posts jp ON jp.id = a.job_id";
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
+
+        $query .= "
+                  GROUP BY DATE_FORMAT(a.applied_at, '%Y-%m')
                   ORDER BY month DESC";
         
-        return $this->query($query);
+        return $this->query($query, $params);
     }
     
     /**
      * Get status distribution for all applications
      */
-    public function getStatusDistribution()
+    public function getStatusDistribution($filters = [])
     {
+        $whereClauses = [];
+        $params = [];
+        $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'a',
+            'job_alias' => 'jp',
+            'date_column' => 'applied_at',
+            'default_days' => null,
+            'param_prefix' => 'status'
+        ]);
+
         $query = "SELECT 
-                    status,
+                    a.status,
                     COUNT(*) as count,
-                    ROUND((COUNT(*) * 100.0 / (SELECT COUNT(*) FROM applications)), 2) as percentage
-                  FROM applications
-                  GROUP BY status
+                    0 as percentage
+                  FROM applications a
+                  LEFT JOIN job_posts jp ON jp.id = a.job_id";
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
+
+        $query .= "
+                  GROUP BY a.status
                   ORDER BY count DESC";
-        
-        return $this->query($query);
+
+        $rows = $this->query($query, $params);
+        if (!is_array($rows) || empty($rows)) {
+            return [];
+        }
+
+        $total = 0;
+        foreach ($rows as $row) {
+            $total += (int)($row['count'] ?? 0);
+        }
+
+        if ($total <= 0) {
+            return $rows;
+        }
+
+        foreach ($rows as &$row) {
+            $row['percentage'] = round((((int)($row['count'] ?? 0)) * 100) / $total, 2);
+        }
+        unset($row);
+
+        return $rows;
     }
     
     /**
      * Get interview statistics
      */
-    public function getInterviewStats()
+    public function getInterviewStats($filters = [])
     {
+        $whereClauses = [];
+        $params = [];
+        $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'i',
+            'job_alias' => 'jp',
+            'date_column' => 'scheduled_date',
+            'default_days' => 30,
+            'param_prefix' => 'interview'
+        ]);
+
+        $whereClauses[] = 'a.id IS NOT NULL';
+
         $query = "SELECT 
                     COUNT(*) as total_interviews,
-                    SUM(CASE WHEN status = 'Completed' THEN 1 ELSE 0 END) as completed,
-                    SUM(CASE WHEN status = 'Scheduled' OR status = 'Pending' THEN 1 ELSE 0 END) as scheduled,
-                    SUM(CASE WHEN status = 'Canceled' THEN 1 ELSE 0 END) as canceled,
-                    COUNT(DISTINCT interviewer_id) as total_interviewers,
-                    COUNT(DISTINCT application_id) as unique_candidates
-                  FROM interviews
-                  WHERE scheduled_date >= DATE_SUB(NOW(), INTERVAL 30 DAY)";
+                    SUM(CASE WHEN i.status = 'Completed' THEN 1 ELSE 0 END) as completed,
+                    SUM(CASE WHEN i.status = 'Scheduled' OR i.status = 'Pending' THEN 1 ELSE 0 END) as scheduled,
+                    SUM(CASE WHEN i.status = 'Canceled' THEN 1 ELSE 0 END) as canceled,
+                    COUNT(DISTINCT i.interviewer_id) as total_interviewers,
+                    COUNT(DISTINCT i.application_id) as unique_candidates
+                  FROM interviews i
+                  LEFT JOIN applications a ON a.id = i.application_id
+                  LEFT JOIN job_posts jp ON jp.id = a.job_id";
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
         
-        return $this->get_row($query);
+        return $this->get_row($query, $params);
     }
     
     /**
      * Get department-wise statistics
      */
-    public function getDepartmentStats()
+    public function getDepartmentStats($filters = [])
     {
+        $normalized = $this->normalizeAnalyticsFilters($filters);
+        $whereClauses = [];
+        $params = [];
+
+        if (!empty($normalized['start_date']) && !empty($normalized['end_date'])) {
+            $whereClauses[] = 'DATE(a.applied_at) BETWEEN :dept_start_date AND :dept_end_date';
+            $params['dept_start_date'] = $normalized['start_date'];
+            $params['dept_end_date'] = $normalized['end_date'];
+        }
+
+        if (!empty($normalized['department_id'])) {
+            $whereClauses[] = 'd.id = :dept_filter_id';
+            $params['dept_filter_id'] = (int)$normalized['department_id'];
+        }
+
+        if (!empty($normalized['level'])) {
+            $variants = $this->getExperienceLevelVariants($normalized['level']);
+            if (!empty($variants)) {
+                $levelPlaceholders = [];
+                foreach ($variants as $index => $variant) {
+                    $key = 'dept_level_' . $index;
+                    $levelPlaceholders[] = ':' . $key;
+                    $params[$key] = $variant;
+                }
+                $whereClauses[] = 'jp.experience_level IN (' . implode(', ', $levelPlaceholders) . ')';
+            }
+        }
+
         $query = "SELECT 
                     d.name as department_name,
                     COUNT(DISTINCT jp.id) as open_positions,
                     COUNT(a.id) as total_applications,
                     SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) as hires
                   FROM departments d
-                                    LEFT JOIN job_posts jp ON d.id = jp.department_id AND jp.status IN ('Open', 'Active')
-                  LEFT JOIN applications a ON jp.id = a.job_id
+                  LEFT JOIN job_posts jp ON d.id = jp.department_id AND jp.status IN ('Open', 'Active')
+                  LEFT JOIN applications a ON jp.id = a.job_id";
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
+
+        $query .= "
                   GROUP BY d.id, d.name
                   ORDER BY total_applications DESC";
         
-        return $this->query($query);
+        return $this->query($query, $params);
     }
 
     /**
      * Get live KPI metrics for report dashboard cards
      */
-    public function getDashboardKpiMetrics()
+    public function getDashboardKpiMetrics($filters = [])
     {
+        $whereClauses = [];
+        $params = [];
+        $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'a',
+            'job_alias' => 'jp',
+            'date_column' => 'applied_at',
+            'default_days' => null,
+            'param_prefix' => 'kpi'
+        ]);
+
+        $fromClause = ' FROM applications a LEFT JOIN job_posts jp ON jp.id = a.job_id';
+        $whereSql = !empty($whereClauses) ? ' WHERE ' . implode(' AND ', $whereClauses) : '';
+
         $totals = $this->get_row("SELECT
                                     COUNT(*) as total_applications,
-                                    SUM(CASE WHEN status = 'Hired' THEN 1 ELSE 0 END) as successful_hires
-                                  FROM applications");
+                                    SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) as successful_hires
+                                  {$fromClause}{$whereSql}", $params);
 
         $avgTimeResult = $this->get_row("SELECT
-                                            ROUND(AVG(CASE WHEN status = 'Hired' THEN DATEDIFF(CURDATE(), DATE(applied_at)) END), 0) as avg_time_to_hire
-                                         FROM applications");
+                                            ROUND(AVG(CASE WHEN a.status = 'Hired' THEN DATEDIFF(CURDATE(), DATE(a.applied_at)) END), 0) as avg_time_to_hire
+                                         {$fromClause}{$whereSql}", $params);
 
         $totalApplications = (int)($totals['total_applications'] ?? 0);
         $successfulHires = (int)($totals['successful_hires'] ?? 0);
@@ -387,7 +632,7 @@ class Report
         $configuredCostPerHire = $this->getConfiguredCostPerHire();
         $costPerHire = $configuredCostPerHire !== null
             ? $configuredCostPerHire
-            : $this->getEstimatedCostPerHire($successfulHires, $totalApplications);
+            : $this->getEstimatedCostPerHire($successfulHires, $totalApplications, $filters);
 
         return [
             'total_applications' => $totalApplications,
@@ -400,9 +645,19 @@ class Report
     /**
      * Get top performing job posts for reports table
      */
-    public function getTopPerformingJobPosts($limit = 5)
+    public function getTopPerformingJobPosts($limit = 5, $filters = [])
     {
         $limit = max(1, (int)$limit);
+
+        $whereClauses = [];
+        $params = [];
+        $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'a',
+            'job_alias' => 'jp',
+            'date_column' => 'applied_at',
+            'default_days' => null,
+            'param_prefix' => 'jobs'
+        ]);
 
         $query = "SELECT
                     jp.id,
@@ -428,21 +683,42 @@ class Report
                     ) as avg_days_to_hire
                   FROM job_posts jp
                   LEFT JOIN applications a ON a.job_id = jp.id
-                  LEFT JOIN interviews i ON i.application_id = a.id
+                  LEFT JOIN interviews i ON i.application_id = a.id";
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
+
+        $query .= "
                   GROUP BY jp.id, jp.title
                   HAVING COUNT(DISTINCT a.id) > 0
                   ORDER BY conversion_rate DESC, hires_count DESC, applications_count DESC
                   LIMIT {$limit}";
 
-        return $this->query($query);
+        return $this->query($query, $params);
     }
 
     /**
      * Get interviewer performance for reports table
      */
-    public function getInterviewerPerformance($limit = 10)
+    public function getInterviewerPerformance($limit = 10, $filters = [])
     {
         $limit = max(1, (int)$limit);
+
+        $whereClauses = [];
+        $params = [];
+        $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'i',
+            'job_alias' => 'jp',
+            'date_column' => 'scheduled_date',
+            'default_days' => null,
+            'param_prefix' => 'interviewer'
+        ]);
+
+        $filtersSql = '';
+        if (!empty($whereClauses)) {
+            $filtersSql = ' AND ' . implode(' AND ', $whereClauses);
+        }
 
         if ($this->tableExists('feedback')) {
             $query = "SELECT
@@ -467,8 +743,10 @@ class Report
                       FROM users u
                       JOIN interviews i ON i.interviewer_id = u.id
                       LEFT JOIN applications a ON a.id = i.application_id
+                      LEFT JOIN job_posts jp ON jp.id = a.job_id
                       LEFT JOIN feedback f ON f.interview_id = i.id
                       WHERE u.role_id IN (2, 3)
+                      {$filtersSql}
                       GROUP BY u.id, u.full_name
                       ORDER BY interviews_conducted DESC, hire_rate DESC, avg_rating DESC
                       LIMIT {$limit}";
@@ -492,13 +770,15 @@ class Report
                       FROM users u
                       JOIN interviews i ON i.interviewer_id = u.id
                       LEFT JOIN applications a ON a.id = i.application_id
+                      LEFT JOIN job_posts jp ON jp.id = a.job_id
                       WHERE u.role_id IN (2, 3)
+                      {$filtersSql}
                       GROUP BY u.id, u.full_name
                       ORDER BY interviews_conducted DESC, hire_rate DESC
                       LIMIT {$limit}";
         }
 
-        return $this->query($query);
+        return $this->query($query, $params);
     }
 
     private function tableExists($tableName)
@@ -543,7 +823,7 @@ class Report
         return (float)$numericValue;
     }
 
-    private function getEstimatedCostPerHire($successfulHires, $totalApplications)
+    private function getEstimatedCostPerHire($successfulHires, $totalApplications, $filters = [])
     {
         if ($successfulHires <= 0) {
             return 0;
@@ -551,7 +831,26 @@ class Report
 
         $interviewCount = 0;
         if ($this->tableExists('interviews')) {
-            $interviewStats = $this->get_row("SELECT COUNT(*) as total_interviews FROM interviews");
+            $whereClauses = [];
+            $params = [];
+            $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+                'application_alias' => 'i',
+                'job_alias' => 'jp',
+                'date_column' => 'scheduled_date',
+                'default_days' => null,
+                'param_prefix' => 'cost'
+            ]);
+
+            $query = "SELECT COUNT(*) as total_interviews
+                      FROM interviews i
+                      LEFT JOIN applications a ON a.id = i.application_id
+                      LEFT JOIN job_posts jp ON jp.id = a.job_id";
+
+            if (!empty($whereClauses)) {
+                $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+            }
+
+            $interviewStats = $this->get_row($query, $params);
             $interviewCount = (int)($interviewStats['total_interviews'] ?? 0);
         }
 
@@ -563,9 +862,9 @@ class Report
     /**
      * Calculate conversion rates between stages
      */
-    public function getConversionRates()
+    public function getConversionRates($filters = [])
     {
-        $stats = $this->getRecruitmentFunnelStats();
+        $stats = $this->getRecruitmentFunnelStats($filters);
         
         if (!$stats || $stats['total_applications'] == 0) {
             return [
@@ -598,15 +897,29 @@ class Report
     /**
      * Get overall success rate
      */
-    public function getSuccessRate()
+    public function getSuccessRate($filters = [])
     {
+        $whereClauses = [];
+        $params = [];
+        $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'a',
+            'job_alias' => 'jp',
+            'date_column' => 'applied_at',
+            'default_days' => 90,
+            'param_prefix' => 'success'
+        ]);
+
         $query = "SELECT 
                     COUNT(*) as total,
-                    SUM(CASE WHEN status = 'Hired' THEN 1 ELSE 0 END) as hired
-                  FROM applications
-                  WHERE applied_at >= DATE_SUB(NOW(), INTERVAL 90 DAY)";
+                    SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) as hired
+                  FROM applications a
+                  LEFT JOIN job_posts jp ON jp.id = a.job_id";
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
         
-        $result = $this->get_row($query);
+        $result = $this->get_row($query, $params);
         
         if ($result && $result['total'] > 0) {
             return round(($result['hired'] / $result['total']) * 100, 1);

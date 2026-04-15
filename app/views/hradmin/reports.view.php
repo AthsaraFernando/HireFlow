@@ -121,45 +121,44 @@
             <h3>Report Filters</h3>
             <button class="btn btn-outline btn-sm" onclick="resetFilters()">Reset</button>
         </div>
+        <?php
+            $currentFilters = $filters ?? [];
+            $selectedDateRange = $currentFilters['date_range'] ?? '30d';
+            $selectedDepartmentId = (string)($currentFilters['department_id'] ?? '');
+            $selectedLevel = $currentFilters['level'] ?? '';
+            $selectedReportType = $currentFilters['report_type'] ?? 'overview';
+        ?>
         <div class="filter-controls">
             <div class="filter-group">
                 <label>Date Range</label>
-                <select class="filter-select">
-                    <option value="7d">Last 7 days</option>
-                    <option value="30d" selected>Last 30 days</option>
-                    <option value="90d">Last 90 days</option>
-                    <option value="1y">Last year</option>
+                <select class="filter-select" id="report-date-range" name="date_range">
+                    <option value="7d" <?= $selectedDateRange === '7d' ? 'selected' : '' ?>>Last 7 days</option>
+                    <option value="30d" <?= $selectedDateRange === '30d' ? 'selected' : '' ?>>Last 30 days</option>
+                    <option value="90d" <?= $selectedDateRange === '90d' ? 'selected' : '' ?>>Last 90 days</option>
+                    <option value="1y" <?= $selectedDateRange === '1y' ? 'selected' : '' ?>>Last year</option>
                     <option value="custom">Custom range</option>
                 </select>
             </div>
             <div class="filter-group">
                 <label>Department</label>
-                <select class="filter-select">
+                <select class="filter-select" id="report-department" name="department_id">
                     <option value="">All Departments</option>
-                    <option value="engineering">Engineering</option>
-                    <option value="design">Design</option>
-                    <option value="marketing">Marketing</option>
-                    <option value="sales">Sales</option>
+                    <?php foreach (($department_options ?? []) as $department): ?>
+                        <option value="<?= (int)$department['id'] ?>" <?= $selectedDepartmentId === (string)$department['id'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($department['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="filter-group">
                 <label>Position Level</label>
-                <select class="filter-select">
-                    <option value="">All Levels</option>
-                    <option value="entry">Entry Level</option>
-                    <option value="mid">Mid Level</option>
-                    <option value="senior">Senior Level</option>
-                    <option value="lead">Lead/Executive</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Report Type</label>
-                <select class="filter-select" onchange="changeReportType(this.value)">
-                    <option value="overview">Overview</option>
-                    <option value="recruitment">Recruitment Funnel</option>
-                    <option value="performance">Performance Metrics</option>
-                    <option value="diversity">Diversity & Inclusion</option>
-                    <option value="cost">Cost Analysis</option>
+                <select class="filter-select" id="report-level" name="level">
+                    <option value="" <?= $selectedLevel === '' ? 'selected' : '' ?>>All Levels</option>
+                    <option value="entry" <?= $selectedLevel === 'entry' ? 'selected' : '' ?>>Entry Level</option>
+                    <option value="mid" <?= $selectedLevel === 'mid' ? 'selected' : '' ?>>Mid Level</option>
+                    <option value="senior" <?= $selectedLevel === 'senior' ? 'selected' : '' ?>>Senior Level</option>
+                    <option value="lead" <?= $selectedLevel === 'lead' ? 'selected' : '' ?>>Lead/Executive</option>
+                    <option value="executive" <?= $selectedLevel === 'executive' ? 'selected' : '' ?>>Executive</option>
                 </select>
             </div>
         </div>
@@ -200,17 +199,6 @@
                     <span>Updated from database</span>
                 </div>
             </div>
-            
-            <div class="metric-card info">
-                <div class="metric-header">
-                    <h4>Cost per Hire</h4>
-                </div>
-                <div class="metric-value" id="metric-cost-per-hire">$<?= number_format((float)($dashboard_metrics['cost_per_hire'] ?? 0), 0) ?></div>
-                <div class="metric-change positive">
-                    <span class="change-icon">•</span>
-                    <span>Updated from database</span>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -218,7 +206,6 @@
     <div class="data-section">
         <div class="section-header">
             <h3>Recruitment Funnel Status <span style="font-size: 0.85rem; color: #666; font-weight: normal;">(Last 90 Days)</span></h3>
-            <button class="btn btn-outline btn-sm" onclick="exportData('funnel')">Export Data</button>
         </div>
         <div class="data-grid">
             <div class="data-summary-card stage-applications">
@@ -263,20 +250,6 @@
                 </div>
             </div>
 
-            <div class="data-summary-card stage-offers">
-                <div class="stage-info">
-                    <div class="stage-details">
-                        <h4>Offers Extended</h4>
-                        <p class="stage-number" id="funnel-offers"><?= number_format($funnel_stats['offers_extended'] ?? 0) ?></p>
-                        <p class="stage-percentage" id="funnel-offers-pct"><?= round((($funnel_stats['offers_extended'] ?? 0) / max(1, $funnel_stats['total_applications'] ?? 1)) * 100, 1) ?>% of applications</p>
-                    </div>
-                </div>
-                <div class="stage-stats">
-                    <span class="stat-label">Offer Rate</span>
-                    <span class="stat-value" id="funnel-offer-rate"><?= $conversion_rates['offer_rate'] ?? 0 ?>% from interviews</span>
-                </div>
-            </div>
-
             <div class="data-summary-card stage-hires">
                 <div class="stage-info">
                     <div class="stage-details">
@@ -297,7 +270,6 @@
     <div class="data-section">
         <div class="section-header">
             <h3>Applications Over Time <span style="font-size: 0.85rem; color: #666; font-weight: normal;">(Last 12 Weeks)</span></h3>
-            <button class="btn btn-outline btn-sm" onclick="exportData('timeline')">Export Data</button>
         </div>
         <div class="table-container">
             <table class="data-table timeline-table">
@@ -361,7 +333,6 @@
         <div class="table-card">
             <div class="table-header">
                 <h4>Hiring by Department <span style="font-size: 0.8rem; color: #666; font-weight: normal;">(All Time)</span></h4>
-                <button class="btn btn-outline btn-sm" onclick="exportData('department')">Export</button>
             </div>
             <div class="table-container">
                 <table class="data-table">
@@ -428,7 +399,6 @@
         <div class="table-card">
             <div class="table-header">
                 <h4>Application Sources <span style="font-size: 0.8rem; color: #666; font-weight: normal;">(Live from tracked application records)</span></h4>
-                <button class="btn btn-outline btn-sm" onclick="exportData('sources')">Export</button>
             </div>
             <div class="table-container">
                 <table class="data-table">
@@ -539,7 +509,6 @@
         <div class="table-card">
             <div class="table-header">
                 <h4>Interviewer Performance</h4>
-                <button class="btn btn-outline btn-sm" onclick="viewInterviewerDetails()">View Details</button>
             </div>
             <div class="table-container">
                 <table class="data-table">
@@ -1020,39 +989,72 @@
 </style>
 
 <script>
+window.reportFiltersAPI = null;
+
 function exportReport() {
-    alert('Exporting current report as PDF...');
+    return;
 }
 
 function scheduleReport() {
-    alert('Opening report scheduling dialog...');
+    return;
 }
 
 function resetFilters() {
-    document.querySelectorAll('.filter-select').forEach(select => {
-        select.selectedIndex = 0;
-    });
-    generateReport();
+    if (window.reportFiltersAPI && typeof window.reportFiltersAPI.reset === 'function') {
+        window.reportFiltersAPI.reset();
+    }
 }
 
 function changeReportType(type) {
-    alert(`Switching to ${type} report view...`);
+    if (window.reportFiltersAPI && typeof window.reportFiltersAPI.setReportType === 'function') {
+        window.reportFiltersAPI.setReportType(type);
+    }
 }
 
 function exportData(dataType) {
-    alert(`Exporting ${dataType} data as CSV...`);
+    return;
 }
 
 function viewInterviewerDetails() {
-    alert('Opening detailed interviewer performance...');
+    return;
 }
 
 function generateReport() {
-    alert('Regenerating report with current filters...');
+    if (window.reportFiltersAPI && typeof window.reportFiltersAPI.apply === 'function') {
+        window.reportFiltersAPI.apply();
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
     const rootUrl = '<?= ROOT ?>';
+    const dateRangeSelect = document.getElementById('report-date-range');
+    const departmentSelect = document.getElementById('report-department');
+    const levelSelect = document.getElementById('report-level');
+    const reportTypeSelect = document.getElementById('report-type');
+
+    const getCurrentFilters = () => ({
+        date_range: dateRangeSelect ? dateRangeSelect.value : '30d',
+        department_id: departmentSelect ? departmentSelect.value : '',
+        level: levelSelect ? levelSelect.value : '',
+        report_type: reportTypeSelect ? reportTypeSelect.value : 'overview'
+    });
+
+    const buildFilterQueryString = (filters) => {
+        const query = new URLSearchParams();
+
+        query.set('date_range', filters.date_range || '30d');
+        query.set('report_type', filters.report_type || 'overview');
+
+        if (filters.department_id) {
+            query.set('department_id', filters.department_id);
+        }
+
+        if (filters.level) {
+            query.set('level', filters.level);
+        }
+
+        return query.toString();
+    };
 
     document.querySelectorAll('.data-summary-card').forEach((card, index) => {
         card.style.opacity = '0';
@@ -1350,9 +1352,10 @@ document.addEventListener('DOMContentLoaded', function() {
         renderInterviewerPerformance(data.interviewer_performance || []);
     };
 
-    const refreshReportData = async () => {
+    const refreshReportData = async (filters = getCurrentFilters()) => {
         try {
-            const response = await fetch(`${rootUrl}/hradmin/reports/liveData`, {
+            const query = buildFilterQueryString(filters);
+            const response = await fetch(`${rootUrl}/hradmin/reports/liveData?${query}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json'
@@ -1369,13 +1372,57 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
+            if (window.history && typeof window.history.replaceState === 'function') {
+                window.history.replaceState({}, '', `${rootUrl}/hradmin/reports?${query}`);
+            }
+
             applyReportData(payload.data);
         } catch (error) {
         }
     };
 
-    refreshReportData();
-    setInterval(refreshReportData, 30000);
+    const applyFilters = () => refreshReportData(getCurrentFilters());
+
+    if (dateRangeSelect) {
+        dateRangeSelect.addEventListener('change', applyFilters);
+    }
+    if (departmentSelect) {
+        departmentSelect.addEventListener('change', applyFilters);
+    }
+    if (levelSelect) {
+        levelSelect.addEventListener('change', applyFilters);
+    }
+    if (reportTypeSelect) {
+        reportTypeSelect.addEventListener('change', applyFilters);
+    }
+
+    window.reportFiltersAPI = {
+        apply: applyFilters,
+        reset: () => {
+            if (dateRangeSelect) {
+                dateRangeSelect.value = '30d';
+            }
+            if (departmentSelect) {
+                departmentSelect.value = '';
+            }
+            if (levelSelect) {
+                levelSelect.value = '';
+            }
+            if (reportTypeSelect) {
+                reportTypeSelect.value = 'overview';
+            }
+            applyFilters();
+        },
+        setReportType: (type) => {
+            if (reportTypeSelect) {
+                reportTypeSelect.value = type || 'overview';
+            }
+            applyFilters();
+        }
+    };
+
+    applyFilters();
+    setInterval(() => applyFilters(), 30000);
 });
 </script>
 

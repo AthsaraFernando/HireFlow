@@ -33,6 +33,11 @@ class EditJob extends Controller
         // Use model abstraction
         $departmentModel = new Department();
         $data['departments'] = $departmentModel->findAll();
+
+        $jobCategoryModel = new JobCategory();
+        $data['job_categories'] = $jobCategoryModel->query(
+            "SELECT id, name FROM job_categories WHERE status = 'active' ORDER BY name ASC"
+        );
         
         // Hiring managers (new feature, keep)
         $userModel = new User();
