@@ -1,6 +1,6 @@
 <?php
 $notificationFeedUrl = ROOT . '/applicant/notifications/feed';
-$notificationMarkReadUrl = ROOT . '/applicant/notifications/mark-read';
+$notificationMarkReadUrl = ROOT . '/applicant/notifications/markRead';
 $notificationDeleteUrl = ROOT . '/applicant/notifications/delete';
 ?>
 <div class="applicant-header-actions">

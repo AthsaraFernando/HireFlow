@@ -32,7 +32,7 @@
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/dashboard" class="nav-link"><span class="nav-text">Dashboard</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/jobs" class="nav-link"><span class="nav-text">Browse Jobs</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/applications" class="nav-link"><span class="nav-text">My Applications</span></a></li>
-                <li class="nav-item"><a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link"><span class="nav-text">Saved Jobs</span></a></li>
+                <li class="nav-item"><a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="nav-link"><span class="nav-text">Saved Jobs</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/interviews" class="nav-link active"><span class="nav-text">Interview Schedule</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/interviews/feedback" class="nav-link"><span class="nav-text">Interview Feedback</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/profile" class="nav-link"><span class="nav-text">My Profile</span></a></li>
@@ -73,6 +73,10 @@
 
             <div class="cards-grid" id="interviewsContainer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(390px,1fr));gap:20px;">
                 <?php foreach (($interviews ?? []) as $interview): ?>
+                    <?php
+                        $locationMeetingText = $interview['location_meeting_text'] ?? 'TBD';
+                        $locationMeetingHref = $interview['location_meeting_href'] ?? '';
+                    ?>
                     <article id="interview-<?= (int)$interview['id'] ?>" class="interview-card" data-status="<?= htmlspecialchars($interview['status']) ?>" style="scroll-margin-top:96px;">
                         <div class="card-header">
                             <div class="company-info">
@@ -80,7 +84,6 @@
                                 <div class="job-info">
                                     <h3 class="job-title"><?= htmlspecialchars($interview['job_title']) ?></h3>
                                     <p class="company-name"><?= htmlspecialchars($interview['company']) ?></p>
-                                    <p class="location">📍 <?= htmlspecialchars($interview['location']) ?></p>
                                 </div>
                             </div>
                             <div class="card-status">
@@ -94,6 +97,16 @@
                             <div class="detail-item"><span class="detail-label">Type:</span><span class="detail-value"><?= htmlspecialchars($interview['type']) ?></span></div>
                             <div class="detail-item"><span class="detail-label">Interviewer:</span><span class="detail-value"><?= htmlspecialchars($interview['interviewer']) ?></span></div>
                             <div class="detail-item"><span class="detail-label">Duration:</span><span class="detail-value"><?= htmlspecialchars($interview['duration']) ?></span></div>
+                            <div class="detail-item">
+                                <span class="detail-label"><?= htmlspecialchars($interview['location_meeting_label'] ?? 'Location/Meeting Link') ?>:</span>
+                                <span class="detail-value">
+                                    <?php if (!empty($locationMeetingHref)): ?>
+                                        <a href="<?= htmlspecialchars($locationMeetingHref) ?>" target="_blank" rel="noopener noreferrer"><?= htmlspecialchars($locationMeetingText) ?></a>
+                                    <?php else: ?>
+                                        <?= htmlspecialchars($locationMeetingText) ?>
+                                    <?php endif; ?>
+                                </span>
+                            </div>
                         </div>
 
                         <div class="card-actions">
