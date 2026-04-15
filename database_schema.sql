@@ -74,6 +74,7 @@ CREATE TABLE IF NOT EXISTS job_posts (
     title VARCHAR(200) NOT NULL,
     description TEXT NOT NULL,
     requirements TEXT,
+    benefits TEXT,
     responsibilities TEXT,
     department VARCHAR(100),
     location VARCHAR(100),

@@ -120,13 +120,6 @@
             </div>
         </div>
 
-        <div class="content-card">
-            <h3 class="card-title">Key Responsibilities</h3>
-            <div class="job-content">
-                <?= nl2br(htmlspecialchars($job['responsibilities'] ?? 'No responsibilities specified.')) ?>
-                </div>
-            </div>
-
             <div class="content-card">
                 <h3 class="card-title">Requirements</h3>
                 <div class="job-content">
@@ -143,14 +136,12 @@
             </div>
             <?php endif; ?>
 
-            <?php if(isset($job['benefits']) && !empty($job['benefits'])): ?>
             <div class="content-card">
                 <h3 class="card-title">Benefits & Perks</h3>
                 <div class="job-content">
-                    <?= nl2br(htmlspecialchars($job['benefits'])) ?>
+                    <?= nl2br(htmlspecialchars($job['benefits'] ?? 'No benefits package specified.')) ?>
                 </div>
             </div>
-            <?php endif; ?>
 
         <!-- Recent Applications -->
         <div class="content-card">

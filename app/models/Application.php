@@ -38,7 +38,7 @@ class Application
 
     public function getApplicationsWithDetails()
     {
-        $query = "SELECT a.*, jp.title as job_title, u.full_name, u.email
+        $query = "SELECT a.*, jp.title as job_title, u.full_name, u.email, u.phone
                   FROM applications a 
                   LEFT JOIN job_posts jp ON a.job_id = jp.id 
                   LEFT JOIN users u ON a.applicant_id = u.id 

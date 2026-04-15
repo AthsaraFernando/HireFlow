@@ -20,6 +20,12 @@ class CreateJob extends Controller
         // Fetch departments (use model abstraction, not raw SQL)
         $departmentModel = new Department();
         $data['departments'] = $departmentModel->findAll();
+
+        // Fetch active job categories/roles for title dropdown
+        $jobCategoryModel = new JobCategory();
+        $data['job_categories'] = $jobCategoryModel->query(
+            "SELECT id, name FROM job_categories WHERE status = 'active' ORDER BY name ASC"
+        );
         
         // Fetch recruitment managers (role_id = 3)
         $userModel = new User();
@@ -51,6 +57,20 @@ class CreateJob extends Controller
             
             if (empty($data['errors'])) {
 
+                // Ensure selected title exists in active categories
+                $selectedTitle = trim($_POST['job_title'] ?? '');
+                $validCategory = $jobCategoryModel->query(
+                    "SELECT id FROM job_categories WHERE name = ? AND status = 'active' LIMIT 1",
+                    [$selectedTitle]
+                );
+
+                if (empty($validCategory)) {
+                    $data['errors'][] = 'Please select a valid job title from categories.';
+                }
+            }
+
+            if (empty($data['errors'])) {
+
                 $jobPost = new JobPost();
                 
                 // Hiring manager override (new feature, keep it)
@@ -63,6 +83,7 @@ class CreateJob extends Controller
                     'department_id' => $_POST['department_id'] ?? null,
                     'description' => $_POST['summary'] ?? '',
                     'requirements' => $_POST['requirements'] ?? '',
+                    'benefits' => $_POST['benefits'] ?? '',
                     'responsibilities' => $_POST['responsibilities'] ?? '',
                     'salary_range' => $_POST['salary_range'] ?? '',
                     'location' => $_POST['location'] ?? '',

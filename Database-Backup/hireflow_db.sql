@@ -206,6 +206,7 @@ CREATE TABLE `job_posts` (
   `department_id` int(11) DEFAULT NULL,
   `description` text NOT NULL,
   `requirements` text DEFAULT NULL,
+  `benefits` text DEFAULT NULL,
   `department` varchar(100) DEFAULT NULL,
   `location` varchar(100) DEFAULT NULL,
   `salary_range` varchar(100) DEFAULT NULL,

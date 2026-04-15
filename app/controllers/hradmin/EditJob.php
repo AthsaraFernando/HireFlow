@@ -5,6 +5,7 @@ class EditJob extends Controller
     public function index($id = null)
     {
         Auth::requireRole(2);
+        $isModalRequest = isset($_GET['modal']) && $_GET['modal'] == '1';
         
         if (!$id) {
             redirect('hradmin/job-posts');
@@ -16,6 +17,7 @@ class EditJob extends Controller
         $data['success'] = '';
         $data['page_title'] = 'Edit Job';
         $data['job_id'] = $id;
+        $data['is_modal'] = $isModalRequest;
         
         $jobPost = new JobPost();
         $job = $jobPost->first(['id' => $id], []);
@@ -110,6 +112,7 @@ class EditJob extends Controller
                     'department_id' => $_POST['department_id'] ?? null,
                     'description' => $_POST['summary'] ?? '',
                     'requirements' => $_POST['requirements'] ?? '',
+                    'benefits' => $_POST['benefits'] ?? '',
                     'responsibilities' => $_POST['responsibilities'] ?? '',
                     'salary_range' => $_POST['salary_range'] ?? '',
                     'location' => $_POST['location'] ?? '',
@@ -123,6 +126,15 @@ class EditJob extends Controller
                 ];
                 
                 if ($jobPost->update($id, $updateData)) {
+                    if ($isModalRequest) {
+                        header('Content-Type: application/json');
+                        echo json_encode([
+                            'success' => true,
+                            'message' => 'Job updated successfully!'
+                        ]);
+                        exit;
+                    }
+
                     $_SESSION['success_message'] = 'Job updated successfully!';
                     redirect('hradmin/view-job/' . $id);
                 } else {
@@ -132,7 +144,21 @@ class EditJob extends Controller
             
             if (!empty($data['errors'])) {
                 $data['form_data'] = $_POST;
+
+                if ($isModalRequest) {
+                    header('Content-Type: application/json');
+                    echo json_encode([
+                        'success' => false,
+                        'errors' => $data['errors']
+                    ]);
+                    exit;
+                }
             }
+        }
+
+        if ($isModalRequest) {
+            $this->view('hradmin/partials/edit-job-form', $data);
+            return;
         }
         
         $this->view('hradmin/edit-job', $data);

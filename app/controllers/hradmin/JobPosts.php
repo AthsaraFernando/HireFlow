@@ -11,6 +11,13 @@ class JobPosts extends Controller
         $data['errors'] = [];
         $data['success'] = '';
         $data['page_title'] = 'Job Posts Management';
+
+        $filters = [
+            'q' => trim((string)($_GET['q'] ?? '')),
+            'status' => trim((string)($_GET['status'] ?? '')),
+            'department' => trim((string)($_GET['department'] ?? '')),
+            'type' => trim((string)($_GET['type'] ?? '')),
+        ];
         
         // Check for success message from redirect
         if (!empty($_SESSION['success_message'])) {
@@ -31,12 +38,15 @@ class JobPosts extends Controller
         $departmentModel = new Department();
         $departments = $departmentModel->findAll();
         $deptMap = [];
+        $departmentOptions = [];
         foreach ($departments as $dept) {
             $deptMap[$dept['id']] = $dept['name'];
+            $departmentOptions[] = $dept['name'];
         }
         
         // Format data for the view
         $data['job_posts'] = [];
+        $typeOptions = [];
         if ($jobs) {
             foreach ($jobs as $job) {
                 // Get department name from map if department_id exists
@@ -47,7 +57,7 @@ class JobPosts extends Controller
                     $deptName = $job['department'];
                 }
                 
-                $data['job_posts'][] = [
+                $formattedJob = [
                     'id' => $job['id'],
                     'title' => $job['title'],
                     'department' => $deptName,
@@ -58,8 +68,41 @@ class JobPosts extends Controller
                     'created_date' => date('Y-m-d', strtotime($job['created_at'])),
                     'deadline' => $job['deadline']
                 ];
+
+                if (!empty($formattedJob['type'])) {
+                    $typeOptions[] = $formattedJob['type'];
+                }
+
+                $searchText = strtolower(implode(' ', [
+                    (string)($formattedJob['title'] ?? ''),
+                    (string)($formattedJob['department'] ?? ''),
+                    (string)($formattedJob['location'] ?? ''),
+                    (string)($formattedJob['type'] ?? ''),
+                ]));
+
+                if ($filters['q'] !== '' && strpos($searchText, strtolower($filters['q'])) === false) {
+                    continue;
+                }
+
+                if ($filters['status'] !== '' && strtolower((string)$formattedJob['status']) !== strtolower($filters['status'])) {
+                    continue;
+                }
+
+                if ($filters['department'] !== '' && strtolower((string)$formattedJob['department']) !== strtolower($filters['department'])) {
+                    continue;
+                }
+
+                if ($filters['type'] !== '' && strtolower((string)$formattedJob['type']) !== strtolower($filters['type'])) {
+                    continue;
+                }
+
+                $data['job_posts'][] = $formattedJob;
             }
         }
+
+        $data['filters'] = $filters;
+        $data['department_options'] = array_values(array_unique(array_filter($departmentOptions)));
+        $data['type_options'] = array_values(array_unique(array_filter($typeOptions)));
         
         $this->view('hradmin/job-posts', $data);
     }

@@ -30,8 +30,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/hradmin/interview-schedule" class="nav-link">
-                        <span class="nav-text">Interviews</span>
+                    <a href="<?= ROOT ?>/hradmin/departments" class="nav-link">
+                        <span class="nav-text">Departments</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="<?= ROOT ?>/hradmin/categories" class="nav-link">
+                        <span class="nav-text">Categories</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -104,9 +109,6 @@
                         <a href="<?= ROOT ?>/hradmin/create-job" class="btn btn-primary">
                             <i class="icon-plus"></i>Create New Job
                         </a>
-                        <button class="btn btn-outline" onclick="exportJobs()">
-                            <i class="icon-download"></i>Export Jobs
-                        </button>
                     </div>
                 </div>
 
@@ -126,36 +128,44 @@
 
     <!-- Filter Section -->
     <div class="filter-section">
-        <div class="filter-controls">
+        <form class="filter-controls" method="GET" action="<?= ROOT ?>/hradmin/job-posts">
             <div class="search-box">
-                <input type="text" placeholder="Search job posts..." class="search-input">
-                <button class="search-btn">Search</button>
+                <input type="text" name="q" value="<?= htmlspecialchars($filters['q'] ?? '') ?>" placeholder="Search job posts..." class="search-input">
+                <button type="submit" class="search-btn">Search</button>
             </div>
             <div class="filter-group">
-                <select class="filter-select">
+                <select class="filter-select" name="status" onchange="this.form.submit()">
                     <option value="">All Statuses</option>
-                    <option value="active">Active</option>
-                    <option value="paused">Paused</option>
-                    <option value="closed">Closed</option>
-                    <option value="draft">Draft</option>
+                    <?php
+                        $statusOptions = ['Open', 'Active', 'Closed', 'Draft', 'Paused'];
+                        $selectedStatus = strtolower((string)($filters['status'] ?? ''));
+                    ?>
+                    <?php foreach ($statusOptions as $statusOption): ?>
+                        <option value="<?= htmlspecialchars($statusOption) ?>" <?= $selectedStatus === strtolower($statusOption) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($statusOption) ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
-                <select class="filter-select">
+                <select class="filter-select" name="department" onchange="this.form.submit()">
                     <option value="">All Departments</option>
-                    <option value="engineering">Engineering</option>
-                    <option value="design">Design</option>
-                    <option value="marketing">Marketing</option>
-                    <option value="sales">Sales</option>
-                    <option value="hr">Human Resources</option>
+                    <?php $selectedDepartment = strtolower((string)($filters['department'] ?? '')); ?>
+                    <?php foreach (($department_options ?? []) as $departmentOption): ?>
+                        <option value="<?= htmlspecialchars($departmentOption) ?>" <?= $selectedDepartment === strtolower((string)$departmentOption) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($departmentOption) ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
-                <select class="filter-select">
+                <select class="filter-select" name="type" onchange="this.form.submit()">
                     <option value="">All Types</option>
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="contract">Contract</option>
-                    <option value="internship">Internship</option>
+                    <?php $selectedType = strtolower((string)($filters['type'] ?? '')); ?>
+                    <?php foreach (($type_options ?? []) as $typeOption): ?>
+                        <option value="<?= htmlspecialchars($typeOption) ?>" <?= $selectedType === strtolower((string)$typeOption) ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($typeOption) ?>
+                        </option>
+                    <?php endforeach; ?>
                 </select>
             </div>
-        </div>
+        </form>
     </div>
 
     <!-- Job Posts Table -->
@@ -195,9 +205,9 @@
                                     <a href="<?= ROOT ?>/hradmin/view-job/<?= $job['id'] ?>" class="action-btn view-btn" title="View">
                                         View
                                     </a>
-                                    <a href="<?= ROOT ?>/hradmin/edit-job/<?= $job['id'] ?>" class="action-btn edit-btn" title="Edit">
+                                    <button type="button" class="action-btn edit-btn js-open-edit-modal" data-job-id="<?= $job['id'] ?>" title="Edit">
                                         Edit
-                                    </a>
+                                    </button>
                                     <button class="action-btn delete-btn" title="Delete" onclick="confirmDelete(<?= $job['id'] ?>)">
                                         Delete
                                     </button>
@@ -242,6 +252,18 @@
         <div class="modal-footer">
             <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
             <button class="btn btn-danger" onclick="deleteJob()">Delete</button>
+        </div>
+    </div>
+</div>
+
+<div id="editJobModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content edit-modal-content">
+        <div class="modal-header">
+            <h3>Edit Job Post</h3>
+            <button class="modal-close" onclick="closeEditModal()">&times;</button>
+        </div>
+        <div class="modal-body" id="editJobModalBody">
+            <p>Loading...</p>
         </div>
     </div>
 </div>
@@ -319,9 +341,23 @@
 .search-btn:hover {
     background: #3d2687;
 }
-</style>
 
-/* Modern HR Admin Design System */
+.edit-modal-content {
+    width: min(980px, 96vw);
+    max-height: 90vh;
+    overflow: auto;
+}
+
+#editJobModal .modal-body {
+    max-height: calc(90vh - 80px);
+    overflow-y: auto;
+}
+
+.modal-loading {
+    text-align: center;
+    padding: 2rem;
+}
+</style>
 <style>
     /* Global Variables */
     :root {
@@ -444,6 +480,354 @@
         transform: translateY(-3px);
     }
 
+    .main-container {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.7rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+    }
+
+    .hero-stat {
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.26);
+        border-radius: 12px;
+        padding: 0.75rem 1rem;
+        min-width: 130px;
+    }
+
+    .hero-stat .stat-number {
+        font-size: 1.75rem;
+        line-height: 1;
+        color: #fff;
+    }
+
+    .hero-stat .stat-label {
+        color: rgba(255, 255, 255, 0.9);
+        margin-top: 0.3rem;
+        display: block;
+    }
+
+    .filter-section {
+        background: #fff;
+        border: 1px solid #e7e9f3;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(86, 76, 207, 0.08);
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .filter-controls {
+        display: grid;
+        grid-template-columns: minmax(300px, 1fr) auto;
+        gap: 0.85rem;
+        align-items: center;
+    }
+
+    .search-box {
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+
+    .search-input {
+        width: 100%;
+        height: 44px;
+        padding: 0 0.95rem;
+        border: 1px solid #d8deef;
+        border-radius: 10px;
+        color: #2f3552;
+        background: #fff;
+    }
+
+    .search-input:focus,
+    .filter-select:focus {
+        outline: none;
+        border-color: #a7aeef;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.16);
+    }
+
+    .search-btn {
+        height: 44px;
+        padding: 0 1.1rem;
+        border-radius: 10px;
+        background: #5a4ccf;
+        color: #fff;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+    }
+
+    .search-btn:hover {
+        background: #4b40b6;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 0.6rem;
+        align-items: center;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .filter-select {
+        height: 44px;
+        min-width: 170px;
+        padding: 0 0.8rem;
+        border: 1px solid #d8deef;
+        border-radius: 10px;
+        color: #2f3552;
+        background: #fff;
+    }
+
+    .table-container {
+        background: #fff;
+        border: 1px solid #e7e9f3;
+        border-radius: 14px;
+        box-shadow: 0 8px 24px rgba(86, 76, 207, 0.08);
+        overflow: hidden;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table thead th {
+        background: linear-gradient(135deg, #fafaff 0%, #f4f5ff 100%);
+        color: #3d3e8e;
+        font-weight: 700;
+        font-size: 0.88rem;
+        letter-spacing: 0.01em;
+        padding: 0.9rem 0.85rem;
+        border-bottom: 1px solid #ececf5;
+        text-align: left;
+    }
+
+    .data-table tbody td {
+        padding: 0.95rem 0.85rem;
+        border-bottom: 1px solid #f0f1f8;
+        color: #2f3552;
+        vertical-align: middle;
+    }
+
+    .data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
+
+    .data-table tbody tr:hover {
+        background: #fbfbff;
+    }
+
+    .job-title {
+        font-weight: 700;
+        color: #2f3552;
+        margin-bottom: 0.2rem;
+    }
+
+    .job-location {
+        font-size: 0.83rem;
+        color: #6d7485;
+    }
+
+    .dept-tag {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.28rem 0.72rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        background: #edf1ff;
+        color: #4052b5;
+        border: 1px solid #dbe3ff;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.3rem 0.72rem;
+        border-radius: 999px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+
+    .status-badge.open,
+    .status-badge.active {
+        background: #e9f8ef;
+        color: #1f8d56;
+        border: 1px solid #cfeedd;
+    }
+
+    .status-badge.draft {
+        background: #eef1f7;
+        color: #5a647a;
+        border: 1px solid #e0e4ee;
+    }
+
+    .status-badge.closed {
+        background: #fce9ec;
+        color: #b54556;
+        border: 1px solid #f5d1d8;
+    }
+
+    .application-count {
+        font-weight: 700;
+        color: #3d3e8e;
+        margin-right: 0.5rem;
+    }
+
+    .view-applications {
+        color: #5a4ccf;
+        font-size: 0.84rem;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .view-applications:hover {
+        text-decoration: underline;
+    }
+
+    .pagination-container {
+        margin-top: 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.8rem;
+        flex-wrap: wrap;
+    }
+
+    .pagination-info {
+        color: #6d7485;
+        font-weight: 600;
+        font-size: 0.88rem;
+    }
+
+    .pagination {
+        display: flex;
+        gap: 0.45rem;
+    }
+
+    .pagination-btn {
+        border: 1px solid #d7dcf2;
+        background: #f8f9ff;
+        color: #4753a6;
+        border-radius: 8px;
+        padding: 0.42rem 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+    }
+
+    .pagination-btn.active {
+        background: #5a4ccf;
+        color: #fff;
+        border-color: #5a4ccf;
+    }
+
+    .pagination-btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+    }
+
+    .modal-content {
+        width: min(540px, 94vw);
+        background: #fff;
+        border: 1px solid #e7e9f3;
+        border-radius: 14px;
+        box-shadow: 0 20px 40px rgba(18, 26, 68, 0.2);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        padding: 1rem 1.1rem;
+        border-bottom: 1px solid #ececf5;
+        background: linear-gradient(135deg, #fafaff 0%, #f4f5ff 100%);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .modal-header h3 {
+        margin: 0;
+        color: #3d3e8e;
+    }
+
+    .modal-body {
+        padding: 1rem 1.1rem;
+        color: #2f3552;
+    }
+
+    .modal-footer {
+        padding: 0.95rem 1.1rem;
+        border-top: 1px solid #ececf5;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.55rem;
+    }
+
+    .modal-close {
+        border: none;
+        background: transparent;
+        color: #5a647a;
+        font-size: 1.45rem;
+        line-height: 1;
+        cursor: pointer;
+    }
+
+    .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(21, 25, 48, 0.46);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        z-index: 999;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: #fff;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+
+    .alert {
+        border-radius: 12px;
+        padding: 0.9rem 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid transparent;
+    }
+
+    .alert-error {
+        background: #fff5f6;
+        border-color: #f3cfd6;
+        color: #9b3647;
+    }
+
+    .alert-success {
+        background: #eefaf3;
+        border-color: #cfeedd;
+        color: #1f8d56;
+    }
+
+    .empty-state {
+        color: #6d7485;
+    }
+
     .job-card {
         background: white;
         border-radius: var(--border-radius);
@@ -473,11 +857,76 @@
         .dashboard-content {
             padding: 1rem;
         }
+
+        .filter-controls {
+            grid-template-columns: 1fr;
+            align-items: stretch;
+        }
+
+        .search-box {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-group {
+            justify-content: stretch;
+        }
+
+        .filter-select {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .data-table {
+            min-width: 860px;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
     }
 </style>
 
 <script>
 let deleteJobId = null;
+let editModalOpen = false;
+
+function openEditModal(jobId) {
+    const modal = document.getElementById('editJobModal');
+    const modalBody = document.getElementById('editJobModalBody');
+
+    if (!modal || !modalBody) {
+        return;
+    }
+
+    modalBody.innerHTML = '<div class="modal-loading"><p>Loading...</p></div>';
+    modal.style.display = 'flex';
+    editModalOpen = true;
+
+    fetch('<?= ROOT ?>/hradmin/edit-job/' + jobId + '?modal=1', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => response.text())
+        .then(html => {
+            modalBody.innerHTML = html;
+        })
+        .catch(() => {
+            modalBody.innerHTML = '<div class="alert alert-error"><p>Failed to load edit form. Please try again.</p></div>';
+        });
+}
+
+function closeEditModal() {
+    const modal = document.getElementById('editJobModal');
+    const modalBody = document.getElementById('editJobModalBody');
+    if (!modal || !modalBody) {
+        return;
+    }
+    modal.style.display = 'none';
+    modalBody.innerHTML = '<div class="modal-loading"><p>Loading...</p></div>';
+    editModalOpen = false;
+}
 
 function confirmDelete(jobId) {
     deleteJobId = jobId;
@@ -503,6 +952,12 @@ document.getElementById('deleteModal').addEventListener('click', function(e) {
     }
 });
 
+document.getElementById('editJobModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeEditModal();
+    }
+});
+
 // Sidebar toggle functionality
 document.getElementById('sidebarToggle').addEventListener('click', function () {
     document.querySelector('.sidebar').classList.toggle('collapsed');
@@ -518,6 +973,71 @@ document.querySelector('.sidebar-toggle').addEventListener('click', function (e)
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.js-open-edit-modal').forEach(function(button) {
+        button.addEventListener('click', function() {
+            openEditModal(this.getAttribute('data-job-id'));
+        });
+    });
+
+    const modalBody = document.getElementById('editJobModalBody');
+    if (modalBody) {
+        modalBody.addEventListener('submit', function(event) {
+            const form = event.target.closest('.js-edit-job-form');
+            if (!form || !editModalOpen) {
+                return;
+            }
+
+            event.preventDefault();
+
+            const submitButton = form.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.disabled = true;
+                submitButton.textContent = 'Updating...';
+            }
+
+            const formData = new FormData(form);
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        window.location.reload();
+                        return;
+                    }
+
+                    const errors = Array.isArray(result.errors) ? result.errors : ['Failed to update job post.'];
+                    const errorHtml = '<div class="alert alert-error">' +
+                        errors.map(function(error) {
+                            return '<p>' + error + '</p>';
+                        }).join('') +
+                        '</div>';
+                    const existingError = form.querySelector('.alert.alert-error');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+                    form.insertAdjacentHTML('afterbegin', errorHtml);
+                })
+                .catch(() => {
+                    const existingError = form.querySelector('.alert.alert-error');
+                    if (existingError) {
+                        existingError.remove();
+                    }
+                    form.insertAdjacentHTML('afterbegin', '<div class="alert alert-error"><p>Failed to update job post. Please try again.</p></div>');
+                })
+                .finally(() => {
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Update Job';
+                    }
+                });
+        });
+    }
+
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-link');
 

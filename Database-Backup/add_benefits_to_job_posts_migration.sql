@@ -1,0 +1,6 @@
+START TRANSACTION;
+
+ALTER TABLE job_posts
+ADD COLUMN IF NOT EXISTS benefits TEXT AFTER requirements;
+
+COMMIT;

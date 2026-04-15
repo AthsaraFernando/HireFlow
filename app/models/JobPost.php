@@ -13,6 +13,7 @@ class JobPost
         'department',
         'description',
         'requirements',
+        'benefits',
         'responsibilities',
         'salary_range',
         'location',
