@@ -4,91 +4,37 @@ class ApplicantDatabase extends Controller
 {
     public function index()
     {
-        // Require HR Admin role (role_id = 2)
         Auth::requireRole(2);
-        
-        // Initialize data array
+
         $data = [];
         $data['errors'] = [];
         $data['success'] = '';
         $data['page_title'] = 'Applicants & Applications Management';
-        
-        // Get the active tab (applicants or applications)
+
         $data['active_tab'] = isset($_GET['tab']) ? $_GET['tab'] : 'applicants';
-        
-        // Load models
-        $userModel = new User();
-        $applicationModel = new Application();
-        
-        // Get all users who have applied for jobs (applicants)
-        $query = "SELECT DISTINCT u.* FROM users u 
-                  INNER JOIN applications a ON u.id = a.applicant_id 
-                  ORDER BY u.created_at DESC";
-        $applicantUsers = $userModel->query($query);
-        
-        // Transform applicant data to match view format
-        $data['applicants'] = [];
-        if ($applicantUsers) {
-            foreach ($applicantUsers as $user) {
-                // Get the most recent application for this user
-                $recentApplication = $applicationModel->query(
-                    "SELECT applied_at FROM applications WHERE applicant_id = ? ORDER BY applied_at DESC LIMIT 1", 
-                    [$user['id']]
-                );
-                
-                $data['applicants'][] = [
-                    'id' => $user['id'],
-                    'name' => $user['full_name'],
-                    'email' => $user['email'],
-                    'phone' => $user['phone'] ?? 'N/A',
-                    'experience' => 'N/A', // This would need to be added to user profile
-                    'skills' => [], // This would need to be added to user profile or separate table
-                    'location' => $user['address'] ?? 'N/A',
-                    'last_application' => $recentApplication ? $recentApplication[0]['applied_at'] : 'Never',
-                    'status' => ucfirst($user['status']),
-                    'rating' => 0 // This would need to be calculated from reviews/ratings
-                ];
-            }
-        }
 
-        // Get applications data from database with details
-        $applications = $applicationModel->getApplicationsWithDetails();
-        
-        // Transform applications data to match view format
-        $data['applications'] = [];
-        if ($applications) {
-            foreach ($applications as $app) {
-                $data['applications'][] = [
-                    'id' => $app['id'],
-                    'applicant_name' => $app['full_name'],
-                    'email' => $app['email'],
-                    'phone' => 'N/A', // Would need to join user data for phone
-                    'position' => $app['job_title'],
-                    'status' => strtolower($app['status']),
-                    'applied_date' => date('Y-m-d', strtotime($app['applied_at'])),
-                    'experience' => 'N/A', // Would need additional profile data
-                    'location' => 'N/A', // Would need additional profile data
-                    'source' => 'website',
-                    'rating' => 0, // Would need rating system
-                    'education' => 'N/A', // Would need additional profile data
-                    'skills' => [], // Would need additional profile data
-                    'resume_url' => $app['resume_path'] ?? ''
-                ];
-            }
-        }
-
-        // Statistics - calculate from real data
-        $data['total_candidates'] = count($data['applicants']);
-        $data['active_candidates'] = $userModel->query("SELECT COUNT(DISTINCT u.id) as count FROM users u INNER JOIN applications a ON u.id = a.applicant_id WHERE u.status = 'active'")[0]['count'] ?? 0;
-        $data['hired_candidates'] = $applicationModel->query("SELECT COUNT(*) as count FROM applications WHERE status = 'hired'")[0]['count'] ?? 0;
-        $data['top_skills'] = 0; // This would need a skills tracking system
-        
-        $data['total_applications'] = count($data['applications']);
-        $data['pending_review'] = $applicationModel->query("SELECT COUNT(*) as count FROM applications WHERE status = 'applied' OR status = 'under review'")[0]['count'] ?? 0;
-        $data['shortlisted'] = $applicationModel->query("SELECT COUNT(*) as count FROM applications WHERE status = 'shortlisted'")[0]['count'] ?? 0;
-        $data['interviewed'] = $applicationModel->query("SELECT COUNT(*) as count FROM applications WHERE status = 'interviewed' OR status = 'interview scheduled'")[0]['count'] ?? 0;
+        $liveData = $this->buildLiveData();
+        $data = array_merge($data, $liveData);
         
         $this->view('hradmin/applicant-database', $data);
+    }
+
+    public function liveData()
+    {
+        Auth::requireRole(2);
+
+        header('Content-Type: application/json');
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+
+        try {
+            $payload = $this->buildLiveData();
+            echo json_encode(['success' => true, 'data' => $payload]);
+        } catch (Throwable $e) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Unable to fetch applicant database data']);
+        }
+
+        exit;
     }
 
     public function viewApplication($id = null)
@@ -139,5 +85,109 @@ class ApplicantDatabase extends Controller
         }
         
         $this->view('hradmin/view-application', $data);
+    }
+
+    private function buildLiveData()
+    {
+        $userModel = new User();
+        $applicationModel = new Application();
+
+        $query = "SELECT
+                    u.id,
+                    u.full_name,
+                    u.email,
+                    u.phone,
+                    u.address,
+                    u.status,
+                    MAX(a.applied_at) AS last_application
+                  FROM users u
+                  INNER JOIN applications a ON u.id = a.applicant_id
+                  GROUP BY u.id, u.full_name, u.email, u.phone, u.address, u.status
+                  ORDER BY last_application DESC";
+
+        $applicantUsers = $userModel->query($query);
+
+        $applicants = [];
+        if ($applicantUsers) {
+            foreach ($applicantUsers as $user) {
+                $applicants[] = [
+                    'id' => (int)$user['id'],
+                    'name' => $user['full_name'] ?? 'N/A',
+                    'email' => $user['email'] ?? 'N/A',
+                    'phone' => $user['phone'] ?? 'N/A',
+                    'experience' => 'N/A',
+                    'skills' => [],
+                    'location' => $user['address'] ?? 'N/A',
+                    'last_application' => !empty($user['last_application']) ? date('Y-m-d H:i:s', strtotime((string)$user['last_application'])) : 'Never',
+                    'status' => ucfirst((string)($user['status'] ?? 'inactive')),
+                    'rating' => 0
+                ];
+            }
+        }
+
+        $rawApplications = $applicationModel->getApplicationsWithDetails();
+        $applications = [];
+        if ($rawApplications) {
+            foreach ($rawApplications as $app) {
+                $status = (string)($app['status'] ?? 'Applied');
+                $applications[] = [
+                    'id' => (int)($app['id'] ?? 0),
+                    'applicant_name' => $app['full_name'] ?? 'N/A',
+                    'email' => $app['email'] ?? 'N/A',
+                    'phone' => $app['phone'] ?? 'N/A',
+                    'position' => $app['job_title'] ?? 'N/A',
+                    'status' => strtolower(str_replace(' ', '-', $status)),
+                    'status_label' => $status,
+                    'applied_date' => !empty($app['applied_at']) ? date('Y-m-d', strtotime((string)$app['applied_at'])) : date('Y-m-d'),
+                    'experience' => 'N/A',
+                    'location' => 'N/A',
+                    'source' => 'website',
+                    'rating' => 0,
+                    'education' => 'N/A',
+                    'skills' => [],
+                    'resume_url' => $app['resume_path'] ?? ''
+                ];
+            }
+        }
+
+        $activeCandidatesRow = $userModel->get_row(
+            "SELECT COUNT(DISTINCT u.id) AS count
+             FROM users u
+             INNER JOIN applications a ON u.id = a.applicant_id
+             WHERE u.status = 'active'"
+        );
+
+        $hiredCandidatesRow = $applicationModel->get_row(
+            "SELECT COUNT(*) AS count FROM applications WHERE status = 'Hired'"
+        );
+
+        $pendingReviewRow = $applicationModel->get_row(
+            "SELECT COUNT(*) AS count
+             FROM applications
+             WHERE status IN ('Applied', 'Under Review')"
+        );
+
+        $shortlistedRow = $applicationModel->get_row(
+            "SELECT COUNT(*) AS count FROM applications WHERE status = 'Shortlisted'"
+        );
+
+        $interviewedRow = $applicationModel->get_row(
+            "SELECT COUNT(*) AS count
+             FROM applications
+             WHERE status IN ('Interview Scheduled', 'Interview Completed')"
+        );
+
+        return [
+            'applicants' => $applicants,
+            'applications' => $applications,
+            'total_candidates' => count($applicants),
+            'active_candidates' => (int)($activeCandidatesRow['count'] ?? 0),
+            'hired_candidates' => (int)($hiredCandidatesRow['count'] ?? 0),
+            'top_skills' => 0,
+            'total_applications' => count($applications),
+            'pending_review' => (int)($pendingReviewRow['count'] ?? 0),
+            'shortlisted' => (int)($shortlistedRow['count'] ?? 0),
+            'interviewed' => (int)($interviewedRow['count'] ?? 0),
+        ];
     }
 }

@@ -111,10 +111,10 @@
                 <!-- Tab Navigation -->
                 <div class="tab-container">
                     <div class="tab-nav">
-                        <button class="tab-btn <?= $active_tab === 'applicants' ? 'active' : '' ?>" onclick="switchTab('candidates')">
+                        <button class="tab-btn <?= $active_tab === 'applicants' ? 'active' : '' ?>" onclick="switchTab('candidates', this)">
                             <i class="icon-users"></i>All Candidates Database
                         </button>
-                        <button class="tab-btn <?= $active_tab === 'applications' ? 'active' : '' ?>" onclick="switchTab('applications')">
+                        <button class="tab-btn <?= $active_tab === 'applications' ? 'active' : '' ?>" onclick="switchTab('applications', this)">
                             <i class="icon-applications"></i>Job Applications
                         </button>
                     </div>
@@ -124,19 +124,19 @@
                         <!-- Database Statistics -->
                         <div class="stats-grid">
                             <div class="stat-card">
-                                <div class="stat-value"><?= $total_candidates ?? '1,247' ?></div>
+                                <div class="stat-value" id="candidates-total"><?= (int)($total_candidates ?? 0) ?></div>
                                 <div class="stat-label">Total Candidates</div>
-                                <div class="stat-change positive">+18 this month</div>
+                                <div class="stat-change positive">Live from database</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-value"><?= $active_candidates ?? '423' ?></div>
+                                <div class="stat-value" id="candidates-active"><?= (int)($active_candidates ?? 0) ?></div>
                                 <div class="stat-label">Active in Process</div>
-                                <div class="stat-change positive">+8 this week</div>
+                                <div class="stat-change positive">Live from database</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-value"><?= $hired_candidates ?? '89' ?></div>
+                                <div class="stat-value" id="candidates-hired"><?= (int)($hired_candidates ?? 0) ?></div>
                                 <div class="stat-label">Successfully Hired</div>
-                                <div class="stat-change positive">+3 this month</div>
+                                <div class="stat-change positive">Live from database</div>
                             </div>
                         </div>
 
@@ -212,7 +212,7 @@
                         <div class="results-section">
                             <div class="results-header">
                                 <div class="results-info">
-                                    <span class="results-count">Showing 1-10 of 1,247 candidates</span>
+                                    <span class="results-count" id="candidates-results-count">Showing 1-<?= count($applicants ?? []) ?> of <?= count($applicants ?? []) ?> candidates</span>
                                     <div class="view-options">
                                         <button class="view-btn active" onclick="setView('list')">
                                             <i class="icon-list"></i>
@@ -306,8 +306,8 @@
 
                         <!-- Pagination -->
                         <div class="pagination-container">
-                            <div class="pagination-info">
-                                Showing 1-3 of 1,247 candidates
+                            <div class="pagination-info" id="candidates-pagination-info">
+                                Showing 1-<?= count($applicants ?? []) ?> of <?= count($applicants ?? []) ?> candidates
                             </div>
                             <div class="pagination">
                                 <button class="pagination-btn" disabled>Previous</button>
@@ -324,24 +324,24 @@
                         <!-- Application Statistics -->
                         <div class="stats-grid">
                             <div class="stat-card">
-                                <div class="stat-value"><?= $total_applications ?? '1,847' ?></div>
+                                <div class="stat-value" id="applications-total"><?= (int)($total_applications ?? 0) ?></div>
                                 <div class="stat-label">Total Applications</div>
-                                <div class="stat-change positive">+25 this week</div>
+                                <div class="stat-change positive">Live from database</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-value"><?= $pending_review ?? '156' ?></div>
+                                <div class="stat-value" id="applications-pending"><?= (int)($pending_review ?? 0) ?></div>
                                 <div class="stat-label">Pending Review</div>
-                                <div class="stat-change positive">+12 today</div>
+                                <div class="stat-change positive">Live from database</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-value"><?= $shortlisted ?? '89' ?></div>
+                                <div class="stat-value" id="applications-shortlisted"><?= (int)($shortlisted ?? 0) ?></div>
                                 <div class="stat-label">Shortlisted</div>
-                                <div class="stat-change positive">+5 this week</div>
+                                <div class="stat-change positive">Live from database</div>
                             </div>
                             <div class="stat-card">
-                                <div class="stat-value"><?= $interviews_scheduled ?? '34' ?></div>
+                                <div class="stat-value" id="applications-interviewed"><?= (int)($interviewed ?? 0) ?></div>
                                 <div class="stat-label">Interviews Scheduled</div>
-                                <div class="stat-change positive">+8 this week</div>
+                                <div class="stat-change positive">Live from database</div>
                             </div>
                         </div>
 
@@ -389,7 +389,7 @@
                         <div class="applications-section">
                             <div class="applications-header">
                                 <div class="applications-info">
-                                    <span class="applications-count">Showing 1-10 of 847 applications</span>
+                                    <span class="applications-count" id="applications-results-count">Showing 1-<?= count($applications ?? []) ?> of <?= count($applications ?? []) ?> applications</span>
                                 </div>
                                 <div class="applications-actions">
                                     <button class="btn btn-outline" onclick="bulkActions()">Bulk Actions</button>
@@ -402,7 +402,7 @@
                                 </div>
                             </div>
 
-                            <div class="applications-list">
+                            <div class="applications-list" id="applications-list-container">
                                 <?php if(!empty($applications)): ?>
                                     <?php foreach($applications as $application): ?>
                                         <div class="application-card">
@@ -443,7 +443,7 @@
                                                     </span>
                                                 </div>
                                                 <div class="application-meta">
-                                                    <span class="status-badge <?= strtolower($application['status']) ?>"><?= ucfirst($application['status']) ?></span>
+                                                    <span class="status-badge <?= htmlspecialchars(strtolower($application['status'])) ?>"><?= htmlspecialchars($application['status_label'] ?? ucfirst(str_replace('-', ' ', $application['status']))) ?></span>
                                                     <span class="match-score">Source: <?= ucfirst($application['source']) ?></span>
                                                     <?php if(isset($application['rating'])): ?>
                                                         <span class="last-activity">Rating: <?= $application['rating'] ?>/5</span>
@@ -462,8 +462,8 @@
 
                         <!-- Applications Pagination -->
                         <div class="pagination-container">
-                            <div class="pagination-info">
-                                Showing 1-2 of 847 applications
+                            <div class="pagination-info" id="applications-pagination-info">
+                                Showing 1-<?= count($applications ?? []) ?> of <?= count($applications ?? []) ?> applications
                             </div>
                             <div class="pagination">
                                 <button class="pagination-btn" disabled>Previous</button>
@@ -1183,7 +1183,7 @@
         }
 
         // Tab switching functionality
-        function switchTab(tabName) {
+        function switchTab(tabName, button) {
             // Remove active class from all tabs and buttons
             document.querySelectorAll('.tab-content').forEach(tab => {
                 tab.classList.remove('active');
@@ -1194,7 +1194,9 @@
 
             // Add active class to selected tab and button
             document.getElementById(tabName + 'Tab').classList.add('active');
-            event.currentTarget.classList.add('active');
+            if (button) {
+                button.classList.add('active');
+            }
         }
 
         // Application-specific functions
@@ -1248,6 +1250,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', function () {
+            const rootUrl = '<?= ROOT ?>';
             const currentPath = window.location.pathname;
             const navLinks = document.querySelectorAll('.nav-link');
 
@@ -1257,6 +1260,200 @@
                     link.classList.add('active');
                 }
             });
+
+            const escapeHtml = (value) => {
+                const text = String(value ?? '');
+                return text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
+
+            const formatDate = (dateValue) => {
+                if (!dateValue) {
+                    return '';
+                }
+
+                const date = new Date(dateValue);
+                if (Number.isNaN(date.getTime())) {
+                    return dateValue;
+                }
+
+                return date.toLocaleDateString(undefined, {
+                    month: 'short',
+                    day: '2-digit',
+                    year: 'numeric'
+                });
+            };
+
+            const setText = (id, value) => {
+                const node = document.getElementById(id);
+                if (node) {
+                    node.textContent = value;
+                }
+            };
+
+            const updateCountText = (total, type) => {
+                const normalizedTotal = Number(total || 0);
+                if (normalizedTotal <= 0) {
+                    return `Showing 0 of 0 ${type}`;
+                }
+                return `Showing 1-${normalizedTotal} of ${normalizedTotal} ${type}`;
+            };
+
+            const renderApplicants = (applicants) => {
+                const listView = document.getElementById('listView');
+                if (!listView) {
+                    return;
+                }
+
+                if (!Array.isArray(applicants) || applicants.length === 0) {
+                    listView.innerHTML = '<div class="empty-state"><p>No candidates found.</p></div>';
+                    return;
+                }
+
+                listView.innerHTML = applicants.map((applicant) => {
+                    const rating = Math.floor(Number(applicant.rating || 0));
+                    const stars = Array.from({ length: 5 }, (_, index) => {
+                        return `<span class="star ${index + 1 > rating ? 'empty' : ''}">★</span>`;
+                    }).join('');
+
+                    return `
+                        <div class="candidate-card">
+                            <div class="candidate-avatar">
+                                <img src="${rootUrl}/assets/images/avatar-placeholder.png" alt="Profile" class="avatar">
+                            </div>
+                            <div class="candidate-info">
+                                <div class="candidate-header">
+                                    <h4 class="candidate-name">${escapeHtml(applicant.name || '')}</h4>
+                                    <div class="candidate-actions">
+                                        <button class="btn-icon" title="Add to favorites" onclick="toggleFavorite(${Number(applicant.id || 0)})">
+                                            <i class="icon-heart"></i>
+                                        </button>
+                                        <button class="btn-icon" title="Send message" onclick="sendMessage(${Number(applicant.id || 0)})">
+                                            <i class="icon-message"></i>
+                                        </button>
+                                        <a href="${rootUrl}/hradmin/applicant-database/viewApplication/${Number(applicant.id || 0)}" class="btn-icon" title="View profile">
+                                            <i class="icon-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="candidate-title">Looking for new opportunities</div>
+                                <div class="candidate-details">
+                                    <span class="detail-item"><i class="icon-location"></i>${escapeHtml(applicant.location || 'N/A')}</span>
+                                    <span class="detail-item"><i class="icon-experience"></i>${escapeHtml(applicant.experience || 'N/A')} experience</span>
+                                    <span class="detail-item"><i class="icon-email"></i>${escapeHtml(applicant.email || 'N/A')}</span>
+                                </div>
+                                <div class="candidate-skills"></div>
+                                <div class="candidate-meta">
+                                    <span class="status-badge ${escapeHtml(String(applicant.status || '').toLowerCase())}">${escapeHtml(applicant.status || '')}</span>
+                                    <div class="rating">${stars}<span class="rating-text">${Number(applicant.rating || 0)}/5</span></div>
+                                    <span class="last-activity">Last application: ${escapeHtml(applicant.last_application || 'Never')}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            };
+
+            const renderApplications = (applications) => {
+                const container = document.getElementById('applications-list-container');
+                if (!container) {
+                    return;
+                }
+
+                if (!Array.isArray(applications) || applications.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><p>No applications found.</p></div>';
+                    return;
+                }
+
+                container.innerHTML = applications.map((application) => {
+                    const statusClass = String(application.status || '').toLowerCase();
+                    const statusLabel = application.status_label || statusClass.replace('-', ' ');
+
+                    return `
+                        <div class="application-card">
+                            <div class="application-checkbox">
+                                <input type="checkbox" class="application-select" value="${Number(application.id || 0)}">
+                            </div>
+                            <div class="applicant-avatar">
+                                <img src="${rootUrl}/assets/images/avatar-placeholder.png" alt="Profile" class="avatar">
+                            </div>
+                            <div class="application-info">
+                                <div class="application-header">
+                                    <h4 class="applicant-name">${escapeHtml(application.applicant_name || '')}</h4>
+                                    <div class="application-actions">
+                                        <button class="btn-icon" title="View application" onclick="viewApplication(${Number(application.id || 0)})"><i class="icon-eye"></i></button>
+                                        <button class="btn-icon" title="Schedule interview" onclick="scheduleInterview(${Number(application.id || 0)})"><i class="icon-calendar"></i></button>
+                                        <button class="btn-icon" title="Send message" onclick="sendMessage(${Number(application.id || 0)})"><i class="icon-message"></i></button>
+                                    </div>
+                                </div>
+                                <div class="job-position">Applied for: ${escapeHtml(application.position || 'N/A')}</div>
+                                <div class="application-details">
+                                    <span class="detail-item"><i class="icon-calendar"></i>Applied: ${escapeHtml(formatDate(application.applied_date || ''))}</span>
+                                    <span class="detail-item"><i class="icon-experience"></i>${escapeHtml(application.experience || 'N/A')} experience</span>
+                                    <span class="detail-item"><i class="icon-location"></i>${escapeHtml(application.location || 'N/A')}</span>
+                                    <span class="detail-item"><i class="icon-phone"></i>${escapeHtml(application.phone || 'N/A')}</span>
+                                </div>
+                                <div class="application-meta">
+                                    <span class="status-badge ${escapeHtml(statusClass)}">${escapeHtml(statusLabel)}</span>
+                                    <span class="match-score">Source: ${escapeHtml(String(application.source || 'website').replace(/^./, (c) => c.toUpperCase()))}</span>
+                                    <span class="last-activity">Rating: ${Number(application.rating || 0)}/5</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            };
+
+            const applyLiveData = (payload) => {
+                setText('candidates-total', Number(payload.total_candidates || 0));
+                setText('candidates-active', Number(payload.active_candidates || 0));
+                setText('candidates-hired', Number(payload.hired_candidates || 0));
+
+                setText('applications-total', Number(payload.total_applications || 0));
+                setText('applications-pending', Number(payload.pending_review || 0));
+                setText('applications-shortlisted', Number(payload.shortlisted || 0));
+                setText('applications-interviewed', Number(payload.interviewed || 0));
+
+                setText('candidates-results-count', updateCountText(payload.total_candidates || 0, 'candidates'));
+                setText('candidates-pagination-info', updateCountText(payload.total_candidates || 0, 'candidates'));
+
+                setText('applications-results-count', updateCountText(payload.total_applications || 0, 'applications'));
+                setText('applications-pagination-info', updateCountText(payload.total_applications || 0, 'applications'));
+
+                renderApplicants(payload.applicants || []);
+                renderApplications(payload.applications || []);
+            };
+
+            const refreshLiveData = async () => {
+                try {
+                    const response = await fetch(`${rootUrl}/hradmin/applicant-database/liveData`, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        },
+                        cache: 'no-store'
+                    });
+
+                    if (!response.ok) {
+                        return;
+                    }
+
+                    const payload = await response.json();
+                    if (!payload || payload.success !== true || !payload.data) {
+                        return;
+                    }
+
+                    applyLiveData(payload.data);
+                } catch (error) {
+                }
+            };
+
+            refreshLiveData();
+            setInterval(refreshLiveData, 30000);
         });
     </script>
 

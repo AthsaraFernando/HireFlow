@@ -231,7 +231,6 @@
         <div class="data-grid">
             <div class="data-summary-card stage-applications">
                 <div class="stage-info">
-                    <div class="stage-icon">📝</div>
                     <div class="stage-details">
                         <h4>Applications Received</h4>
                         <p class="stage-number"><?= number_format($funnel_stats['total_applications'] ?? 0) ?></p>
@@ -246,7 +245,6 @@
 
             <div class="data-summary-card stage-screening">
                 <div class="stage-info">
-                    <div class="stage-icon">🔍</div>
                     <div class="stage-details">
                         <h4>In Screening</h4>
                         <p class="stage-number"><?= number_format($funnel_stats['screening_passed'] ?? 0) ?></p>
@@ -261,7 +259,6 @@
 
             <div class="data-summary-card stage-interviews">
                 <div class="stage-info">
-                    <div class="stage-icon">💬</div>
                     <div class="stage-details">
                         <h4>Interviews Scheduled</h4>
                         <p class="stage-number"><?= number_format($funnel_stats['interviews_scheduled'] ?? 0) ?></p>
@@ -276,7 +273,6 @@
 
             <div class="data-summary-card stage-offers">
                 <div class="stage-info">
-                    <div class="stage-icon">📄</div>
                     <div class="stage-details">
                         <h4>Offers Extended</h4>
                         <p class="stage-number"><?= number_format($funnel_stats['offers_extended'] ?? 0) ?></p>
@@ -291,7 +287,6 @@
 
             <div class="data-summary-card stage-hires">
                 <div class="stage-info">
-                    <div class="stage-icon">✅</div>
                     <div class="stage-details">
                         <h4>Successful Hires</h4>
                         <p class="stage-number"><?= number_format($funnel_stats['successful_hires'] ?? 0) ?></p>
@@ -363,37 +358,6 @@
                             </td>
                         </tr>
                     <?php endif; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-                    <tr>
-                        <td><strong>Week 3</strong></td>
-                        <td>89</td>
-                        <td><span class="trend-up">+30.9%</span></td>
-                        <td>40</td>
-                        <td>22</td>
-                        <td>14</td>
-                        <td>7</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Week 2</strong></td>
-                        <td>68</td>
-                        <td><span class="trend-up">+51.1%</span></td>
-                        <td>31</td>
-                        <td>17</td>
-                        <td>10</td>
-                        <td>5</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Week 1</strong></td>
-                        <td>45</td>
-                        <td><span class="trend-neutral">--</span></td>
-                        <td>20</td>
-                        <td>11</td>
-                        <td>7</td>
-                        <td>3</td>
-                    </tr>
                 </tbody>
             </table>
         </div>
@@ -803,11 +767,6 @@
     margin-bottom: 1rem;
 }
 
-.stage-icon {
-    font-size: 2rem;
-    line-height: 1;
-}
-
 .stage-details h4 {
     margin: 0 0 0.5rem;
     color: #495057;
@@ -990,10 +949,6 @@
     
     .data-summary-card {
         padding: 1rem;
-    }
-    
-    .stage-icon {
-        font-size: 1.5rem;
     }
     
     .stage-number {

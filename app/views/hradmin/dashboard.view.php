@@ -92,15 +92,15 @@
                         <p class="hero-description">Manage your recruitment process efficiently with our comprehensive HR tools</p>
                         <div class="hero-stats">
                             <div class="hero-stat">
-                                <span class="stat-number"><?= $active_jobs ?? '18' ?></span>
+                                <span class="stat-number" id="hero-active-jobs"><?= (int)($active_jobs ?? 0) ?></span>
                                 <span class="stat-label">Active Jobs</span>
                             </div>
                             <div class="hero-stat">
-                                <span class="stat-number"><?= $total_applications ?? '156' ?></span>
+                                <span class="stat-number" id="hero-total-applications"><?= (int)($total_applications ?? 0) ?></span>
                                 <span class="stat-label">Applications</span>
                             </div>
                             <div class="hero-stat">
-                                <span class="stat-number"><?= $scheduled_interviews ?? '12' ?></span>
+                                <span class="stat-number" id="hero-scheduled-interviews"><?= (int)($scheduled_interviews ?? 0) ?></span>
                                 <span class="stat-label">Interviews</span>
                             </div>
                         </div>
@@ -132,22 +132,22 @@
     <!-- Key Metrics Cards -->
     <div class="card-grid">
         <div class="metric-card">
-            <div class="metric-value"><?= $total_jobs ?? 42 ?></div>
+            <div class="metric-value" id="metric-total-jobs"><?= (int)($total_jobs ?? 0) ?></div>
             <div class="metric-label">Total Job Posts</div>
-            <div class="metric-change positive">+3 this month</div>
+            <div class="metric-change positive">Live from database</div>
         </div>
         <div class="metric-card">
-            <div class="metric-value"><?= $active_jobs ?? 18 ?></div>
+            <div class="metric-value" id="metric-active-jobs"><?= (int)($active_jobs ?? 0) ?></div>
             <div class="metric-label">Active Positions</div>
-            <div class="metric-change positive">+2 this week</div>
+            <div class="metric-change positive">Live from database</div>
         </div>
         <div class="metric-card">
-            <div class="metric-value"><?= $total_applications ?? 156 ?></div>
+            <div class="metric-value" id="metric-total-applications"><?= (int)($total_applications ?? 0) ?></div>
             <div class="metric-label">Total Applications</div>
-            <div class="metric-change positive">+12 today</div>
+            <div class="metric-change positive">Live from database</div>
         </div>
         <div class="metric-card">
-            <div class="metric-value"><?= $scheduled_interviews ?? 12 ?></div>
+            <div class="metric-value" id="metric-scheduled-interviews"><?= (int)($scheduled_interviews ?? 0) ?></div>
             <div class="metric-label">Scheduled Interviews</div>
             <div class="metric-change neutral">This week</div>
         </div>
@@ -179,7 +179,7 @@
                 <h3>Recent Applications</h3>
                 <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications" class="view-all-link">View All</a>
             </div>
-            <div class="card-content">
+            <div class="card-content" id="recent-applications-list">
                 <?php if(isset($recent_applications) && !empty($recent_applications)): ?>
                     <?php foreach($recent_applications as $application): ?>
                         <div class="recent-item">
@@ -202,28 +202,20 @@
                 <h3>Active Job Posts</h3>
                 <a href="<?= ROOT ?>/hradmin/job-posts" class="view-all-link">Manage All</a>
             </div>
-            <div class="card-content">
-                <div class="job-item">
-                    <div class="job-info">
-                        <div class="job-title">Senior Software Developer</div>
-                        <div class="job-meta">Engineering • 23 applications</div>
-                    </div>
-                    <div class="job-status active">Active</div>
-                </div>
-                <div class="job-item">
-                    <div class="job-info">
-                        <div class="job-title">UI/UX Designer</div>
-                        <div class="job-meta">Design • 18 applications</div>
-                    </div>
-                    <div class="job-status active">Active</div>
-                </div>
-                <div class="job-item">
-                    <div class="job-info">
-                        <div class="job-title">Marketing Manager</div>
-                        <div class="job-meta">Marketing • 12 applications</div>
-                    </div>
-                    <div class="job-status active">Active</div>
-                </div>
+            <div class="card-content" id="active-job-posts-list">
+                <?php if(isset($active_job_posts) && !empty($active_job_posts)): ?>
+                    <?php foreach($active_job_posts as $job): ?>
+                        <div class="job-item">
+                            <div class="job-info">
+                                <div class="job-title"><?= htmlspecialchars($job['title'] ?? '') ?></div>
+                                <div class="job-meta"><?= htmlspecialchars($job['department'] ?? 'General') ?> • <?= (int)($job['applications_count'] ?? 0) ?> applications</div>
+                            </div>
+                            <div class="job-status active"><?= htmlspecialchars($job['status'] ?? 'Open') ?></div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="empty-state">No active job posts</div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -233,37 +225,23 @@
                 <h3>Upcoming Interviews</h3>
                 <a href="<?= ROOT ?>/hradmin/interviewschedule" class="view-all-link">View Schedule</a>
             </div>
-            <div class="card-content">
-                <div class="interview-item">
-                    <div class="interview-time">
-                        <div class="time">10:00 AM</div>
-                        <div class="date">Jan 20</div>
-                    </div>
-                    <div class="interview-info">
-                        <div class="candidate">John Smith</div>
-                        <div class="position">Senior Software Developer</div>
-                    </div>
-                </div>
-                <div class="interview-item">
-                    <div class="interview-time">
-                        <div class="time">2:00 PM</div>
-                        <div class="date">Jan 21</div>
-                    </div>
-                    <div class="interview-info">
-                        <div class="candidate">Sarah Johnson</div>
-                        <div class="position">UI/UX Designer</div>
-                    </div>
-                </div>
-                <div class="interview-item">
-                    <div class="interview-time">
-                        <div class="time">11:00 AM</div>
-                        <div class="date">Jan 22</div>
-                    </div>
-                    <div class="interview-info">
-                        <div class="candidate">Mike Wilson</div>
-                        <div class="position">Project Manager</div>
-                    </div>
-                </div>
+            <div class="card-content" id="upcoming-interviews-list">
+                <?php if(isset($upcoming_interviews) && !empty($upcoming_interviews)): ?>
+                    <?php foreach($upcoming_interviews as $interview): ?>
+                        <div class="interview-item">
+                            <div class="interview-time">
+                                <div class="time"><?= date('g:i A', strtotime((string)($interview['scheduled_time'] ?? '00:00:00'))) ?></div>
+                                <div class="date"><?= date('M d', strtotime((string)($interview['scheduled_date'] ?? 'now'))) ?></div>
+                            </div>
+                            <div class="interview-info">
+                                <div class="candidate"><?= htmlspecialchars($interview['candidate'] ?? '') ?></div>
+                                <div class="position"><?= htmlspecialchars($interview['position'] ?? '') ?></div>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="empty-state">No upcoming interviews</div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -275,23 +253,23 @@
             <div class="card-content">
                 <div class="stat-row">
                     <span class="stat-label">Applications Today</span>
-                    <span class="stat-value">12</span>
+                    <span class="stat-value" id="quick-applications-today"><?= (int)($quick_stats['applications_today'] ?? 0) ?></span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Pending Reviews</span>
-                    <span class="stat-value">34</span>
+                    <span class="stat-value" id="quick-pending-reviews"><?= (int)($quick_stats['pending_reviews'] ?? 0) ?></span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Interviews This Week</span>
-                    <span class="stat-value">8</span>
+                    <span class="stat-value" id="quick-interviews-week"><?= (int)($quick_stats['interviews_this_week'] ?? 0) ?></span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Offers Extended</span>
-                    <span class="stat-value">5</span>
+                    <span class="stat-value" id="quick-offers-extended"><?= (int)($quick_stats['offers_extended'] ?? 0) ?></span>
                 </div>
                 <div class="stat-row">
                     <span class="stat-label">Avg. Time to Hire</span>
-                    <span class="stat-value">23 days</span>
+                    <span class="stat-value" id="quick-avg-time-to-hire"><?= (int)($quick_stats['avg_time_to_hire_days'] ?? 0) ?> days</span>
                 </div>
             </div>
         </div>
@@ -950,7 +928,6 @@
 </style>
 
 <script>
-// Sidebar toggle functionality
 document.getElementById('sidebarToggle').addEventListener('click', function () {
     document.querySelector('.sidebar').classList.toggle('collapsed');
     document.querySelector('.main-content').classList.toggle('expanded');
@@ -965,6 +942,8 @@ document.querySelector('.sidebar-toggle').addEventListener('click', function (e)
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+    const rootUrl = '<?= ROOT ?>';
+
     const currentPath = window.location.pathname;
     const navLinks = document.querySelectorAll('.nav-link');
 
@@ -974,6 +953,169 @@ document.addEventListener('DOMContentLoaded', function () {
             link.classList.add('active');
         }
     });
+
+    const setText = (id, value) => {
+        const node = document.getElementById(id);
+        if (node) {
+            node.textContent = value;
+        }
+    };
+
+    const escapeHtml = (value) => {
+        const text = String(value ?? '');
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    };
+
+    const formatDateLabel = (dateValue) => {
+        if (!dateValue) {
+            return '';
+        }
+
+        const date = new Date(dateValue);
+        if (Number.isNaN(date.getTime())) {
+            return '';
+        }
+
+        return date.toLocaleDateString(undefined, { month: 'short', day: '2-digit' });
+    };
+
+    const formatTimeLabel = (timeValue) => {
+        if (!timeValue) {
+            return '';
+        }
+
+        const date = new Date(`1970-01-01T${timeValue}`);
+        if (Number.isNaN(date.getTime())) {
+            return '';
+        }
+
+        return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+    };
+
+    const renderRecentApplications = (items) => {
+        const container = document.getElementById('recent-applications-list');
+        if (!container) {
+            return;
+        }
+
+        if (!Array.isArray(items) || items.length === 0) {
+            container.innerHTML = '<div class="empty-state">No recent applications</div>';
+            return;
+        }
+
+        container.innerHTML = items.map((application) => `
+            <div class="recent-item">
+                <div class="item-info">
+                    <div class="item-title">${escapeHtml(application.name || '')}</div>
+                    <div class="item-subtitle">${escapeHtml(application.position || '')}</div>
+                </div>
+                <div class="item-time">${escapeHtml(application.time || 'Just now')}</div>
+            </div>
+        `).join('');
+    };
+
+    const renderActiveJobs = (items) => {
+        const container = document.getElementById('active-job-posts-list');
+        if (!container) {
+            return;
+        }
+
+        if (!Array.isArray(items) || items.length === 0) {
+            container.innerHTML = '<div class="empty-state">No active job posts</div>';
+            return;
+        }
+
+        container.innerHTML = items.map((job) => `
+            <div class="job-item">
+                <div class="job-info">
+                    <div class="job-title">${escapeHtml(job.title || '')}</div>
+                    <div class="job-meta">${escapeHtml(job.department || 'General')} • ${Number(job.applications_count || 0)} applications</div>
+                </div>
+                <div class="job-status active">${escapeHtml(job.status || 'Open')}</div>
+            </div>
+        `).join('');
+    };
+
+    const renderUpcomingInterviews = (items) => {
+        const container = document.getElementById('upcoming-interviews-list');
+        if (!container) {
+            return;
+        }
+
+        if (!Array.isArray(items) || items.length === 0) {
+            container.innerHTML = '<div class="empty-state">No upcoming interviews</div>';
+            return;
+        }
+
+        container.innerHTML = items.map((interview) => `
+            <div class="interview-item">
+                <div class="interview-time">
+                    <div class="time">${escapeHtml(formatTimeLabel(interview.scheduled_time))}</div>
+                    <div class="date">${escapeHtml(formatDateLabel(interview.scheduled_date))}</div>
+                </div>
+                <div class="interview-info">
+                    <div class="candidate">${escapeHtml(interview.candidate || '')}</div>
+                    <div class="position">${escapeHtml(interview.position || '')}</div>
+                </div>
+            </div>
+        `).join('');
+    };
+
+    const updateSummary = (summary) => {
+        setText('hero-active-jobs', Number(summary.active_jobs || 0));
+        setText('hero-total-applications', Number(summary.total_applications || 0));
+        setText('hero-scheduled-interviews', Number(summary.scheduled_interviews || 0));
+
+        setText('metric-total-jobs', Number(summary.total_jobs || 0));
+        setText('metric-active-jobs', Number(summary.active_jobs || 0));
+        setText('metric-total-applications', Number(summary.total_applications || 0));
+        setText('metric-scheduled-interviews', Number(summary.scheduled_interviews || 0));
+    };
+
+    const updateQuickStats = (quickStats) => {
+        setText('quick-applications-today', Number(quickStats.applications_today || 0));
+        setText('quick-pending-reviews', Number(quickStats.pending_reviews || 0));
+        setText('quick-interviews-week', Number(quickStats.interviews_this_week || 0));
+        setText('quick-offers-extended', Number(quickStats.offers_extended || 0));
+        setText('quick-avg-time-to-hire', `${Number(quickStats.avg_time_to_hire_days || 0)} days`);
+    };
+
+    const refreshDashboard = async () => {
+        try {
+            const response = await fetch(`${rootUrl}/hradmin/dashboard/liveData`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                cache: 'no-store'
+            });
+
+            if (!response.ok) {
+                return;
+            }
+
+            const payload = await response.json();
+            if (!payload || payload.success !== true || !payload.data) {
+                return;
+            }
+
+            const data = payload.data;
+            updateSummary(data.summary || {});
+            updateQuickStats(data.quick_stats || {});
+            renderRecentApplications(data.recent_applications || []);
+            renderActiveJobs(data.active_job_posts || []);
+            renderUpcomingInterviews(data.upcoming_interviews || []);
+        } catch (error) {
+        }
+    };
+
+    refreshDashboard();
+    setInterval(refreshDashboard, 30000);
 });
 </script>
 
