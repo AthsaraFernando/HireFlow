@@ -177,6 +177,14 @@ class Application
                   FROM applications a
                   JOIN job_posts jp ON a.job_id = jp.id
                   GROUP BY jp.title";
-        return $this->query(query: $query) ?: [];
+        return $this->query($query) ?: [];
+    }
+
+    public function applicationStatusCounts()
+    {
+        $query = "SELECT status,COUNT(*) AS counts
+                  FROM applications
+                  GROUP BY status";
+        return $this->query($query) ?: [];
     }
 }

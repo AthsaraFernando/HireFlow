@@ -54,6 +54,7 @@ class Usermanage extends Controller
         $data['users'] = $user->getUsersWithRoles();
         $data['roles'] = $role->findAll();
         $data['csrf_token'] = Auth::generateCSRFToken();
+        $data['page_title'] = 'User Management';
 
         $data['view'] = 'usermanage';
         $this->view('systemadmin', $data);

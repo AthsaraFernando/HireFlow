@@ -7,9 +7,8 @@ class Mailer
 {
     public static function send(string $toEmail, string $subject, string $htmlBody, string $toName = '', string $textBody = ''): bool
     {
-        $smtp = MailConfig::smtp();
-
         try {
+            $smtp = MailConfig::smtp();
             $mail = new PHPMailer(true);
             $mail->isSMTP();
             $mail->Host = $smtp['host'];
@@ -27,9 +26,16 @@ class Mailer
             $mail->Body = $htmlBody;
             $mail->AltBody = $textBody !== '' ? $textBody : strip_tags($htmlBody);
 
-            return $mail->send();
-        } catch (Exception $e) {
-            error_log('PHPMailer send failed: ' . $e->getMessage());
+            $sent = $mail->send();
+            if ($sent) {
+                error_log('PHPMailer send success: to=' . $toEmail . ' subject=' . $subject);
+            } else {
+                error_log('PHPMailer send failed: to=' . $toEmail . ' subject=' . $subject . ' error=' . $mail->ErrorInfo);
+            }
+
+            return $sent;
+        } catch (Throwable $e) {
+            error_log('PHPMailer send failed: to=' . $toEmail . ' subject=' . $subject . ' error=' . $e->getMessage());
             return false;
         }
     }

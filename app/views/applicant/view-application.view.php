@@ -101,6 +101,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                        <span class="nav-text">Saved Jobs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/applicant/interviews" class="nav-link">
                         <span class="nav-text">Interview Schedule</span>
                     </a>
@@ -141,6 +146,7 @@
             </div>
         </header>
 
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
         <div class="applications-content">
             <div class="application-detail-card">
                 <div class="detail-section">

@@ -34,6 +34,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                        <span class="nav-text">Saved Jobs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/applicant/interviews" class="nav-link">
                         <span class="nav-text">Interview Schedule</span>
                     </a>
@@ -64,6 +69,7 @@
                 <p class="page-subtitle">Find your next opportunity</p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name"><?= $user['name'] ?? 'User' ?></span>
                     <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'U', 0, 2)) ?></div>
@@ -72,6 +78,18 @@
         </header>
 
         <div class="jobs-content">
+            <?php if(isset($_SESSION['success'])): ?>
+                <div class="alert alert-success" style="margin-bottom: 20px; padding: 15px; background-color: #d4edda; color: #155724; border-radius: 8px;">
+                    <?= $_SESSION['success']; unset($_SESSION['success']); ?>
+                </div>
+            <?php endif; ?>
+
+            <?php if(isset($_SESSION['error'])): ?>
+                <div class="alert alert-error" style="margin-bottom: 20px; padding: 15px; background-color: #f8d7da; color: #721c24; border-radius: 8px;">
+                    <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+                </div>
+            <?php endif; ?>
+
             <!-- Search and Filter Section -->
             <div class="search-section">
                 <div class="search-container">
@@ -156,8 +174,27 @@
                             <span class="job-posted">📅 Posted <?= date('M d', strtotime($job['posted_date'])) ?></span>
                         </div>
                         <div class="job-actions">
-                            <a href="<?= ROOT ?>/applicant/jobs/details?id=<?= $job['id'] ?>" class="btn btn-outline">View Details</a>
-                            <a href="<?= ROOT ?>/applicant/applications/apply?job_id=<?= $job['id'] ?>" class="btn btn-primary">Apply Now</a>
+                            <a href="<?= ROOT ?>/applicant/jobs/details/<?= $job['id'] ?>" class="btn btn-outline">View Details</a>
+                            <?php if(!$job['is_saved']): ?>
+                                <form method="POST" action="<?= ROOT ?>/applicant/savedJobs/save" class="inline-action-form">
+                                    <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
+                                    <input type="hidden" name="return_to" value="applicant/jobs">
+                                    <button type="submit" class="btn btn-outline">Save Job</button>
+                                </form>
+                            <?php else: ?>
+                                <a href="<?= ROOT ?>/applicant/savedJobs" class="btn btn-outline">Saved</a>
+                            <?php endif; ?>
+                            <?php if($job['form_available'] && !$job['has_applied']): ?>
+                                <a href="<?= ROOT ?>/applicant/applications/apply?job_id=<?= $job['id'] ?>" class="btn btn-primary">Apply Now</a>
+                            <?php elseif($job['has_applied']): ?>
+                                <div class="btn btn-secondary" style="cursor: default; text-align: center;">
+                                    ✓ Applied
+                                </div>
+                            <?php else: ?>
+                                <div class="btn btn-disabled" style="cursor: not-allowed; text-align: center;" title="Application form not yet available">
+                                    Opening Soon
+                                </div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

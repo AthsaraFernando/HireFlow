@@ -34,6 +34,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                        <span class="nav-text">Saved Jobs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/applicant/interviews" class="nav-link">
                         <span class="nav-text">Interview Schedule</span>
                     </a>
@@ -69,12 +74,25 @@
                 <p class="page-subtitle"><?= $job['company'] ?> • <?= $job['location'] ?></p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name">John Smith</span>
                     <div class="user-avatar">JS</div>
                 </div>
             </div>
         </header>
+
+        <?php if(isset($_SESSION['success'])): ?>
+            <div class="alert alert-success" style="margin: 20px 32px 0; padding: 15px; background-color: #d4edda; color: #155724; border-radius: 8px;">
+                <?= $_SESSION['success']; unset($_SESSION['success']); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if(isset($_SESSION['error'])): ?>
+            <div class="alert alert-error" style="margin: 20px 32px 0; padding: 15px; background-color: #f8d7da; color: #721c24; border-radius: 8px;">
+                <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
 
         <div class="job-details-content">
             <div class="job-main">
@@ -99,7 +117,57 @@
                             <span class="salary-label">Salary Range</span>
                             <span class="salary-value"><?= $job['salary'] ?></span>
                         </div>
-                        <a href="<?= ROOT ?>/applicant/applications/apply?job_id=<?= $job['id'] ?>" class="btn btn-primary btn-large">Apply Now</a>
+                        <?php if(!$job['is_saved']): ?>
+                            <form method="POST" action="<?= ROOT ?>/applicant/savedJobs/save" class="details-save-form">
+                                <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
+                                <input type="hidden" name="return_to" value="applicant/jobs/details/<?= (int)$job['id'] ?>">
+                                <button type="submit" class="btn btn-outline btn-large">Save Job</button>
+                            </form>
+                        <?php else: ?>
+                            <a href="<?= ROOT ?>/applicant/savedJobs" class="btn btn-outline btn-large">Saved Job</a>
+                        <?php endif; ?>
+                        <?php if($job['has_applied']): ?>
+                            <div class="btn btn-secondary btn-large" style="cursor: default; text-align: center;">
+                                ✓ Already Applied
+                            </div>
+                        <?php elseif($job['form_available']): ?>
+                            <a href="<?= ROOT ?>/applicant/applications/apply?job_id=<?= $job['id'] ?>" class="btn btn-primary btn-large">Apply Now</a>
+                        <?php else: ?>
+                            <div class="btn btn-disabled btn-large" style="cursor: not-allowed; text-align: center; opacity: 0.6;" title="Application form not yet available">
+                                Opening Soon
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <!-- Job Information Section -->
+                <div class="content-card">
+                    <h3 class="section-title">Job Information</h3>
+                    <div class="job-info-grid">
+                        <div class="info-grid-item">
+                            <span class="info-label">Department</span>
+                            <span class="info-value"><?= $job['department'] ?></span>
+                        </div>
+                        <div class="info-grid-item">
+                            <span class="info-label">Employment Type</span>
+                            <span class="info-value"><?= $job['type'] ?></span>
+                        </div>
+                        <div class="info-grid-item">
+                            <span class="info-label">Experience Level</span>
+                            <span class="info-value"><?= $job['experience_level'] ?></span>
+                        </div>
+                        <div class="info-grid-item">
+                            <span class="info-label">Location</span>
+                            <span class="info-value"><?= $job['location'] ?></span>
+                        </div>
+                        <div class="info-grid-item">
+                            <span class="info-label">Salary Range</span>
+                            <span class="info-value"><?= $job['salary'] ?></span>
+                        </div>
+                        <div class="info-grid-item">
+                            <span class="info-label">Application Deadline</span>
+                            <span class="info-value"><?= $job['deadline'] ? date('M d, Y', strtotime($job['deadline'])) : 'Not specified' ?></span>
+                        </div>
                     </div>
                 </div>
 
@@ -117,16 +185,6 @@
                     <ul class="requirements-list">
                         <?php foreach($job['requirements'] as $requirement): ?>
                             <li><?= $requirement ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                </div>
-
-                <!-- Responsibilities -->
-                <div class="content-card">
-                    <h3 class="section-title">Key Responsibilities</h3>
-                    <ul class="responsibilities-list">
-                        <?php foreach($job['responsibilities'] as $responsibility): ?>
-                            <li><?= $responsibility ?></li>
                         <?php endforeach; ?>
                     </ul>
                 </div>
@@ -151,7 +209,17 @@
                 <div class="sidebar-card">
                     <h4>Quick Apply</h4>
                     <p>Ready to join <?= $job['company'] ?>?</p>
-                    <a href="<?= ROOT ?>/applicant/applications/apply?job_id=<?= $job['id'] ?>" class="btn btn-primary btn-full">Apply Now</a>
+                    <?php if($job['has_applied']): ?>
+                        <div class="btn btn-secondary btn-full" style="cursor: default; text-align: center;">
+                            ✓ Already Applied
+                        </div>
+                    <?php elseif($job['form_available']): ?>
+                        <a href="<?= ROOT ?>/applicant/applications/apply?job_id=<?= $job['id'] ?>" class="btn btn-primary btn-full">Apply Now</a>
+                    <?php else: ?>
+                        <div class="btn btn-disabled btn-full" style="cursor: not-allowed; text-align: center; opacity: 0.6;" title="Application form not yet available">
+                            Opening Soon
+                        </div>
+                    <?php endif; ?>
                     <a href="<?= ROOT ?>/applicant/jobs" class="btn btn-outline btn-full">Back to Jobs</a>
                 </div>
 

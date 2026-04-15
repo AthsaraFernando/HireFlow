@@ -4,10 +4,10 @@ class Reports extends Controller
 {
     public function index()
     {
-        // Require System Admin role (role_id = 1)
+
         Auth::requireRole(1);
 
-        // Sample data - in real implementation this would come from database queries
+
         $data = [];
         $data['errors'] = [];
         $data['success'] = '';
@@ -18,7 +18,7 @@ class Reports extends Controller
         $accessLogs = new AccessLog();
         $interviews = new Interview();
 
-        // Fetch the required data using models into the controllers and pass to the frontend view
+
         $data['system_stats'] = [
             'total_users' => $user->getUserCount(),
             'total_jobs' => $jobPost->getJobCount(),
@@ -32,11 +32,10 @@ class Reports extends Controller
         $data['interview_stats'] = $interviews->getInterviewStats();
         $data['user_status'] = $user->getUserStatus();
         $data['job_demand'] = $application->jobDemandStat();
+        $data['application_status_counts'] = $application->applicationStatusCounts();
 
 
         if ($_POST) {
-            // Handle report generation
-            // Send data to the frontend based on the parameters sent in the fetch request
             $data['success'] = 'Report generated successfully!';
         }
 

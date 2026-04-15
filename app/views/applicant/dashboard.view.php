@@ -34,6 +34,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                        <span class="nav-text">Saved Jobs</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/applicant/interviews" class="nav-link">
                         <span class="nav-text">Interview Schedule</span>
                     </a>
@@ -50,6 +55,7 @@
                 </li>
             </ul>
         </nav>
+
         <div class="sidebar-footer">
             <a href="<?= ROOT ?>/signout" class="logout-btn">
                 <span>Logout</span>
@@ -61,12 +67,23 @@
         <header class="header">
             <div class="header-left">
                 <h1 class="page-title">Dashboard</h1>
-                <p class="page-subtitle">Welcome back, <?= $user['name'] ?>! Here's your application overview</p>
+                <p class="page-subtitle">
+                    Welcome back, <?= $user['name'] ?>! Here's your application overview
+                </p>
             </div>
+
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
+
+                <a href="<?= ROOT ?>/announcements" class="action-btn" style="text-decoration:none;">
+                    Announcements
+                </a>
+
                 <div class="user-info">
                     <span class="user-name"><?= $user['name'] ?></span>
-                    <div class="user-avatar"><?= strtoupper(substr($user['name'], 0, 2)) ?></div>
+                    <div class="user-avatar">
+                        <?= strtoupper(substr($user['name'], 0, 2)) ?>
+                    </div>
                 </div>
             </div>
         </header>
@@ -81,6 +98,7 @@
                         <p>Total Applications</p>
                     </div>
                 </div>
+
                 <div class="stat-card">
                     <div class="stat-icon shortlisted">✅</div>
                     <div class="stat-info">
@@ -88,6 +106,7 @@
                         <p>Shortlisted</p>
                     </div>
                 </div>
+
                 <div class="stat-card">
                     <div class="stat-icon pending">⏳</div>
                     <div class="stat-info">
@@ -95,6 +114,7 @@
                         <p>Pending Review</p>
                     </div>
                 </div>
+
                 <div class="stat-card">
                     <div class="stat-icon interviews">🎤</div>
                     <div class="stat-info">
@@ -109,8 +129,11 @@
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h2>Recent Applications</h2>
-                        <a href="<?= ROOT ?>/applicant/applications" class="view-all-btn">View All</a>
+                        <a href="<?= ROOT ?>/applicant/applications" class="view-all-btn">
+                            View All
+                        </a>
                     </div>
+
                     <div class="card-content">
                         <?php if (!empty($recent_applications)): ?>
                             <div class="applications-list">
@@ -119,8 +142,11 @@
                                         <div class="application-info">
                                             <h4><?= $application['job_title'] ?></h4>
                                             <p class="company"><?= $application['company'] ?></p>
-                                            <p class="date">Applied: <?= date('M d, Y', strtotime($application['applied_date'])) ?></p>
+                                            <p class="date">
+                                                Applied: <?= date('M d, Y', strtotime($application['applied_date'])) ?>
+                                            </p>
                                         </div>
+
                                         <div class="application-status">
                                             <span class="status-badge <?= strtolower(str_replace(' ', '-', $application['status'])) ?>">
                                                 <?= ucfirst($application['status']) ?>
@@ -131,7 +157,11 @@
                             </div>
                         <?php else: ?>
                             <div class="empty-state">
-                                <p>No applications yet. <a href="<?= ROOT ?>/applicant/jobs">Browse jobs</a> to get started!</p>
+                                <p>
+                                    No applications yet.
+                                    <a href="<?= ROOT ?>/applicant/jobs">Browse jobs</a>
+                                    to get started!
+                                </p>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -141,8 +171,11 @@
                 <div class="dashboard-card">
                     <div class="card-header">
                         <h2>Upcoming Interviews</h2>
-                        <a href="<?= ROOT ?>/applicant/interviews" class="view-all-btn">View All</a>
+                        <a href="<?= ROOT ?>/applicant/interviews" class="view-all-btn">
+                            View All
+                        </a>
                     </div>
+
                     <div class="card-content">
                         <?php if (!empty($upcoming_interviews)): ?>
                             <div class="interviews-list">
@@ -151,14 +184,21 @@
                                         <div class="interview-info">
                                             <h4><?= $interview['job_title'] ?></h4>
                                             <p class="company"><?= $interview['company'] ?></p>
+
                                             <p class="datetime">
-                                                📅 <?= date('M d, Y', strtotime($interview['date'])) ?> 
+                                                📅 <?= date('M d, Y', strtotime($interview['date'])) ?>
                                                 at <?= $interview['time'] ?>
                                             </p>
-                                            <p class="type">Type: <?= $interview['type'] ?></p>
+
+                                            <p class="type">
+                                                Type: <?= $interview['type'] ?>
+                                            </p>
                                         </div>
+
                                         <div class="interview-actions">
-                                            <a href="<?= ROOT ?>/applicant/interviews" class="btn btn-primary">View Details</a>
+                                            <a href="<?= ROOT ?>/applicant/interviews" class="btn btn-primary">
+                                                View Details
+                                            </a>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -176,20 +216,24 @@
                     <div class="card-header">
                         <h2>Quick Actions</h2>
                     </div>
+
                     <div class="card-content">
                         <div class="quick-actions">
                             <a href="<?= ROOT ?>/applicant/jobs" class="action-btn">
                                 <div class="action-icon">🔍</div>
                                 <span>Browse Jobs</span>
                             </a>
+
                             <a href="<?= ROOT ?>/applicant/profile" class="action-btn">
                                 <div class="action-icon">👤</div>
                                 <span>Update Profile</span>
                             </a>
+
                             <a href="<?= ROOT ?>/applicant/applications" class="action-btn">
                                 <div class="action-icon">📄</div>
                                 <span>My Applications</span>
                             </a>
+
                             <a href="<?= ROOT ?>/applicant/interviews" class="action-btn">
                                 <div class="action-icon">📅</div>
                                 <span>Interview Schedule</span>
@@ -197,8 +241,6 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
     </div>

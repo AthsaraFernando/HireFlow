@@ -4,127 +4,135 @@ class Applications extends Controller
 {
     public function index()
     {
-        // Require Recruitment Manager role (role_id = 3)
         Auth::requireRole(3);
+
+        $applicationModel = new Application();
 
         $data = [];
         $data['errors'] = [];
-        $data['success'] = '';
         $data['page_title'] = 'Review Applications';
-        
-        // Get job filter from URL
         $data['selected_job'] = $_GET['job'] ?? 'all';
-        
-        // Sample applications data
-        $data['applications'] = [
-            [
-                'id' => 1,
-                'candidate_name' => 'John Smith',
-                'email' => 'john.smith@email.com',
-                'phone' => '+1 555-0123',
-                'job_title' => 'Senior Software Developer',
-                'job_id' => 1,
-                'experience_years' => 8,
-                'current_company' => 'Tech Corp',
-                'location' => 'San Francisco, CA',
-                'application_date' => '2025-08-25',
-                'status' => 'pending',
-                'match_score' => 92,
-                'resume_url' => '/resumes/john_smith.pdf',
-                'cover_letter' => 'I am excited to apply for this position...',
-                'skills' => ['JavaScript', 'React', 'Node.js', 'Python'],
-                'education' => 'MS Computer Science - Stanford University'
-            ],
-            [
-                'id' => 2,
-                'candidate_name' => 'Sarah Johnson',
-                'email' => 'sarah.j@email.com',
-                'phone' => '+1 555-0456',
-                'job_title' => 'Senior Software Developer',
-                'job_id' => 1,
-                'experience_years' => 6,
-                'current_company' => 'StartupXYZ',
-                'location' => 'New York, NY',
-                'application_date' => '2025-08-24',
-                'status' => 'under_review',
-                'match_score' => 88,
-                'resume_url' => '/resumes/sarah_johnson.pdf',
-                'cover_letter' => 'With 6 years of experience in full-stack development...',
-                'skills' => ['JavaScript', 'Vue.js', 'PHP', 'MySQL'],
-                'education' => 'BS Computer Science - MIT'
-            ],
-            [
-                'id' => 3,
-                'candidate_name' => 'Mike Wilson',
-                'email' => 'mike.wilson@email.com',
-                'phone' => '+1 555-0789',
-                'job_title' => 'Data Analyst',
-                'job_id' => 2,
-                'experience_years' => 4,
-                'current_company' => 'Analytics Inc',
-                'location' => 'Chicago, IL',
-                'application_date' => '2025-08-23',
-                'status' => 'shortlisted',
-                'match_score' => 85,
-                'resume_url' => '/resumes/mike_wilson.pdf',
-                'cover_letter' => 'As a data professional with extensive experience...',
-                'skills' => ['Python', 'SQL', 'Tableau', 'R'],
-                'education' => 'MS Data Science - University of Chicago'
-            ],
-            [
-                'id' => 4,
-                'candidate_name' => 'Emily Davis',
-                'email' => 'emily.davis@email.com',
-                'phone' => '+1 555-0321',
-                'job_title' => 'UX Designer',
-                'job_id' => 3,
-                'experience_years' => 5,
-                'current_company' => 'Design Studio',
-                'location' => 'Los Angeles, CA',
-                'application_date' => '2025-08-22',
-                'status' => 'rejected',
-                'match_score' => 78,
-                'resume_url' => '/resumes/emily_davis.pdf',
-                'cover_letter' => 'I am passionate about creating user-centered designs...',
-                'skills' => ['Figma', 'Sketch', 'Adobe XD', 'Prototyping'],
-                'education' => 'BFA Graphic Design - Art Center'
-            ]
-        ];
-        
-        // Job options for filtering
-        $data['jobs'] = [
-            ['id' => 'all', 'title' => 'All Jobs'],
-            ['id' => 1, 'title' => 'Senior Software Developer'],
-            ['id' => 2, 'title' => 'Data Analyst'],
-            ['id' => 3, 'title' => 'UX Designer'],
-            ['id' => 4, 'title' => 'Marketing Manager']
-        ];
-        
-        // Filter applications by selected job
-        if($data['selected_job'] !== 'all') {
-            $data['applications'] = array_filter($data['applications'], function($app) use ($data) {
-                return $app['job_id'] == $data['selected_job'];
-            });
+        $data['selected_status'] = $_GET['status'] ?? 'all';
+        $data['search_name'] = trim($_GET['search'] ?? '');
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $allowedStatuses = ['Shortlisted', 'Rejected', 'Offered'];
+            $applicationId = (int)($_POST['application_id'] ?? 0);
+            $newStatus = trim($_POST['status'] ?? '');
+            $notificationModel = new Notification();
+            $applicationLookup = new Application();
+
+            if (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
+                $_SESSION['error'] = 'Invalid request. Please try again.';
+                redirect('recruitment/applications');
+            }
+
+            if ($applicationId < 1 || !in_array($newStatus, $allowedStatuses, true)) {
+                $_SESSION['error'] = 'Invalid application or status.';
+                redirect('recruitment/applications');
+            }
+
+            $updated = $applicationModel->query(
+                "UPDATE applications SET status = :status WHERE id = :id",
+                ['status' => $newStatus, 'id' => $applicationId]
+            );
+
+            if ($updated !== false) {
+                $applicationDetails = $applicationLookup->getApplicationById($applicationId);
+                if ($applicationDetails) {
+                    $jobTitle = $applicationDetails['job_title'] ?? 'your application';
+
+                    if ($newStatus === 'Shortlisted') {
+                        $notificationModel->createForApplication(
+                            $applicationId,
+                            'Application Shortlisted',
+                            'Your application for ' . $jobTitle . ' has been shortlisted.',
+                            'success'
+                        );
+                    } elseif ($newStatus === 'Rejected') {
+                        $notificationModel->createForApplication(
+                            $applicationId,
+                            'Application Rejected',
+                            'Your application for ' . $jobTitle . ' has been rejected.',
+                            'warning'
+                        );
+                    } elseif ($newStatus === 'Offered') {
+                        $notificationModel->createForApplication(
+                            $applicationId,
+                            'Job Offer Extended',
+                            'A job offer has been extended for your application for ' . $jobTitle . '.',
+                            'success'
+                        );
+                    }
+                }
+
+                $_SESSION['success'] = 'Application status updated successfully.';
+            } else {
+                $_SESSION['error'] = 'Failed to update application status.';
+            }
+
+            redirect('recruitment/applications');
         }
-        
-        // Status options
-        $data['statuses'] = ['All', 'Pending', 'Under Review', 'Shortlisted', 'Rejected'];
+
+        $jobsQuery = "SELECT DISTINCT jp.id, jp.title
+                      FROM applications a
+                      INNER JOIN job_posts jp ON jp.id = a.job_id
+                      ORDER BY jp.title ASC";
+        $data['jobs'] = $applicationModel->query($jobsQuery) ?: [];
+
+        $statusQuery = "SELECT DISTINCT status FROM applications ORDER BY status ASC";
+        $statusRows = $applicationModel->query($statusQuery) ?: [];
+        $data['status_filters'] = array_map(function ($row) {
+            return $row['status'];
+        }, $statusRows);
+
+        $params = [];
+        $conditions = [];
+
+        if ($data['selected_job'] !== 'all') {
+            $conditions[] = 'a.job_id = :job_id';
+            $params['job_id'] = (int)$data['selected_job'];
+        }
+
+        if ($data['selected_status'] !== 'all') {
+            $conditions[] = 'a.status = :status_filter';
+            $params['status_filter'] = $data['selected_status'];
+        }
+
+        if ($data['search_name'] !== '') {
+            $conditions[] = 'u.full_name LIKE :search_name';
+            $params['search_name'] = '%' . $data['search_name'] . '%';
+        }
+
+        $whereClause = '';
+        if (!empty($conditions)) {
+            $whereClause = 'WHERE ' . implode(' AND ', $conditions);
+        }
+
+        $applicationsQuery = "SELECT
+                                a.id,
+                                a.job_id,
+                                a.status,
+                                a.applied_at,
+                                a.form_data,
+                                u.full_name AS applicant_name,
+                                u.email AS applicant_email,
+                                u.phone AS applicant_phone,
+                                jp.title AS job_title
+                              FROM applications a
+                              INNER JOIN users u ON u.id = a.applicant_id
+                              INNER JOIN job_posts jp ON jp.id = a.job_id
+                              {$whereClause}
+                              ORDER BY a.applied_at DESC, a.id DESC";
+        $data['applications'] = $applicationModel->query($applicationsQuery, $params) ?: [];
+
+        $data['status_update_options'] = ['Shortlisted', 'Rejected', 'Offered'];
+        $data['csrf_token'] = Auth::generateCSRFToken();
+        $data['success'] = $_SESSION['success'] ?? '';
+        $data['error'] = $_SESSION['error'] ?? '';
+
+        unset($_SESSION['success'], $_SESSION['error']);
 
         $this->view('recruitment/applications', $data);
-    }
-    
-    public function viewApplication($id = null)
-    {
-        if (!$id) {
-            redirect('recruitment/applications');
-            return;
-        }
-        
-        // Individual application view would go here
-        $data = [];
-        $data['page_title'] = 'Application Details';
-        // Add application details logic here
-        
-        $this->view('recruitment/application-details', $data);
     }
 }

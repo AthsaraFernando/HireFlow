@@ -46,6 +46,12 @@ class Signin extends Controller
 
             // Validate login
             if ($user->signInValidate($_POST, $user)) {
+                if (!empty($_POST['remember_me'])) {
+                    Auth::setRememberMeCookie($_SESSION['USER_ID'] ?? null);
+                } else {
+                    Auth::clearRememberMeCookie();
+                }
+
                 // Log successful login
                 AccessLog::log('login', 'User logged in successfully');
                 
@@ -70,6 +76,11 @@ class Signin extends Controller
         // Check for registration success
         if (isset($_GET['registered'])) {
             $data['success'] = "Registration successful! Please login with your credentials.";
+        }
+
+        // Check for account deletion success
+        if (isset($_GET['deleted'])) {
+            $data['success'] = "Your account was deactivated successfully.";
         }
         
         // Check if authentication was required
