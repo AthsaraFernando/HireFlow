@@ -96,7 +96,19 @@ class Notification
             return true;
         }
 
-        return $this->insert($payload) !== false;
+        $inserted = $this->insert($payload) !== false;
+        if (!$inserted) {
+            return false;
+        }
+
+        $this->sendNotificationEmail(
+            $payload['user_id'],
+            $payload['title'],
+            $payload['message'],
+            $payload['type']
+        );
+
+        return true;
     }
 
     public function createForApplication($application_id, $title, $message, $type = 'info')
@@ -221,5 +233,54 @@ class Notification
                 ORDER BY title ASC, message ASC";
 
         return $this->query($query, [$user_id, $user_id]);
+    }
+
+    private function sendNotificationEmail($user_id, $title, $message, $type)
+    {
+        try {
+            $user = $this->get_row(
+                "SELECT full_name, email FROM users WHERE id = ? LIMIT 1",
+                [(int)$user_id]
+            );
+
+            if (!$user || empty($user['email'])) {
+                return;
+            }
+
+            $displayType = ucfirst((string)$type);
+            $safeTitle = htmlspecialchars((string)$title, ENT_QUOTES, 'UTF-8');
+            $safeMessage = nl2br(htmlspecialchars((string)$message, ENT_QUOTES, 'UTF-8'));
+            $notificationsUrl = rtrim(ROOT, '/') . '/applicant/notifications';
+
+            $subject = 'HireFlow Notification: ' . (string)$title;
+            $htmlBody = '
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1f2937;">
+                    <h2 style="margin: 0 0 12px;">You have a new HireFlow update</h2>
+                    <p style="margin: 0 0 10px;"><strong>' . $safeTitle . '</strong></p>
+                    <p style="margin: 0 0 10px;">' . $safeMessage . '</p>
+                    <p style="margin: 0 0 16px;">Type: <strong>' . htmlspecialchars($displayType, ENT_QUOTES, 'UTF-8') . '</strong></p>
+                    <p style="margin: 0 0 18px;">
+                        <a href="' . htmlspecialchars($notificationsUrl, ENT_QUOTES, 'UTF-8') . '" style="background: #111827; color: #ffffff; text-decoration: none; padding: 10px 14px; border-radius: 6px; display: inline-block;">View Notifications</a>
+                    </p>
+                    <p style="font-size: 12px; color: #6b7280; margin: 0;">This is an automated email from HireFlow.</p>
+                </div>
+            ';
+
+            $textBody = "You have a new HireFlow update\n\n"
+                . $title . "\n"
+                . $message . "\n\n"
+                . 'Type: ' . $displayType . "\n"
+                . 'View notifications: ' . $notificationsUrl;
+
+            Mailer::send(
+                (string)$user['email'],
+                $subject,
+                $htmlBody,
+                (string)($user['full_name'] ?? ''),
+                $textBody
+            );
+        } catch (Throwable $e) {
+            error_log('Notification email skipped: ' . $e->getMessage());
+        }
     }
 }
