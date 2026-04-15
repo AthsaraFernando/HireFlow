@@ -4,9 +4,9 @@ class Profile extends Controller
 
     public function index()
     {
-        // Ensure user is logged in and is a system admin
+        
         Auth::requireLogin();
-        Auth::requireRole(1); // System Admin role_id = 1
+        Auth::requireRole(1); 
 
         $user = new User();
         $errors = [];
@@ -129,7 +129,8 @@ class Profile extends Controller
         $this->view('systemadmin/profile', [
             'logs' => $logs,
             'errors' => $errors,
-            'success' => $success
+            'success' => $success,
+            'page_title' => 'My Profile'
         ]);
     }
 
@@ -148,7 +149,6 @@ class Profile extends Controller
                 'created_at' => date('Y-m-d H:i:s')
             ]);
         } catch (Exception $e) {
-            // Log error but don't break the profile update
             error_log("Failed to log activity: " . $e->getMessage());
         }
     }
