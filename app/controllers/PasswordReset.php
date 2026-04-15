@@ -7,7 +7,7 @@ class PasswordReset extends Controller
         $data = [];
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Check for CSRF token
+            
             if (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
                 $data['errors']['general'] = "Invalid request. Please try again.";
                 $this->view('password-reset', $data);
@@ -25,17 +25,16 @@ class PasswordReset extends Controller
                 $token = $user->generatePasswordResetToken($email);
 
                 if ($token) {
-                    // For now, we'll just show a success message
+                    
                     $data['success'] = "If an account with that email exists, you will receive password reset link.";
 
-                    // Log password reset request
+                    
                     AccessLog::log('password_reset_request', 'Password reset requested for: ' . $email);
 
-                    // For development, you might want to show the token
-                    // Remove below data in production
+                    
                     if (DEBUG) {
-                        $data['debug_token'] = $token;
-                        $data['debug_link'] = ROOT . '/passwordreset/reset?token=' . $token;
+                        // $data['debug_token'] = $token;
+                        // $data['debug_link'] = ROOT . '/passwordreset/reset?token=' . $token;
                     }
 
                     $resetLink = ROOT . '/passwordreset/reset?token=' . urlencode($token);
@@ -51,11 +50,11 @@ class PasswordReset extends Controller
                         <p>If you did not request this, you can ignore this email.</p>
                     ";
                     $textBody = "Reset your HireFlow password: {$resetLink} (expires in 20 mins).";
-                    // Do not expose mail delivery status to the UI for account enumeration safety.
+                
                     Mailer::send($email, $subject, $htmlBody, '', $textBody);
 
                 } else {
-                    // Don't reveal if email exists or not for security
+                    
                     $data['success'] = "If an account with that email exists, you will receive password reset link.";
                 }
             }
@@ -75,7 +74,7 @@ class PasswordReset extends Controller
         }
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // Check for CSRF token
+            
             if (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
                 $data['errors']['general'] = "Invalid request. Please try again.";
                 $this->view('password-reset-form', $data);
@@ -102,7 +101,7 @@ class PasswordReset extends Controller
                 $user = new User();
                 $resettedUser = $user->resetPassword($token, $password);
                 if ($resettedUser) {
-                    // Log successful password reset
+                    
                     AccessLog::log('password_change', 'Password successfully reset', $resettedUser['id'], 0, $resettedUser['role_id']);
 
                     redirect('signin?password_reset=1');

@@ -1,10 +1,10 @@
-<?php $this->view('components/header') ?>
+<?php $this->view('components/header', ['page_title' => $page_title ?? 'System Admin']); ?>
 
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
             <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
-            <p class="brand-subtitle">System Admin</p>
+        
         </div>
 
         <nav class="sidebar-nav">
@@ -35,6 +35,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/announcements" class="nav-link">
+                        <span class="nav-text">Announcements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link active">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -57,9 +62,7 @@
             </div>
 
             <div class="header-right">
-                <!-- <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div> -->
+                
 
                 <div class="header-user">
                     <div class="user-info">
@@ -81,9 +84,8 @@
                     }
                     ?>
                     <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt=""
-                            class="profile_picture_header">
-                    <!-- <div class="user-avatar">
-                    </div> -->
+                        class="profile_picture_header">
+                    
                 </div>
             </div>
         </header>
@@ -128,7 +130,7 @@
                             <input hidden type="file" id="profile_picture" name="profile_picture" class="form-input"
                                 accept="image/*">
                             <br>
-                            <!-- <small class="text-muted">Accepted formats: JPG, PNG, GIF (Max 2MB)</small> -->
+                        
                         </div>
                         <div class="profile-header-info">
                             <h1 class="profile-name"><?= $_SESSION['USER']['full_name'] ?? 'System Administrator' ?>
@@ -298,28 +300,28 @@
                     <h3 class="card-title">Quick Actions</h3>
                     <div class="quick-actions-grid">
                         <a href="<?= ROOT ?>/systemadmin/usermanage" class="quick-action">
-                            <!-- <div class="action-icon"></div> -->
+                            <div class="action-icon"></div>
                             <div class="action-content">
                                 <h4>Manage Users</h4>
                                 <p>Add, edit, or remove user accounts</p>
                             </div>
                         </a>
                         <a href="<?= ROOT ?>/systemadmin/reports" class="quick-action">
-                            <!-- <div class="action-icon"></div> -->
+                            <div class="action-icon"></div>
                             <div class="action-content">
                                 <h4>System Reports</h4>
                                 <p>View analytics and system insights</p>
                             </div>
                         </a>
                         <a href="<?= ROOT ?>/systemadmin/accesslogs" class="quick-action">
-                            <!-- <div class="action-icon"></div> -->
+                            <div class="action-icon"></div>
                             <div class="action-content">
                                 <h4>Access Logs</h4>
                                 <p>Monitor system access and security</p>
                             </div>
                         </a>
                         <a href="<?= ROOT ?>/systemadmin/dashboard" class="quick-action">
-                            <!-- <div class="action-icon"></div> -->
+                            <div class="action-icon"></div>
                             <div class="action-content">
                                 <h4>Dashboard</h4>
                                 <p>Return to main dashboard</p>

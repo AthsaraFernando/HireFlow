@@ -10,21 +10,15 @@ class BackupRestore extends Controller
         $data['errors'] = [];
         $data['success'] = '';
 
-        // Pass user role information to view
         $data['current_user_role'] = Auth::user_role();
         $data['is_system_admin'] = Auth::hasRole(1);
         $data['user_role_name'] = getRoleName(Auth::user_role());
         $data['current_user'] = Auth::user();
         $data['csrf_token'] = Auth::generateCSRFToken();
 
-
-        $accessLog = new AccessLog();
-        $data['recent_logins'] = $accessLog->getAllActivityWithUsers(15);
-
         $canCreateBackups = Auth::hasRole(1);
 
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            // logger($_POST);
             if (!$canCreateBackups) {
                 echo json_encode(['success' => false, 'message' => 'Insufficient privileges to perform this action.']);
                 return;
@@ -45,6 +39,9 @@ class BackupRestore extends Controller
                 case 'download':
                     $this->downloadBackup();
                     return;
+                case 'delete':
+                    $this->deleteBackup();
+                    return;
                 default:
                     $data['errors']['general'] = "Invalid action";
                     return;
@@ -53,16 +50,16 @@ class BackupRestore extends Controller
 
         $backup = new Backup();
         $data['logs'] = $backup->fetchLogs();
-
+        $data['monthly_backup_frequencies'] = $backup->backupFrequency();
+        $data['monthly_restore_frequencies'] = $backup->restoreFrequency();
 
         $this->view('systemadmin/backup-restore', $data);
 
     }
 
-    // Create access logs for all the activites
 
     public function createBackup()
-    { // Implement here - Use the backup name + current datetime and create a db backup and save in  the backups folder
+    { 
 
         $date = date('Ymd_His');
         if (isset($_POST['backupName'])) {
@@ -96,14 +93,14 @@ class BackupRestore extends Controller
         Backup::log($backupName, $backupPath, $fileSize, 'success');
 
         $accessLog = new AccessLog();
-        $accessLog::log('db_backup', 'Database backed up successfully');
+        $accessLog::log('db_backup_created', 'Database backed up successfully');
 
         echo json_encode(['success' => true, 'message' => 'Backup created successfully']);
     }
 
 
     public function restoreBackup()
-    { // Implement here
+    {
         $backupId = (int) $_POST['backup_id'];
 
         $backup = new Backup();
@@ -167,7 +164,7 @@ class BackupRestore extends Controller
 
         $downloadName = !empty($backupData['backup_name']) ? basename($backupData['backup_name']) : basename($backupPath);
 
-        // Ensure no buffered output corrupts the file stream.
+        
         while (ob_get_level() > 0) {
             ob_end_clean();
         }
@@ -187,6 +184,55 @@ class BackupRestore extends Controller
         readfile($backupPath);
         exit;
 
+    }
+
+    public function deleteBackup()
+    {
+        $backupId = (int) ($_POST['backup_id'] ?? 0);
+
+        if ($backupId <= 0) {
+            http_response_code(400);
+            echo json_encode(['success' => false, 'message' => 'Invalid backup ID']);
+            exit;
+        }
+
+        $backup = new Backup();
+        $accessLog = new AccessLog();
+        $backupData = $backup->first(['id' => $backupId]);
+
+        if (!$backupData || empty($backupData['file_path'])) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Backup record not found']);
+            exit;
+        }
+
+        $backupPath = $backupData['file_path'];
+        if (!file_exists($backupPath)) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Backup file missing']);
+            exit;
+        }
+
+        if (!is_writable($backupPath) || !unlink($backupPath)) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'message' => 'Failed to delete backup file']);
+            exit;
+        }
+
+        if ($backup->delete($backupId)) {
+            $accessLog::log('db_backup_deleted', "Deleted database backup with backup ID {$backupId}");
+            echo json_encode([
+                'success' => true,
+                'message' => 'Backup deleted successfully'
+            ]);
+            exit;
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Backup file deleted but database record deletion failed'
+            ]);
+            exit;
+        }
     }
 
 

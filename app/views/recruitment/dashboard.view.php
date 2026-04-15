@@ -68,6 +68,7 @@
             </div>
 
             <div class="header-right">
+                <a href="<?= ROOT ?>/announcements" class="btn btn-secondary">Announcements</a>
                 <div class="header-notifications">
                     <button class="notification-btn"></button>
                 </div>

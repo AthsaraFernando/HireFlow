@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= isset($page_title) ? $page_title . ' - HireFlow' : 'HireFlow - Recruitment Management System' ?></title>
+    <title><?= isset($page_title) ? $page_title : 'HireFlow - Recruitment Management System' ?></title>
+    <link rel="icon" type="image/x-icon" href="<?= ROOT ?>/assets/images/logo.png">
     
     <!-- CSS Files -->
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/main.css">

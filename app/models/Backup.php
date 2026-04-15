@@ -42,5 +42,33 @@ class Backup
         return $this->query($query);
     }
 
+    public function backupFrequency()
+    {
+        $query = "SELECT DATE_FORMAT(created_at, '%b %Y') AS instance, COUNT(*) AS monthly_backup_count
+                  FROM db_backups
+                  GROUP BY instance
+                  ORDER BY MIN(created_at)";
+
+        $result = $this->query($query);
+        return $result ?: [];
+
+
+    }
+
+    public function restoreFrequency()
+    {
+        $query = "SELECT DATE_FORMAT(created_at, '%b %Y') AS instance, COUNT(*) AS monthly_restore_count
+                  FROM db_backups
+                  WHERE restored_at IS NOT NULL
+                  GROUP BY instance
+                  ORDER BY MIN(created_at)";
+
+        $result = $this->query($query);
+        return $result ?: [];
+
+
+    }
+
+
 
 }

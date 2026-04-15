@@ -274,6 +274,19 @@ ALTER TABLE users
 ADD COLUMN password_reset_token VARCHAR(255) DEFAULT NULL,
 ADD COLUMN password_reset_expires DATETIME DEFAULT NULL;
 
+
+CREATE TABLE IF NOT EXISTS announcements (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    created_by INT NULL,
+    updated_by INT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_announcements_created_by FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
+    CONSTRAINT fk_announcements_updated_by FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+);
+
 -- ====================================================================
 -- DATABASE VERIFICATION
 -- ====================================================================
