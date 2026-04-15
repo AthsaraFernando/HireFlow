@@ -92,15 +92,9 @@
         <h1 class="page-title">Recruitment Dashboard</h1>
         <p class="page-description">Overview of your recruitment activities and pending tasks</p>
         <div class="quick-actions">
-            <a href="<?= ROOT ?>/recruitment/applications" class="btn btn-primary">
-                <i class="icon-applications"></i>Review Applications
-            </a>
-            <a href="<?= ROOT ?>/recruitment/interview-schedule" class="btn btn-outline">
-                <i class="icon-calendar"></i>Schedule Interview
-            </a>
-            <a href="<?= ROOT ?>/recruitment/shortlist-candidates" class="btn btn-secondary">
-                <i class="icon-users"></i>Manage Shortlist
-            </a>
+            <a href="<?= ROOT ?>/recruitment/interview-schedule" class="btn btn-primary">Create Interviews</a>
+            <a href="<?= ROOT ?>/recruitment/reports" class="btn btn-outline">Create Report</a>
+            <a href="<?= ROOT ?>/recruitment/applicationforms" class="btn btn-secondary">Create Application Form</a>
         </div>
     </div>
 
@@ -114,173 +108,60 @@
 
     <!-- Dashboard Metrics -->
     <div class="metrics-overview">
-        <div class="metric-card primary">
-            <div class="metric-icon">📋</div>
-            <div class="metric-info">
-                <div class="metric-value"><?= $metrics['assigned_jobs'] ?></div>
-                <div class="metric-label">Assigned Jobs</div>
-            </div>
-            <a href="<?= ROOT ?>/recruitment/assigned-jobs" class="metric-action">View All</a>
-        </div>
-
         <div class="metric-card warning">
-            <div class="metric-icon">📄</div>
             <div class="metric-info">
-                <div class="metric-value"><?= $metrics['pending_applications'] ?></div>
-                <div class="metric-label">Pending Reviews</div>
+                <div class="metric-value"><?= $metrics['under_review_applications'] ?? 0 ?></div>
+                <div class="metric-label">Applications Under Review</div>
             </div>
-            <a href="<?= ROOT ?>/recruitment/applications" class="metric-action">Review</a>
         </div>
 
         <div class="metric-card success">
-            <div class="metric-icon">🎯</div>
             <div class="metric-info">
-                <div class="metric-value"><?= $metrics['shortlisted_candidates'] ?></div>
-                <div class="metric-label">Shortlisted</div>
+                <div class="metric-value"><?= $metrics['shortlisted_applications'] ?? 0 ?></div>
+                <div class="metric-label">Shortlisted Applications</div>
             </div>
-            <a href="<?= ROOT ?>/recruitment/shortlist-candidates" class="metric-action">Manage</a>
         </div>
 
         <div class="metric-card info">
-            <div class="metric-icon">📅</div>
             <div class="metric-info">
-                <div class="metric-value"><?= $metrics['scheduled_interviews'] ?></div>
-                <div class="metric-label">Interviews Scheduled</div>
+                <div class="metric-value"><?= $metrics['interview_scheduled_applications'] ?? 0 ?></div>
+                <div class="metric-label">Interview Scheduled</div>
             </div>
-            <a href="<?= ROOT ?>/recruitment/interview-schedule" class="metric-action">View</a>
-        </div>
-
-        <div class="metric-card danger">
-            <div class="metric-icon">⏰</div>
-            <div class="metric-info">
-                <div class="metric-value"><?= $metrics['pending_feedback'] ?></div>
-                <div class="metric-label">Pending Feedback</div>
-            </div>
-            <a href="<?= ROOT ?>/recruitment/interview-feedback" class="metric-action">Submit</a>
         </div>
 
     </div>
 
     <!-- Main Content Layout -->
     <div class="dashboard-content">
-        <!-- Left Column -->
         <div class="content-column">
-            <!-- Assigned Jobs Summary -->
-            <div class="content-card">
-                <div class="card-header">
-                    <h3 class="card-title">My Assigned Jobs</h3>
-                    <a href="<?= ROOT ?>/recruitment/assigned-jobs" class="view-all-link">View All</a>
-                </div>
-                <div class="jobs-list">
-                    <?php foreach($assigned_jobs as $job): ?>
-                    <div class="job-item">
-                        <div class="job-info">
-                            <h4 class="job-title"><?= htmlspecialchars($job['title']) ?></h4>
-                            <span class="job-department"><?= htmlspecialchars($job['department']) ?></span>
-                        </div>
-                        <div class="job-stats">
-                            <span class="stat-item">
-                                <strong><?= $job['applications_count'] ?></strong> Applications
-                            </span>
-                            <span class="stat-item pending">
-                                <strong><?= $job['pending_reviews'] ?></strong> Pending
-                            </span>
-                        </div>
-                        <div class="job-actions">
-                            <a href="<?= ROOT ?>/recruitment/applications?job=<?= $job['id'] ?>" class="btn btn-sm btn-primary">Review</a>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
-            <!-- Recent Activities -->
-            <div class="content-card">
-                <div class="card-header">
-                    <h3 class="card-title">Recent Activities</h3>
-                    <a href="<?= ROOT ?>/recruitment/notifications" class="view-all-link">View All</a>
-                </div>
-                <div class="activities-list">
-                    <?php foreach($recent_activities as $activity): ?>
-                    <div class="activity-item <?= $activity['priority'] ?>">
-                        <div class="activity-icon">
-                            <?php 
-                            switch($activity['type']) {
-                                case 'application_review': echo '📋'; break;
-                                case 'interview_scheduled': echo '📅'; break;
-                                case 'candidate_shortlisted': echo '⭐'; break;
-                                default: echo '🔔'; break;
-                            }
-                            ?>
-                        </div>
-                        <div class="activity-content">
-                            <p class="activity-description"><?= htmlspecialchars($activity['description']) ?></p>
-                            <span class="activity-time"><?= $activity['time'] ?></span>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="content-column">
-            <!-- Upcoming Interviews -->
             <div class="content-card">
                 <div class="card-header">
                     <h3 class="card-title">Upcoming Interviews</h3>
                     <a href="<?= ROOT ?>/recruitment/interview-schedule" class="view-all-link">Manage All</a>
                 </div>
                 <div class="interviews-list">
-                    <?php foreach($upcoming_interviews as $interview): ?>
-                    <div class="interview-card">
-                        <div class="interview-time">
-                            <div class="date"><?= date('M j', strtotime($interview['scheduled_time'])) ?></div>
-                            <div class="time"><?= date('g:i A', strtotime($interview['scheduled_time'])) ?></div>
-                        </div>
-                        <div class="interview-details">
-                            <h3><?= htmlspecialchars($interview['candidate_name']) ?></h3>
-                            <p><?= htmlspecialchars($interview['position']) ?></p>
-                            <div class="interview-meta">
-                                <span class="interview-type"><?= $interview['type'] ?></span>
-                                <span class="duration">45 min</span>
+                    <?php if(!empty($upcoming_interviews)): ?>
+                        <?php foreach($upcoming_interviews as $interview): ?>
+                        <div class="interview-card">
+                            <div class="interview-time">
+                                <div class="date"><?= date('M j', strtotime($interview['scheduled_time'])) ?></div>
+                                <div class="time"><?= date('g:i A', strtotime($interview['scheduled_time'])) ?></div>
+                            </div>
+                            <div class="interview-details">
+                                <h3><?= htmlspecialchars($interview['candidate_name']) ?></h3>
+                                <p><?= htmlspecialchars($interview['position']) ?></p>
+                                <div class="interview-meta">
+                                    <span class="interview-type"><?= htmlspecialchars($interview['type']) ?></span>
+                                </div>
+                            </div>
+                            <div class="interview-actions">
+                                <span class="interview-status <?= strtolower($interview['status']) ?>"><?= ucfirst($interview['status']) ?></span>
                             </div>
                         </div>
-                        <div class="interview-actions">
-                            <span class="interview-status <?= strtolower($interview['status']) ?>"><?= ucfirst($interview['status']) ?></span>
-                            <a href="<?= ROOT ?>/recruitment/conduct-interview/1" class="btn btn-sm btn-primary">Join</a>
-                        </div>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="content-card">
-                <div class="card-header">
-                    <h3 class="card-title">Quick Actions</h3>
-                </div>
-                <div class="quick-actions-grid">
-                    <a href="<?= ROOT ?>/recruitment/applications" class="quick-action-item">
-                        <div class="action-icon">📋</div>
-                        <div class="action-label">Review Applications</div>
-                        <div class="action-count"><?= $metrics['pending_applications'] ?> pending</div>
-                    </a>
-                    <a href="<?= ROOT ?>/recruitment/shortlist-candidates" class="quick-action-item">
-                        <div class="action-icon">⭐</div>
-                        <div class="action-label">Manage Shortlist</div>
-                        <div class="action-count"><?= $metrics['shortlisted_candidates'] ?> candidates</div>
-                    </a>
-                    <a href="<?= ROOT ?>/recruitment/interview-feedback" class="quick-action-item">
-                        <div class="action-icon">💬</div>
-                        <div class="action-label">Submit Feedback</div>
-                        <div class="action-count"><?= $metrics['pending_feedback'] ?> pending</div>
-                    </a>
-                    <a href="<?= ROOT ?>/recruitment/reports" class="quick-action-item">
-                        <div class="action-icon">📊</div>
-                        <div class="action-label">View Reports</div>
-                        <div class="action-count">Analytics</div>
-                    </a>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <p class="empty-state">No upcoming interviews.</p>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

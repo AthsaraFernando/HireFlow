@@ -67,6 +67,7 @@ class ConductInterview extends Controller
         $evaluationModel = new InterviewEvaluation();
         $interviewModel = new Interview();
         $applicationModel = new Application();
+        $notificationModel = new Notification();
 
         $interview = $evaluationModel->getInterviewForEvaluation((int) $interview_id);
         if (!$interview) {
@@ -106,8 +107,46 @@ class ConductInterview extends Controller
             exit;
         }
 
-        $interviewModel->updateInterview((int) $interview_id, ['status' => 'Completed']);
-        $applicationModel->update($interview['application_id'], ['status' => 'Interview Completed']);
+        $recommendation = $payload['recommendation'] ?? '';
+        if (in_array($recommendation, ['Hire', 'Reject'], true)) {
+            $jobTitle = $interview['job_title'] ?? 'your application';
+            if ($recommendation === 'Hire') {
+                $notificationModel->createForApplication(
+                    $interview['application_id'],
+                    'Interview Feedback: Hire',
+                    'Your interview feedback for ' . $jobTitle . ' recommends you for hire.',
+                    'success'
+                );
+            } else {
+                $notificationModel->createForApplication(
+                    $interview['application_id'],
+                    'Interview Feedback: Reject',
+                    'Your interview feedback for ' . $jobTitle . ' recommends rejection.',
+                    'error'
+                );
+            }
+        }
+
+        $warnings = [];
+
+        try {
+            $interviewUpdated = $interviewModel->updateInterview((int) $interview_id, ['status' => 'Completed']);
+            if (!$interviewUpdated) {
+                $warnings[] = 'Interview status was not updated to Completed.';
+            }
+        } catch (Exception $e) {
+            $warnings[] = 'Interview status update failed.';
+        }
+
+        try {
+            // applications.status enum does not include "Interview Completed".
+            $applicationUpdated = $applicationModel->update($interview['application_id'], ['status' => 'Under Review']);
+            if (!$applicationUpdated) {
+                $warnings[] = 'Application status was not updated.';
+            }
+        } catch (Exception $e) {
+            $warnings[] = 'Application status update failed.';
+        }
 
         $totalPoints = (int) $payload['technical_skills']
             + (int) $payload['problem_solving']
@@ -119,7 +158,8 @@ class ConductInterview extends Controller
         echo json_encode([
             'success' => true,
             'message' => 'Interview feedback submitted successfully.',
-            'total_points' => $totalPoints
+            'total_points' => $totalPoints,
+            'warnings' => $warnings
         ]);
         exit;
     }

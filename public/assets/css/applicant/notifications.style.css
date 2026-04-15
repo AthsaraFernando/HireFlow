@@ -1,0 +1,210 @@
+.notifications-content {
+    padding: 32px;
+    background: #f8fafc;
+    min-height: calc(100vh - 96px);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.notifications-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 24px;
+    padding: 28px;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 55%, #334155 100%);
+    color: #fff;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+}
+
+.hero-kicker {
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.75rem;
+    color: rgba(226, 232, 240, 0.75);
+}
+
+.notifications-hero h2 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+.hero-copy {
+    margin: 10px 0 0;
+    max-width: 620px;
+    color: rgba(226, 232, 240, 0.88);
+    line-height: 1.6;
+}
+
+.notifications-summary {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.summary-card {
+    min-width: 180px;
+    border-radius: 20px;
+    padding: 18px 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+}
+
+.summary-value {
+    font-size: 2rem;
+    font-weight: 800;
+}
+
+.summary-label {
+    font-size: 0.88rem;
+    color: rgba(226, 232, 240, 0.82);
+}
+
+.notifications-panel {
+    background: #fff;
+    border-radius: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+    padding: 24px;
+}
+
+.notifications-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 18px;
+}
+
+.notification-card {
+    border-radius: 20px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.notification-card.read {
+    opacity: 0.72;
+    background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.notification-card.read h3,
+.notification-card.read .notification-message {
+    color: #64748b;
+}
+
+.notification-card.interview {
+    border-top: 4px solid #3b82f6;
+}
+
+.notification-card.feedback {
+    border-top: 4px solid #10b981;
+}
+
+.notification-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.notification-eyebrow {
+    margin: 0 0 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+    color: #64748b;
+}
+
+.notification-card h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #0f172a;
+}
+
+.notification-type {
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.notification-type.success { background: #dcfce7; color: #166534; }
+.notification-type.warning { background: #fef3c7; color: #92400e; }
+.notification-type.error { background: #fee2e2; color: #991b1b; }
+.notification-type.info { background: #dbeafe; color: #1d4ed8; }
+
+.notification-message {
+    margin: 0;
+    color: #475569;
+    line-height: 1.65;
+}
+
+.notification-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: #64748b;
+    padding-top: 4px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.notification-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.notification-delete {
+    border-color: #e2e8f0;
+    color: #475569;
+}
+
+.notification-delete:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.empty-state {
+    padding: 48px 24px;
+    border-radius: 22px;
+    border: 1px dashed #cbd5e1;
+    text-align: center;
+    background: #f8fafc;
+}
+
+.empty-state h3 {
+    margin: 0 0 10px;
+    font-size: 1.35rem;
+    color: #0f172a;
+}
+
+.empty-state p {
+    margin: 0 auto 20px;
+    max-width: 540px;
+    color: #64748b;
+    line-height: 1.65;
+}
+
+@media (max-width: 900px) {
+    .notifications-hero {
+        flex-direction: column;
+    }
+
+    .summary-card {
+        min-width: 0;
+        width: 100%;
+    }
+}
