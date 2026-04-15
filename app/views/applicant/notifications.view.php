@@ -74,15 +74,58 @@
                         <a href="<?= ROOT ?>/applicant/interviews" class="btn btn-primary">Go to interview schedule</a>
                     </div>
                 <?php else: ?>
+                    <?php
+                    $resolveNotificationTag = function (array $notification): array {
+                        $title = strtolower((string)($notification['title'] ?? ''));
+                        $message = strtolower((string)($notification['message'] ?? ''));
+                        $type = strtolower((string)($notification['type'] ?? 'info'));
+                        $text = $title . ' ' . $message;
+
+                        if (strpos($text, 'reject') !== false) {
+                            return ['label' => 'Rejected', 'class' => 'error'];
+                        }
+
+                        if (strpos($text, 'hire') !== false || strpos($text, 'offer') !== false) {
+                            return ['label' => 'Hired', 'class' => 'success'];
+                        }
+
+                        if (strpos($text, 'shortlist') !== false) {
+                            return ['label' => 'Shortlisted', 'class' => 'success'];
+                        }
+
+                        if (strpos($text, 'cancel') !== false) {
+                            return ['label' => 'Canceled', 'class' => 'warning'];
+                        }
+
+                        if (strpos($text, 'reschedule') !== false) {
+                            return ['label' => 'Rescheduled', 'class' => 'info'];
+                        }
+
+                        if (strpos($text, 'schedule') !== false) {
+                            return ['label' => 'Scheduled', 'class' => 'info'];
+                        }
+
+                        if ($type === 'error' || $type === 'warning') {
+                            return ['label' => 'Rejected', 'class' => 'error'];
+                        }
+
+                        if ($type === 'success') {
+                            return ['label' => 'Hired', 'class' => 'success'];
+                        }
+
+                        return ['label' => 'Update', 'class' => 'info'];
+                    };
+                    ?>
                     <div class="notifications-grid" id="notificationsGrid">
                         <?php foreach ($notifications as $notification): ?>
+                            <?php $tag = $resolveNotificationTag($notification); ?>
                             <article class="notification-card <?= htmlspecialchars($notification['category'] ?? 'interview') ?> <?= !empty($notification['is_read']) ? 'read' : 'unread' ?>" data-notification-id="<?= (int)$notification['id'] ?>">
                                 <div class="notification-card-header">
                                     <div>
                                         <p class="notification-eyebrow"><?= htmlspecialchars(ucfirst($notification['category'] ?? 'interview')) ?></p>
                                         <h3><?= htmlspecialchars($notification['title']) ?></h3>
                                     </div>
-                                    <span class="notification-type <?= htmlspecialchars($notification['type']) ?>"><?= htmlspecialchars($notification['type']) ?></span>
+                                    <span class="notification-type <?= htmlspecialchars($tag['class']) ?>"><?= htmlspecialchars($tag['label']) ?></span>
                                 </div>
 
                                 <p class="notification-message"><?= htmlspecialchars($notification['message']) ?></p>

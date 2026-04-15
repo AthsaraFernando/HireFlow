@@ -295,11 +295,54 @@ $notificationDeleteUrl = ROOT . '/applicant/notifications/delete';
                 '"': '&quot;'
             }[char]));
 
+            const getNotificationTag = (notification) => {
+                const title = String(notification.title || '').toLowerCase();
+                const message = String(notification.message || '').toLowerCase();
+                const type = String(notification.type || 'info').toLowerCase();
+                const text = `${title} ${message}`;
+
+                if (text.includes('reject')) {
+                    return { label: 'Rejected', className: 'error' };
+                }
+
+                if (text.includes('hire') || text.includes('offer')) {
+                    return { label: 'Hired', className: 'success' };
+                }
+
+                if (text.includes('shortlist')) {
+                    return { label: 'Shortlisted', className: 'success' };
+                }
+
+                if (text.includes('cancel')) {
+                    return { label: 'Canceled', className: 'warning' };
+                }
+
+                if (text.includes('reschedule')) {
+                    return { label: 'Rescheduled', className: 'info' };
+                }
+
+                if (text.includes('schedule')) {
+                    return { label: 'Scheduled', className: 'info' };
+                }
+
+                if (type === 'error' || type === 'warning') {
+                    return { label: 'Rejected', className: 'error' };
+                }
+
+                if (type === 'success') {
+                    return { label: 'Hired', className: 'success' };
+                }
+
+                return { label: 'Update', className: 'info' };
+            };
+
             const renderNotification = (notification) => {
                 const id = Number(notification.id || 0);
                 const title = escapeHtml(notification.title || 'Notification');
                 const message = escapeHtml(notification.message || '');
-                const type = escapeHtml(notification.type || 'info');
+                const tag = getNotificationTag(notification);
+                const typeClass = escapeHtml(tag.className);
+                const typeLabel = escapeHtml(tag.label);
                 const createdAt = escapeHtml(notification.created_at_display || '');
                 const isRead = Boolean(Number(notification.is_read ? 1 : 0));
                 const link = escapeHtml(notification.link || '#');
@@ -309,7 +352,7 @@ $notificationDeleteUrl = ROOT . '/applicant/notifications/delete';
                     <div class="applicant-notification-item ${isRead ? 'read' : 'unread'}" data-notification-id="${id}" data-is-read="${isRead ? '1' : '0'}">
                         <div class="applicant-notification-item-header">
                             <h5 class="applicant-notification-title">${title}</h5>
-                            <span class="applicant-notification-type ${type}">${type}</span>
+                            <span class="applicant-notification-type ${typeClass}">${typeLabel}</span>
                         </div>
                         <p class="applicant-notification-message">${message}</p>
                         <div class="applicant-notification-meta">
