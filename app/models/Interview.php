@@ -76,7 +76,7 @@ class Interview
                   LEFT JOIN users u ON i.interviewer_id = u.id
                   WHERE a.applicant_id = ?
                   AND i.scheduled_date >= CURDATE()
-                  AND i.status = 'Scheduled'
+                  AND LOWER(i.status) IN ('pending', 'scheduled', 'rescheduled')
                   ORDER BY i.scheduled_date ASC, i.scheduled_time ASC
                   LIMIT 5";
 
@@ -86,8 +86,8 @@ class Interview
     public function getInterviewCount($user_id)
     {
         $query = "SELECT COUNT(*) as total_interviews,
-                         SUM(CASE WHEN i.status = 'Scheduled' AND i.scheduled_date >= CURDATE() THEN 1 ELSE 0 END) as upcoming_interviews,
-                         SUM(CASE WHEN i.status = 'Completed' THEN 1 ELSE 0 END) as completed_interviews
+                         SUM(CASE WHEN LOWER(i.status) IN ('pending', 'scheduled', 'rescheduled') AND i.scheduled_date >= CURDATE() THEN 1 ELSE 0 END) as upcoming_interviews,
+                         SUM(CASE WHEN LOWER(i.status) = 'completed' THEN 1 ELSE 0 END) as completed_interviews
                   FROM interviews i 
                   JOIN applications a ON i.application_id = a.id
                   WHERE a.applicant_id = ?";

@@ -34,7 +34,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                    <a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="nav-link">
                         <span class="nav-text">Saved Jobs</span>
                     </a>
                 </li>
@@ -118,13 +118,13 @@
                             <span class="salary-value"><?= $job['salary'] ?></span>
                         </div>
                         <?php if(!$job['is_saved']): ?>
-                            <form method="POST" action="<?= ROOT ?>/applicant/savedJobs/save" class="details-save-form">
+                            <form method="POST" action="<?= ROOT ?>/applicant/jobs/savedJobs/save" class="details-save-form">
                                 <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
                                 <input type="hidden" name="return_to" value="applicant/jobs/details/<?= (int)$job['id'] ?>">
                                 <button type="submit" class="btn btn-outline btn-large">Save Job</button>
                             </form>
                         <?php else: ?>
-                            <a href="<?= ROOT ?>/applicant/savedJobs" class="btn btn-outline btn-large">Saved Job</a>
+                            <a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="btn btn-outline btn-large">Saved Job</a>
                         <?php endif; ?>
                         <?php if($job['has_applied']): ?>
                             <div class="btn btn-secondary btn-large" style="cursor: default; text-align: center;">

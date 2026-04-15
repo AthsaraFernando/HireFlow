@@ -21,7 +21,7 @@
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/dashboard" class="nav-link"><span class="nav-text">Dashboard</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/jobs" class="nav-link"><span class="nav-text">Browse Jobs</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/applications" class="nav-link"><span class="nav-text">My Applications</span></a></li>
-                <li class="nav-item"><a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link active"><span class="nav-text">Saved Jobs</span></a></li>
+                <li class="nav-item"><a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="nav-link active"><span class="nav-text">Saved Jobs</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/interviews" class="nav-link"><span class="nav-text">Interview Schedule</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/interviews/feedback" class="nav-link"><span class="nav-text">Interview Feedback</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/profile" class="nav-link"><span class="nav-text">My Profile</span></a></li>
@@ -86,7 +86,7 @@
 
                             <p class="job-description"><?= htmlspecialchars(mb_substr($saved_job['description'], 0, 160)) ?><?= mb_strlen($saved_job['description']) > 160 ? '...' : '' ?></p>
 
-                            <form method="POST" action="<?= ROOT ?>/applicant/savedJobs/updateNote/<?= (int)$saved_job['id'] ?>" class="note-form">
+                            <form method="POST" action="<?= ROOT ?>/applicant/jobs/savedJobs/updateNote/<?= (int)$saved_job['id'] ?>" class="note-form">
                                 <label for="note_<?= (int)$saved_job['id'] ?>">My Note</label>
                                 <textarea id="note_<?= (int)$saved_job['id'] ?>" name="note" rows="3"><?= htmlspecialchars($saved_job['note'] ?? '') ?></textarea>
                                 <button type="submit" class="btn btn-outline action-btn">Update Note</button>
@@ -101,7 +101,7 @@
                                 <?php else: ?>
                                     <span class="btn btn-disabled action-btn action-static" title="Application form not yet available">Opening Soon</span>
                                 <?php endif; ?>
-                                <form method="POST" action="<?= ROOT ?>/applicant/savedJobs/delete/<?= (int)$saved_job['id'] ?>" onsubmit="return confirm('Remove this job from your saved list?');">
+                                <form method="POST" action="<?= ROOT ?>/applicant/jobs/savedJobs/delete/<?= (int)$saved_job['id'] ?>" onsubmit="return confirm('Remove this job from your saved list?');">
                                     <button type="submit" class="btn btn-danger action-btn">Remove</button>
                                 </form>
                             </div>

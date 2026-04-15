@@ -23,15 +23,25 @@ if (session_status() === PHP_SESSION_NONE) {
 spl_autoload_register(function ($className) {
     $modelPath = "../app/models/" . ucfirst($className) . ".php";
     $corePath = "../app/core/" . ucfirst($className) . ".php";
+    $coresPath = "../app/cores/" . ucfirst($className) . ".php";
     
     if (file_exists($modelPath)) {
         require $modelPath;
     } elseif (file_exists($corePath)) {
         require $corePath;
+    } elseif (file_exists($coresPath)) {
+        require $coresPath;
     }
 });
 
 // Use __DIR__ to ensure we load project files, not system files
+
+// Load shared applicant trait explicitly because traits must be available
+// before controller classes that `use` them are parsed.
+$applicantTraitPath = dirname(__DIR__) . '/core/ApplicantBaseTrait.php';
+if (file_exists($applicantTraitPath)) {
+    require_once $applicantTraitPath;
+}
 
 // Load Composer autoloader (for PHPMailer and other vendor packages)
 $composerAutoload = dirname(__DIR__, 2) . '/vendor/autoload.php';

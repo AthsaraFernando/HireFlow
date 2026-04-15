@@ -7,6 +7,8 @@ class Application
     protected $allowedColumns = [
         'job_id',
         'applicant_id',
+        'form_id',
+        'form_data',
         'cover_letter',
         'resume_path',
         'status',
@@ -87,6 +89,10 @@ class Application
         if ($this->hasAppliedToJob($data['applicant_id'], $data['job_id'])) {
             $this->errors['duplicate'] = "You have already applied to this job";
             return false;
+        }
+
+        if (array_key_exists('form_data', $data) && is_array($data['form_data'])) {
+            $data['form_data'] = json_encode($data['form_data'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         }
 
         if ($this->validate($data)) {
