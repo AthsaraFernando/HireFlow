@@ -74,6 +74,7 @@
                 <p class="page-subtitle"><?= $job['company'] ?> • <?= $job['location'] ?></p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name">John Smith</span>
                     <div class="user-avatar">JS</div>

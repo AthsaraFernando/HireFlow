@@ -67,6 +67,7 @@ class ConductInterview extends Controller
         $evaluationModel = new InterviewEvaluation();
         $interviewModel = new Interview();
         $applicationModel = new Application();
+        $notificationModel = new Notification();
 
         $interview = $evaluationModel->getInterviewForEvaluation((int) $interview_id);
         if (!$interview) {
@@ -104,6 +105,26 @@ class ConductInterview extends Controller
                 'message' => 'Failed to save interview feedback.'
             ]);
             exit;
+        }
+
+        $recommendation = $payload['recommendation'] ?? '';
+        if (in_array($recommendation, ['Hire', 'Reject'], true)) {
+            $jobTitle = $interview['job_title'] ?? 'your application';
+            if ($recommendation === 'Hire') {
+                $notificationModel->createForApplication(
+                    $interview['application_id'],
+                    'Interview Feedback: Hire',
+                    'Your interview feedback for ' . $jobTitle . ' recommends you for hire.',
+                    'success'
+                );
+            } else {
+                $notificationModel->createForApplication(
+                    $interview['application_id'],
+                    'Interview Feedback: Reject',
+                    'Your interview feedback for ' . $jobTitle . ' recommends rejection.',
+                    'error'
+                );
+            }
         }
 
         $warnings = [];

@@ -19,6 +19,8 @@ class Applications extends Controller
             $allowedStatuses = ['Shortlisted', 'Rejected', 'Offered'];
             $applicationId = (int)($_POST['application_id'] ?? 0);
             $newStatus = trim($_POST['status'] ?? '');
+            $notificationModel = new Notification();
+            $applicationLookup = new Application();
 
             if (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
                 $_SESSION['error'] = 'Invalid request. Please try again.';
@@ -36,6 +38,34 @@ class Applications extends Controller
             );
 
             if ($updated !== false) {
+                $applicationDetails = $applicationLookup->getApplicationById($applicationId);
+                if ($applicationDetails) {
+                    $jobTitle = $applicationDetails['job_title'] ?? 'your application';
+
+                    if ($newStatus === 'Shortlisted') {
+                        $notificationModel->createForApplication(
+                            $applicationId,
+                            'Application Shortlisted',
+                            'Your application for ' . $jobTitle . ' has been shortlisted.',
+                            'success'
+                        );
+                    } elseif ($newStatus === 'Rejected') {
+                        $notificationModel->createForApplication(
+                            $applicationId,
+                            'Application Rejected',
+                            'Your application for ' . $jobTitle . ' has been rejected.',
+                            'warning'
+                        );
+                    } elseif ($newStatus === 'Offered') {
+                        $notificationModel->createForApplication(
+                            $applicationId,
+                            'Job Offer Extended',
+                            'A job offer has been extended for your application for ' . $jobTitle . '.',
+                            'success'
+                        );
+                    }
+                }
+
                 $_SESSION['success'] = 'Application status updated successfully.';
             } else {
                 $_SESSION['error'] = 'Failed to update application status.';

@@ -51,6 +51,7 @@
                 <p class="page-subtitle">Review detailed evaluations from completed interviews.</p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name"><?= htmlspecialchars($user['name'] ?? 'User') ?></span>
                     <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'U', 0, 2)) ?></div>
@@ -70,7 +71,7 @@
 
             <div class="cards-grid" id="feedbackContainer" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:20px;">
                 <?php foreach (($feedbacks ?? []) as $feedback): ?>
-                    <article class="feedback-card" id="feedback-card-<?= (int)$feedback['id'] ?>" data-status="<?= strtolower($feedback['recommendation'] ?? 'pending') ?>" data-feedback-id="<?= (int)$feedback['id'] ?>" data-interview-id="<?= (int)$feedback['interview_id'] ?>">
+                    <article id="feedback-<?= (int)$feedback['id'] ?>" class="feedback-card" data-status="<?= strtolower($feedback['recommendation'] ?? 'pending') ?>" data-feedback-id="<?= (int)$feedback['id'] ?>" data-interview-id="<?= (int)$feedback['interview_id'] ?>" style="scroll-margin-top:96px;">
                         <div class="card-header">
                             <div class="company-info">
                                 <div class="company-logo"><?= strtoupper(substr($feedback['job_title'] ?? 'FB', 0, 2)) ?></div>

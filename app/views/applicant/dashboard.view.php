@@ -69,6 +69,7 @@
                 <p class="page-subtitle">Welcome back, <?= $user['name'] ?>! Here's your application overview</p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name"><?= $user['name'] ?></span>
                     <div class="user-avatar"><?= strtoupper(substr($user['name'], 0, 2)) ?></div>

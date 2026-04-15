@@ -99,6 +99,7 @@
                     <span class="user-name"><?= esc($user['name'] ?? 'Applicant') ?></span>
                     <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'A', 0, 1)) ?></div>
                 </div>
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
             </div>
         </header>
 

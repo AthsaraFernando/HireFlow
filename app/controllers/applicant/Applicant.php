@@ -116,8 +116,9 @@ class Applicant extends Controller
             }
         }
 
-        // Get unread notifications count
-        $data['unread_notifications'] = $notificationModel->getUnreadCount($user_id);
+        // Sync and get unread notifications count from notifications table.
+        $notificationModel->syncApplicantNotifications($user_id);
+        $data['unread_notifications'] = (int)$notificationModel->getUnreadCount($user_id);
 
         $this->view('applicant/dashboard', $data);
     }
@@ -770,20 +771,52 @@ class Applicant extends Controller
         
         // Submit application
         if ($applicationModel->submitApplication($data)) {
-            // Create notification
-            $notificationModel->insert([
-                'user_id' => $user_id,
-                'title' => 'Application Submitted',
-                'message' => 'Your job application has been submitted successfully.',
-                'type' => 'success'
-            ]);
-            
             $_SESSION['success'] = "Your application has been submitted successfully!";
             redirect('applicant/applications');
         } else {
             $_SESSION['error'] = "Failed to submit application. Please try again.";
             redirect('applicant/applications/apply?job_id=' . $job_id);
         }
+    }
+
+    private function buildApplicantNotificationFeed($user_id, $limit = 20)
+    {
+        $notificationModel = new Notification();
+        $notificationModel->syncApplicantNotifications($user_id);
+        $rows = $notificationModel->getUserNotifications($user_id, $limit);
+        $notifications = [];
+
+        if ($rows && is_array($rows)) {
+            foreach ($rows as $row) {
+                $title = trim((string)($row['title'] ?? 'Notification'));
+                $message = trim((string)($row['message'] ?? ''));
+                $type = trim((string)($row['type'] ?? 'info'));
+                $isRead = ((int)($row['is_read'] ?? 0)) === 1;
+                $createdAt = $row['created_at'] ?? null;
+                if (empty($createdAt)) {
+                    $createdAt = date('Y-m-d H:i:s');
+                }
+
+                $isFeedback = stripos($title, 'Feedback') !== false;
+                $category = $isFeedback ? 'feedback' : 'interview';
+                $link = $isFeedback ? ROOT . '/applicant/interviews/feedback' : ROOT . '/applicant/interviews';
+
+                $notifications[] = [
+                    'id' => (int)($row['id'] ?? 0),
+                    'category' => $category,
+                    'title' => $title,
+                    'message' => $message,
+                    'type' => in_array($type, ['info', 'success', 'warning', 'error'], true) ? $type : 'info',
+                    'is_read' => $isRead,
+                    'link' => $link,
+                    'link_label' => $isFeedback ? 'Open feedback' : 'Open interview',
+                    'created_at' => $createdAt,
+                    'created_at_display' => date('M d, Y g:i A', strtotime($createdAt)),
+                ];
+            }
+        }
+
+        return $notifications;
     }
 
     private function getApplicationFormCategoryLabels()
@@ -1635,16 +1668,62 @@ class Applicant extends Controller
         
         $notificationModel = new Notification();
         $user_id = Auth::user_id();
-        
+        $notifications = $this->buildApplicantNotificationFeed($user_id, 50);
+
         if ($action === 'mark-read' && isset($_POST['notification_id'])) {
-            $notificationModel->markAsRead($_POST['notification_id']);
-            echo json_encode(['success' => true]);
+            header('Content-Type: application/json; charset=utf-8');
+            $notification_id = (int)$_POST['notification_id'];
+
+            if ($notification_id <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Invalid notification id']);
+                return;
+            }
+
+            $ok = $notificationModel->markAsReadForUser($notification_id, $user_id);
+            $unreadCount = (int)$notificationModel->getUnreadCount($user_id);
+
+            echo json_encode([
+                'success' => $ok !== false,
+                'unread_count' => $unreadCount
+            ]);
+            return;
+        }
+
+        if ($action === 'delete' && isset($_POST['notification_id'])) {
+            header('Content-Type: application/json; charset=utf-8');
+            $notification_id = (int)$_POST['notification_id'];
+
+            if ($notification_id <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Invalid notification id']);
+                return;
+            }
+
+            $ok = $notificationModel->deleteForUser($notification_id, $user_id);
+            $unreadCount = (int)$notificationModel->getUnreadCount($user_id);
+
+            echo json_encode([
+                'success' => $ok !== false,
+                'unread_count' => $unreadCount
+            ]);
+            return;
+        }
+
+        if ($action === 'feed') {
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'success' => true,
+                'count' => count($notifications),
+                'unread_count' => (int)$notificationModel->getUnreadCount($user_id),
+                'notifications' => $notifications
+            ]);
             return;
         }
         
         $data = [];
-        $data['notifications'] = $notificationModel->getUserNotifications($user_id, 50);
-        $data['unread_count'] = $notificationModel->getUnreadCount($user_id);
+        $data['user'] = $this->getUserData($user_id);
+        $data['notifications'] = $notifications;
+        $data['unread_count'] = (int)$notificationModel->getUnreadCount($user_id);
+        $data['total_count'] = count($notifications);
 
         $this->view('applicant/notifications', $data);
     }

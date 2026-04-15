@@ -68,6 +68,7 @@ class InterviewSchedule extends Controller
             
             try {
                 $interview = new Interview();
+                $notificationModel = new Notification();
                 
                 // Get POST data
                 $application_id = $_POST['application_id'] ?? '';
@@ -126,6 +127,18 @@ class InterviewSchedule extends Controller
                         $statusUpdated = $application->update($application_id, ['status' => 'Interview Scheduled']);
 
                         if ($statusUpdated) {
+                            $applicationDetails = $application->getApplicationById($application_id);
+                            $jobTitle = $applicationDetails['job_title'] ?? 'your application';
+                            $scheduledDateLabel = date('M j, Y', strtotime($scheduled_date));
+                            $scheduledTimeLabel = date('g:i A', strtotime($scheduled_time));
+
+                            $notificationModel->createForApplication(
+                                $application_id,
+                                'Interview Scheduled',
+                                'Your interview for ' . $jobTitle . ' has been scheduled for ' . $scheduledDateLabel . ' at ' . $scheduledTimeLabel . '.',
+                                'success'
+                            );
+
                             echo json_encode(['success' => true, 'message' => 'Interview scheduled successfully']);
                         } else {
                             $errorMessage = 'Interview was created, but application status update failed.';
@@ -191,6 +204,7 @@ class InterviewSchedule extends Controller
             
             try {
                 $interview = new Interview();
+                $notificationModel = new Notification();
                 
                 // Get POST data
                 $interviewer_id = $_POST['interviewer_id'] ?? '';
@@ -226,6 +240,19 @@ class InterviewSchedule extends Controller
                 $result = $interview->updateInterview($id, $updateData);
                 
                 if ($result) {
+                    $interviewDetails = $interview->getInterviewById($id);
+                    $applicationDetails = $interviewDetails ? (new Application())->getApplicationById((int)$interviewDetails['application_id']) : null;
+                    $jobTitle = $applicationDetails['job_title'] ?? 'your application';
+                    $scheduledDateLabel = date('M j, Y', strtotime($scheduled_date));
+                    $scheduledTimeLabel = date('g:i A', strtotime($scheduled_time));
+
+                    $notificationModel->createForApplication(
+                        $interviewDetails['application_id'],
+                        'Interview Rescheduled',
+                        'Your interview for ' . $jobTitle . ' has been rescheduled to ' . $scheduledDateLabel . ' at ' . $scheduledTimeLabel . '.',
+                        'info'
+                    );
+
                     echo json_encode(['success' => true, 'message' => 'Interview rescheduled successfully']);
                 } else {
                     $errorMessage = 'Failed to reschedule interview.';
@@ -255,6 +282,7 @@ class InterviewSchedule extends Controller
             
             try {
                 $interview = new Interview();
+                $notificationModel = new Notification();
                 
                 // Get interview details to update application status
                 $interviewData = $interview->getInterviewById($id);
@@ -267,6 +295,14 @@ class InterviewSchedule extends Controller
                         // Update application status back to 'Shortlisted'
                         $application = new Application();
                         $application->update($interviewData['application_id'], ['status' => 'Shortlisted']);
+
+                        $jobTitle = $interviewData['job_title'] ?? 'your application';
+                        $notificationModel->createForApplication(
+                            $interviewData['application_id'],
+                            'Interview Canceled',
+                            'Your interview for ' . $jobTitle . ' has been canceled.',
+                            'warning'
+                        );
                         
                         echo json_encode(['success' => true, 'message' => 'Interview deleted successfully']);
                     } else {
