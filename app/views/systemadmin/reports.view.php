@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Reports - HireFlow Admin</title>
+    <title>System Reports</title>
     <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/main.css">
     <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/components/input.css">
     <link rel="stylesheet" type="text/css" href="<?= ROOT ?>/assets/css/components/button.css">
@@ -84,6 +84,7 @@
             font-size: 0.9em;
             opacity: 0.9;
             color: white;
+            padding: 10px;
         }
 
         .chart-container {
@@ -227,7 +228,7 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
-            <p class="brand-subtitle">System Admin</p>
+    
         </div>
 
         <nav class="sidebar-nav">
@@ -258,6 +259,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/announcements" class="nav-link">
+                        <span class="nav-text">Announcements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -280,9 +286,7 @@
             </div>
 
             <div class="header-right">
-                <!-- <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div> -->
+             
 
                 <div class="header-user">
                     <div class="user-info">
@@ -304,8 +308,7 @@
                     }
                     ?>
                     <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt="" class="profile_picture">
-                    <!-- <div class="user-avatar">
-                    </div> -->
+                   
                 </div>
             </div>
         </header>
@@ -313,8 +316,7 @@
         <div class="dashboard-content">
             <div class="reports-container" style="padding: 30px; margin: 0; max-width: none;">
                 <div class="page-header">
-                    <h1 style="color: white;">System Reports</h1>
-                    <p style="padding:20px; color: white;">Comprehensive system analytics and monitoring reports</p>
+                    
                 </div>
 
                 <!-- Report Filters -->
@@ -414,26 +416,6 @@
                             </div>
                         </div>
 
-                        <!-- <table class="reports-table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Logins</th>
-                                    <th>New Registrations</th>
-                                    <th>Applications Submitted</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($data['user_activity'] as $activity): ?>
-                                    <tr>
-                                        <td><?= date('M d, Y', strtotime($activity['log_date'])) ?></td>
-                                        <td><?= $activity['logins'] ?></td>
-                                        <td><?= $activity['registrations'] ?></td>
-                                        <td><?= $activity['applications_submitted'] ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table> -->
                     </div>
 
                     <div class="reports-section">
@@ -527,7 +509,7 @@
                     </div>
 
                     <div class="reports-section">
-                        <h2 class="section-title">Report 4</h2>
+                        <h2 class="section-title">Report</h2>
                         <div class="export-buttons">
 
                             <button class="btn btn-outline-secondary" onclick="downloadData('')">
@@ -606,7 +588,7 @@
                         userChart1.destroy();
                     }
 
-                    userChart1 = new Chart(ctx, {   // store in global variable
+                    userChart1 = new Chart(ctx, {   
                         type: 'line',
                         data: {
                             labels: labels,
@@ -677,7 +659,7 @@
                         userChart3.destroy();
                     }
 
-                    userChart3 = new Chart(ctx, {   // store in global variable
+                    userChart3 = new Chart(ctx, {   
                         type: 'bar',
                         data: {
                             labels: labels,
@@ -715,7 +697,7 @@
 
                     const ctx = document.getElementById('myChart4').getContext('2d');
 
-                    userChart4 = new Chart(ctx, {   // store in global variable
+                    userChart4 = new Chart(ctx, {   
                         type: 'pie',
                         data: {
                             labels: labels,
@@ -793,7 +775,7 @@
 
                 function exportChart(chartType) {
                     showToast(`Exporting ${chartType} chart...`, 'info');
-                    // In real implementation, this would export chart as image
+                    
                 }
 
                 function downloadData(dataType) {
@@ -857,7 +839,7 @@
                             console.log('Unknown data type:', dataType);
                     }
 
-                    // In real implementation, this would download CSV/JSON data
+                   
                 }
 
                 function showToast(message, type) {
