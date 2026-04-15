@@ -4,7 +4,251 @@ class Report
 {
     use Model;
 
+    protected $table = 'recruitment_reports';
+
+    protected $allowedColumns = [
+        'title',
+        'from_date',
+        'to_date',
+        'report_type',
+        'generated_by',
+        'is_deleted',
+        'deleted_by',
+        'deleted_at',
+        'created_at',
+        'updated_at'
+    ];
+
     private $tableSupportCache = [];
+
+    public function getApplicantsByDateRangeAndType($fromDate, $toDate, $type, $selectedIds = [])
+    {
+        $query = "SELECT
+                    a.id as application_id,
+                    a.status,
+                    DATE(a.applied_at) as applied_date,
+                    u.full_name as applicant_name,
+                    u.email,
+                    u.phone,
+                    jp.title as job_title
+                  FROM applications a
+                  JOIN users u ON u.id = a.applicant_id
+                  JOIN job_posts jp ON jp.id = a.job_id
+                  WHERE DATE(a.applied_at) BETWEEN :from_date AND :to_date";
+
+        $params = [
+            'from_date' => $fromDate,
+            'to_date' => $toDate
+        ];
+
+        $statusCondition = $this->buildStatusFilterSql($type, 'a.status');
+        if ($statusCondition !== '') {
+            $query .= " AND {$statusCondition}";
+        }
+
+        if (!empty($selectedIds)) {
+            $idPlaceholders = [];
+            foreach ($selectedIds as $index => $applicationId) {
+                $key = 'app_id_' . $index;
+                $idPlaceholders[] = ':' . $key;
+                $params[$key] = (int) $applicationId;
+            }
+            $query .= " AND a.id IN (" . implode(', ', $idPlaceholders) . ")";
+        }
+
+        $query .= " ORDER BY a.applied_at DESC";
+
+        return $this->query($query, $params);
+    }
+
+    public function getSummaryCounts($fromDate, $toDate)
+    {
+        $query = "SELECT
+                    COUNT(*) as total_applications,
+                    SUM(CASE WHEN status = 'Applied' THEN 1 ELSE 0 END) as applied_count,
+                    SUM(CASE WHEN status = 'Shortlisted' THEN 1 ELSE 0 END) as shortlisted_count,
+                    SUM(CASE WHEN status = 'Interview Scheduled' THEN 1 ELSE 0 END) as interview_scheduled_count,
+                    SUM(CASE WHEN status = 'Offered' THEN 1 ELSE 0 END) as offered_count,
+                    SUM(CASE WHEN status = 'Rejected' THEN 1 ELSE 0 END) as rejected_count
+                  FROM applications
+                  WHERE DATE(applied_at) BETWEEN :from_date AND :to_date";
+
+        return $this->get_row($query, [
+            'from_date' => $fromDate,
+            'to_date' => $toDate
+        ]);
+    }
+
+    public function getTypeCount($fromDate, $toDate, $type)
+    {
+        if (strtolower($type) === 'all') {
+            $summary = $this->getSummaryCounts($fromDate, $toDate);
+            return (int) ($summary['total_applications'] ?? 0);
+        }
+
+        $query = "SELECT COUNT(*) as total
+                  FROM applications
+                  WHERE DATE(applied_at) BETWEEN :from_date AND :to_date";
+
+        $statusCondition = $this->buildStatusFilterSql($type, 'status');
+        if ($statusCondition !== '') {
+            $query .= " AND {$statusCondition}";
+        }
+
+        $result = $this->get_row($query, [
+            'from_date' => $fromDate,
+            'to_date' => $toDate
+        ]);
+
+        return (int) ($result['total'] ?? 0);
+    }
+
+    public function createRecruitmentReport($payload, $selectedApplicantIds, $userId)
+    {
+        $reportId = $this->insert([
+            'title' => $payload['title'],
+            'from_date' => $payload['from_date'],
+            'to_date' => $payload['to_date'],
+            'report_type' => $payload['report_type'],
+            'generated_by' => (int) $userId,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        if (!$reportId) {
+            return false;
+        }
+
+        foreach ($selectedApplicantIds as $applicationId) {
+            $this->query(
+                "INSERT INTO recruitment_report_applications (report_id, application_id, created_at)
+                 VALUES (:report_id, :application_id, :created_at)",
+                [
+                    'report_id' => (int) $reportId,
+                    'application_id' => (int) $applicationId,
+                    'created_at' => date('Y-m-d H:i:s')
+                ]
+            );
+        }
+
+        return (int) $reportId;
+    }
+
+    public function updateRecruitmentReport($reportId, $payload, $selectedApplicantIds, $userId)
+    {
+        $updated = $this->update((int) $reportId, [
+            'title' => $payload['title'],
+            'from_date' => $payload['from_date'],
+            'to_date' => $payload['to_date'],
+            'report_type' => $payload['report_type'],
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+
+        if (!$updated) {
+            return false;
+        }
+
+        $this->query(
+            "DELETE FROM recruitment_report_applications WHERE report_id = :report_id",
+            ['report_id' => (int) $reportId]
+        );
+
+        foreach ($selectedApplicantIds as $applicationId) {
+            $this->query(
+                "INSERT INTO recruitment_report_applications (report_id, application_id, created_at)
+                 VALUES (:report_id, :application_id, :created_at)",
+                [
+                    'report_id' => (int) $reportId,
+                    'application_id' => (int) $applicationId,
+                    'created_at' => date('Y-m-d H:i:s')
+                ]
+            );
+        }
+
+        return true;
+    }
+
+    public function getSavedReports($userId)
+    {
+        $query = "SELECT
+                    rr.id,
+                    rr.title,
+                    rr.from_date,
+                    rr.to_date,
+                    rr.report_type,
+                    rr.created_at,
+                    rr.updated_at,
+                    COUNT(rra.id) as selected_count
+                  FROM recruitment_reports rr
+                  LEFT JOIN recruitment_report_applications rra ON rra.report_id = rr.id
+                  WHERE rr.generated_by = :user_id
+                  AND rr.is_deleted = 0
+                  GROUP BY rr.id
+                  ORDER BY rr.created_at DESC";
+
+        return $this->query($query, ['user_id' => (int) $userId]);
+    }
+
+    public function getSavedReportById($reportId, $userId)
+    {
+        $query = "SELECT id, title, from_date, to_date, report_type, generated_by, created_at, updated_at
+                  FROM recruitment_reports
+                  WHERE id = :report_id
+                  AND generated_by = :user_id
+                  AND is_deleted = 0
+                  LIMIT 1";
+
+        return $this->get_row($query, [
+            'report_id' => (int) $reportId,
+            'user_id' => (int) $userId
+        ]);
+    }
+
+    public function getSavedReportApplicationIds($reportId)
+    {
+        $rows = $this->query(
+            "SELECT application_id
+             FROM recruitment_report_applications
+             WHERE report_id = :report_id",
+            ['report_id' => (int) $reportId]
+        );
+
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        return array_map(static function ($row) {
+            return (int) $row['application_id'];
+        }, $rows);
+    }
+
+    public function softDeleteRecruitmentReport($reportId, $userId)
+    {
+        return $this->update((int) $reportId, [
+            'is_deleted' => 1,
+            'deleted_by' => (int) $userId,
+            'deleted_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s')
+        ]);
+    }
+
+    private function buildStatusFilterSql($type, $statusColumn = 'status')
+    {
+        $normalized = strtolower(trim((string) $type));
+
+        if ($normalized === 'all') {
+            return "{$statusColumn} IN ('Applied', 'Shortlisted', 'Interview Scheduled', 'Offered', 'Rejected')";
+        }
+
+        $map = [
+            'shortlisted' => "{$statusColumn} = 'Shortlisted'",
+            'interview_scheduled' => "{$statusColumn} = 'Interview Scheduled'",
+            'rejected' => "{$statusColumn} = 'Rejected'",
+            'offered' => "{$statusColumn} = 'Offered'"
+        ];
+
+        return $map[$normalized] ?? "{$statusColumn} IN ('Applied', 'Shortlisted', 'Interview Scheduled', 'Offered', 'Rejected')";
+    }
     
     /**
      * Get recruitment funnel statistics

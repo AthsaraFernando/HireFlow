@@ -11,91 +11,43 @@ class Dashboard extends Controller
         $data['errors'] = [];
         $data['success'] = '';
         $data['page_title'] = 'Recruitment Dashboard';
-        
-        // Dashboard metrics (sample data - replace with database queries)
+
+        $application = new Application();
+        $interview = new Interview();
+
+        // Dashboard metrics from real application statuses.
+        $metricsQuery = "SELECT
+                            SUM(CASE WHEN status = 'Under Review' THEN 1 ELSE 0 END) AS under_review_applications,
+                            SUM(CASE WHEN status = 'Shortlisted' THEN 1 ELSE 0 END) AS shortlisted_applications,
+                            SUM(CASE WHEN status = 'Interview Scheduled' THEN 1 ELSE 0 END) AS interview_scheduled_applications
+                         FROM applications";
+
+        $metricsResult = $application->get_row($metricsQuery);
         $data['metrics'] = [
-            'assigned_jobs' => 8,
-            'pending_applications' => 45,
-            'scheduled_interviews' => 12,
-            'candidates_evaluated' => 32,
-            'pending_feedback' => 6,
-            'shortlisted_candidates' => 18
+            'under_review_applications' => isset($metricsResult['under_review_applications']) ? (int)$metricsResult['under_review_applications'] : 0,
+            'shortlisted_applications' => isset($metricsResult['shortlisted_applications']) ? (int)$metricsResult['shortlisted_applications'] : 0,
+            'interview_scheduled_applications' => isset($metricsResult['interview_scheduled_applications']) ? (int)$metricsResult['interview_scheduled_applications'] : 0,
         ];
-        
-        // Recent activities
-        $data['recent_activities'] = [
-            [
-                'type' => 'application_review',
-                'description' => 'New application received for Senior Developer position',
-                'time' => '2 hours ago',
-                'priority' => 'high'
-            ],
-            [
-                'type' => 'interview_scheduled',
-                'description' => 'Interview scheduled with Sarah Johnson',
-                'time' => '4 hours ago',
-                'priority' => 'medium'
-            ],
-            [
-                'type' => 'candidate_shortlisted',
-                'description' => 'Mike Wilson shortlisted for Data Analyst role',
-                'time' => '1 day ago',
-                'priority' => 'low'
-            ]
-        ];
-        
-        // Assigned jobs summary
-        $data['assigned_jobs'] = [
-            [
-                'id' => 1,
-                'title' => 'Senior Software Developer',
-                'department' => 'Engineering',
-                'applications_count' => 23,
-                'pending_reviews' => 8,
-                'status' => 'active'
-            ],
-            [
-                'id' => 2,
-                'title' => 'Data Analyst',
-                'department' => 'Analytics',
-                'applications_count' => 15,
-                'pending_reviews' => 5,
-                'status' => 'active'
-            ],
-            [
-                'id' => 3,
-                'title' => 'UX Designer',
-                'department' => 'Design',
-                'applications_count' => 12,
-                'pending_reviews' => 3,
-                'status' => 'active'
-            ]
-        ];
-        
-        // Upcoming interviews
-        $data['upcoming_interviews'] = [
-            [
-                'candidate_name' => 'Alice Chen',
-                'position' => 'Senior Software Developer',
-                'scheduled_time' => '2025-09-01 10:00',
-                'type' => 'Technical Interview',
-                'status' => 'confirmed'
-            ],
-            [
-                'candidate_name' => 'Robert Kim',
-                'position' => 'Data Analyst',
-                'scheduled_time' => '2025-09-01 14:30',
-                'type' => 'HR Interview',
-                'status' => 'pending'
-            ],
-            [
-                'candidate_name' => 'Emily Davis',
-                'position' => 'UX Designer',
-                'scheduled_time' => '2025-09-02 09:00',
-                'type' => 'Portfolio Review',
-                'status' => 'confirmed'
-            ]
-        ];
+
+        // Upcoming interviews from database (future date/time, not completed/cancelled).
+        $upcomingInterviewsQuery = "SELECT
+                                        i.id,
+                                        u.full_name AS candidate_name,
+                                        jp.title AS position,
+                                        i.interview_type AS type,
+                                        i.status,
+                                        CONCAT(i.scheduled_date, ' ', i.scheduled_time) AS scheduled_time
+                                    FROM interviews i
+                                    JOIN applications a ON i.application_id = a.id
+                                    JOIN users u ON a.applicant_id = u.id
+                                    JOIN job_posts jp ON a.job_id = jp.id
+                                    WHERE CONCAT(i.scheduled_date, ' ', i.scheduled_time) >= NOW()
+                                      AND i.status NOT IN ('Completed', 'Cancelled')
+                                    ORDER BY i.scheduled_date ASC, i.scheduled_time ASC
+                                    LIMIT 8";
+
+        $upcomingInterviews = $interview->query($upcomingInterviewsQuery);
+        $data['upcoming_interviews'] = is_array($upcomingInterviews) ? $upcomingInterviews : [];
 
         $this->view('recruitment/dashboard', $data);
     }
