@@ -177,7 +177,8 @@ class App
     {
         $publicPages = [
             'home', 'signin', 'signup', 'signout', '_404',
-            'passwordreset', 'password-reset', 'admin-setup'
+            'passwordreset', 'password-reset', 'admin-setup',
+            'terms', 'privacy'
         ];
 
         if (empty($URL[0]) || in_array(strtolower($URL[0]), $publicPages)) {
