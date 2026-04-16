@@ -64,7 +64,7 @@ class JobPosts extends Controller
                     'location' => $job['location'],
                     'type' => $job['employment_type'],
                     'status' => $job['status'],
-                    'applications' => $job['applications_count'] ?? 0,
+                    'applications' => (int)($job['live_applications_count'] ?? 0),
                     'created_date' => date('Y-m-d', strtotime($job['created_at'])),
                     'deadline' => $job['deadline']
                 ];

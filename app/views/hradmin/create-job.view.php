@@ -209,16 +209,6 @@
                 </div>
             </div>
 
-            <!-- Benefits & Perks -->
-            <div class="form-section">
-                <h3 class="section-title">Benefits & Perks</h3>
-                <div class="form-group">
-                    <label for="benefits" class="form-label">Benefits Package</label>
-                    <textarea id="benefits" name="benefits" class="form-textarea" rows="4" 
-                              placeholder="• Health insurance&#10;• Retirement plans&#10;• Paid time off&#10;• Professional development opportunities"><?= $_POST['benefits'] ?? '' ?></textarea>
-                </div>
-            </div>
-
             <!-- Application Settings -->
             <div class="form-section">
                 <h3 class="section-title">Application Settings</h3>

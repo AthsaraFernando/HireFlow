@@ -280,6 +280,27 @@ class Applicant extends Controller
             redirect('applicant/jobs');
             return;
         }
+
+        $viewTrackerKey = 'applicant_job_view_tracker';
+        $viewKey = 'user_' . (int)$user_id . '_job_' . (int)$job['id'];
+        $viewCooldownSeconds = 1800;
+        $currentTime = time();
+        $lastViewedAt = isset($_SESSION[$viewTrackerKey][$viewKey]) ? (int)$_SESSION[$viewTrackerKey][$viewKey] : 0;
+
+        if (($currentTime - $lastViewedAt) >= $viewCooldownSeconds) {
+            if ($jobModel->incrementViewsCount((int)$job['id'])) {
+                if (!isset($_SESSION[$viewTrackerKey]) || !is_array($_SESSION[$viewTrackerKey])) {
+                    $_SESSION[$viewTrackerKey] = [];
+                }
+                $_SESSION[$viewTrackerKey][$viewKey] = $currentTime;
+
+                if (isset($job['views_count']) && is_numeric($job['views_count'])) {
+                    $job['views_count'] = (int)$job['views_count'] + 1;
+                } else {
+                    $job['views_count'] = 1;
+                }
+            }
+        }
         
         // Check if user has already applied
         $has_applied = $applicationModel->hasAppliedToJob($user_id, $job['id']);
