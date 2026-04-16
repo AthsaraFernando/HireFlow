@@ -40,11 +40,6 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/notifications" class="nav-link">
-                        <span class="nav-text">Notifications</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/recruitment/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -69,17 +64,11 @@
 
             <div class="header-right">
                 <a href="<?= ROOT ?>/announcements" class="btn btn-secondary">Announcements</a>
-                <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div>
-
                 <div class="header-user">
                     <div class="user-info">
                         <span class="user-name">
                             <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
                         <span class="user-role">Recruitment Manager</span>
-                    </div>
-                    <div class="user-avatar">
                     </div>
                 </div>
             </div>

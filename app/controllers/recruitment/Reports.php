@@ -206,6 +206,79 @@ class Reports extends Controller
         redirect('recruitment/reports?tab=created');
     }
 
+    public function download($id = null)
+    {
+        Auth::requireRole(3);
+
+        if (!$id) {
+            $_SESSION['error'] = 'Report not found.';
+            redirect('recruitment/reports?tab=created');
+            return;
+        }
+
+        $reportModel = new Report();
+        $userId = Auth::user_id();
+
+        $savedReport = $reportModel->getSavedReportById((int) $id, $userId);
+        if (!$savedReport) {
+            $_SESSION['error'] = 'Report not found.';
+            redirect('recruitment/reports?tab=created');
+            return;
+        }
+
+        $selectedApplicationIds = $reportModel->getSavedReportApplicationIds((int) $id);
+        if (empty($selectedApplicationIds)) {
+            $_SESSION['error'] = 'No applicants available in this report.';
+            redirect('recruitment/reports?tab=created');
+            return;
+        }
+
+        $reportTypeFilterKey = strtolower(str_replace(' ', '_', (string) ($savedReport['report_type'] ?? 'all')));
+        $rows = $reportModel->getApplicantsByDateRangeAndType(
+            $savedReport['from_date'],
+            $savedReport['to_date'],
+            $reportTypeFilterKey,
+            $selectedApplicationIds
+        );
+
+        $safeTitle = preg_replace('/[^a-zA-Z0-9_-]/', '_', (string) ($savedReport['title'] ?? 'report'));
+        $filename = $safeTitle . '_' . date('Ymd_His') . '.csv';
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment; filename="' . $filename . '"');
+
+        $output = fopen('php://output', 'w');
+        if ($output === false) {
+            $_SESSION['error'] = 'Failed to generate report download.';
+            redirect('recruitment/reports?tab=created');
+            return;
+        }
+
+        fputcsv($output, ['Report Title', $savedReport['title']]);
+        fputcsv($output, ['Report Type', $savedReport['report_type']]);
+        fputcsv($output, ['From Date', $savedReport['from_date']]);
+        fputcsv($output, ['To Date', $savedReport['to_date']]);
+        fputcsv($output, []);
+
+        fputcsv($output, ['Applicant Name', 'Email', 'Mobile', 'Job Post Applied', 'Status', 'Applied Date']);
+
+        if (is_array($rows)) {
+            foreach ($rows as $row) {
+                fputcsv($output, [
+                    $row['applicant_name'] ?? '',
+                    $row['email'] ?? '',
+                    $row['phone'] ?? '',
+                    $row['job_title'] ?? '',
+                    $row['status'] ?? '',
+                    $row['applied_date'] ?? ''
+                ]);
+            }
+        }
+
+        fclose($output);
+        exit;
+    }
+
     private function normalizeReportType($type)
     {
         $normalized = strtolower(trim((string) $type));

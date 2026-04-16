@@ -35,8 +35,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/recruitment/reports" class="nav-link">
+                        <span class="nav-text">Reports</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/recruitment/profile" class="nav-link">
-                        <span class="nav-text">Profile</span>
+                        <span class="nav-text">My Profile</span>
                     </a>
                 </li>
             </ul>
