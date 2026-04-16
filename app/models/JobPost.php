@@ -150,11 +150,15 @@ class JobPost
 
     public function getAllJobs()
     {
-        $query = "SELECT jp.*, u.full_name as posted_by_name,
-                  (SELECT COUNT(*) FROM applications WHERE job_id = jp.id) as applications_count
-                  FROM job_posts jp 
-                  LEFT JOIN users u ON jp.hr_id = u.id 
-                  ORDER BY jp.created_at DESC";
+                $query = "SELECT
+                                        jp.*,
+                                        u.full_name AS posted_by_name,
+                                        COUNT(a.id) AS live_applications_count
+                                    FROM job_posts jp
+                                    LEFT JOIN users u ON jp.hr_id = u.id
+                                    LEFT JOIN applications a ON a.job_id = jp.id
+                                    GROUP BY jp.id
+                                    ORDER BY jp.created_at DESC";
         
         return $this->query($query);
     }
@@ -185,6 +189,34 @@ class JobPost
     {
         $query = "SELECT * FROM job_posts WHERE id = ? AND status = 'Open'";
         return $this->get_row($query, [$id]);
+    }
+
+    public function incrementViewsCount($id, $step = 1)
+    {
+        $id = (int)$id;
+        $step = max(1, (int)$step);
+
+        if ($id <= 0) {
+            return false;
+        }
+
+        if (!in_array('views_count', $this->getExistingColumns(), true)) {
+            return false;
+        }
+
+        $query = "UPDATE {$this->table} 
+                  SET views_count = COALESCE(views_count, 0) + :step 
+                  WHERE id = :id";
+
+        try {
+            $this->query($query, [
+                'step' => $step,
+                'id' => $id
+            ]);
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
     }
     
     public function searchJobs($filters = [], $limit = 20, $offset = 0)

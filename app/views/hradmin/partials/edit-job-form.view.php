@@ -25,8 +25,32 @@ if (!empty($is_modal)) {
         <div class="form-grid">
             <div class="form-group">
                 <label class="form-label">Job Title *</label>
-                <input type="text" name="job_title" class="form-input"
-                    value="<?= htmlspecialchars($formJob['title'] ?? $formJob['job_title'] ?? '') ?>" required>
+                <?php $selectedJobTitle = $formJob['title'] ?? $formJob['job_title'] ?? ''; ?>
+                <?php
+                    $selectedTitleExists = false;
+                    if (!empty($job_categories) && is_array($job_categories)) {
+                        foreach ($job_categories as $category) {
+                            if (($category['name'] ?? '') === $selectedJobTitle) {
+                                $selectedTitleExists = true;
+                                break;
+                            }
+                        }
+                    }
+                ?>
+                <select name="job_title" class="form-select" required>
+                    <option value="">Select Job Title</option>
+                    <?php foreach ($job_categories ?? [] as $category): ?>
+                        <option value="<?= htmlspecialchars($category['name']) ?>"
+                            <?= $selectedJobTitle === $category['name'] ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($category['name']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                    <?php if ($selectedJobTitle !== '' && !$selectedTitleExists): ?>
+                        <option value="<?= htmlspecialchars($selectedJobTitle) ?>" selected>
+                            <?= htmlspecialchars($selectedJobTitle) ?>
+                        </option>
+                    <?php endif; ?>
+                </select>
             </div>
 
             <div class="form-group">

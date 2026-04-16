@@ -12,7 +12,7 @@
                 <i class="icon-edit"></i>Edit Job
             </a>
             <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications&job=<?= $job['id'] ?? '1' ?>" class="btn btn-outline">
-                <i class="icon-applications"></i>View Applications (<?= $job['applications_count'] ?? '23' ?>)
+                <i class="icon-applications"></i>View Applications
             </a>
         </div>
     </div>
@@ -43,25 +43,24 @@
                 <?php elseif(($job['status'] ?? '') == 'paused'): ?>
                     <button class="btn btn-success btn-sm" onclick="activateJob()">Activate Job</button>
                 <?php endif; ?>
-                <button class="btn btn-info btn-sm" onclick="shareJob()">Share Job</button>
             </div>
         </div>
         
         <div class="metrics-grid">
             <div class="metric-item">
-                <div class="metric-value"><?= $job['views_count'] ?? '456' ?></div>
+                <div class="metric-value"><?= (int)($job['views_count'] ?? 0) ?></div>
                 <div class="metric-label">Views</div>
             </div>
             <div class="metric-item">
-                <div class="metric-value"><?= $job['applications_count'] ?? '23' ?></div>
+                <div class="metric-value"><?= (int)($job['applications_count'] ?? 0) ?></div>
                 <div class="metric-label">Applications</div>
             </div>
             <div class="metric-item">
-                <div class="metric-value"><?= $job['shortlisted_count'] ?? '8' ?></div>
+                <div class="metric-value"><?= (int)($job['shortlisted_count'] ?? 0) ?></div>
                 <div class="metric-label">Shortlisted</div>
             </div>
             <div class="metric-item">
-                <div class="metric-value"><?= $job['interviewed_count'] ?? '5' ?></div>
+                <div class="metric-value"><?= (int)($job['interviewed_count'] ?? 0) ?></div>
                 <div class="metric-label">Interviewed</div>
             </div>
         </div>
@@ -170,7 +169,7 @@
                 </div>
             </div>
             <div class="section-footer">
-                <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications&job=<?= $job['id'] ?? '1' ?>" class="view-all-applications">View All Applications (<?= $job['applications_count'] ?? '23' ?>)</a>
+                <a href="<?= ROOT ?>/hradmin/applicant-database?tab=applications&job=<?= $job['id'] ?? '1' ?>" class="view-all-applications">View All Applications</a>
             </div>
         </div>
 
@@ -196,30 +195,6 @@
                     <span><?= $job['application_deadline'] ?></span>
                 </div>
                 <?php endif; ?>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Share Job Modal -->
-<div id="shareModal" class="modal" style="display: none;">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>Share Job Post</h3>
-            <button class="modal-close" onclick="closeShareModal()">&times;</button>
-        </div>
-        <div class="modal-body">
-            <div class="share-option">
-                <label>Job URL:</label>
-                <div class="url-copy">
-                    <input type="text" value="<?= ROOT ?>/jobs/<?= $job['id'] ?? '1' ?>" readonly class="url-input">
-                    <button class="copy-btn" onclick="copyUrl()">Copy</button>
-                </div>
-            </div>
-            <div class="share-buttons">
-                <button class="share-btn linkedin">Share on LinkedIn</button>
-                <button class="share-btn email">Email to Team</button>
-                <button class="share-btn internal">Post to Internal Board</button>
             </div>
         </div>
     </div>
@@ -490,51 +465,6 @@
     font-size: 0.875rem;
 }
 
-.share-option {
-    margin-bottom: 1.5rem;
-}
-
-.url-copy {
-    display: flex;
-    gap: 0.5rem;
-    margin-top: 0.5rem;
-}
-
-.url-input {
-    flex: 1;
-    padding: 0.5rem;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 0.875rem;
-}
-
-.copy-btn {
-    padding: 0.5rem 1rem;
-    background: #4e31aa;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.share-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.share-btn {
-    padding: 0.75rem 1rem;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.share-btn.linkedin { background: #0077b5; color: white; }
-.share-btn.email { background: #6c757d; color: white; }
-.share-btn.internal { background: #28a745; color: white; }
-
 /* Icon styles */
 .icon-back::before { content: '←'; }
 .icon-edit::before { content: '✏️'; }
@@ -583,21 +513,6 @@ function activateJob() {
     }
 }
 
-function shareJob() {
-    document.getElementById('shareModal').style.display = 'flex';
-}
-
-function closeShareModal() {
-    document.getElementById('shareModal').style.display = 'none';
-}
-
-function copyUrl() {
-    const urlInput = document.querySelector('.url-input');
-    urlInput.select();
-    document.execCommand('copy');
-    alert('URL copied to clipboard!');
-}
-
 function confirmArchive() {
     if (confirm('Are you sure you want to archive this job? This will remove it from active listings.')) {
         // Make AJAX call to archive job
@@ -605,13 +520,6 @@ function confirmArchive() {
         window.location.href = '<?= ROOT ?>/hradmin/jobposts';
     }
 }
-
-// Close modal when clicking outside
-document.getElementById('shareModal').addEventListener('click', function(e) {
-    if (e.target === this) {
-        closeShareModal();
-    }
-});
 </script>
 
 <?php $this->view('components/footer') ?>
