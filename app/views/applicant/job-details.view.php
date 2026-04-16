@@ -189,18 +189,6 @@
                     </ul>
                 </div>
 
-                <!-- Benefits -->
-                <div class="content-card">
-                    <h3 class="section-title">Benefits & Perks</h3>
-                    <div class="benefits-grid">
-                        <?php foreach($job['benefits'] as $benefit): ?>
-                            <div class="benefit-item">
-                                <span class="benefit-icon">✅</span>
-                                <span><?= $benefit ?></span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
             </div>
 
             <!-- Sidebar -->

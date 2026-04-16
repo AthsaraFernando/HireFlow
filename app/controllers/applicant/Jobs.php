@@ -189,14 +189,7 @@ class Jobs extends Controller
             'application_status' => $user_application['status'] ?? null,
             'applied_at' => $user_application['applied_at'] ?? null,
             'form_available' => $form_available,
-            'is_saved' => $savedJobModel->isJobSaved($user_id, $job['id']),
-            'benefits' => [
-                'Competitive salary package',
-                'Health and medical benefits',
-                'Professional development opportunities',
-                'Flexible working arrangements',
-                'Performance-based incentives'
-            ]
+            'is_saved' => $savedJobModel->isJobSaved($user_id, $job['id'])
         ];
 
         $this->view('applicant/job-details', $data);
