@@ -42,6 +42,11 @@ class Applications extends Controller
                 if ($applicationDetails) {
                     $jobTitle = $applicationDetails['job_title'] ?? 'your application';
 
+                    AccessLog::log(
+                        'application_status_updated',
+                        'Recruitment manager changed application ID ' . $applicationId . ' to ' . $newStatus . ' for job: ' . $jobTitle
+                    );
+
                     if ($newStatus === 'Shortlisted') {
                         $notificationModel->createForApplication(
                             $applicationId,
@@ -68,6 +73,12 @@ class Applications extends Controller
 
                 $_SESSION['success'] = 'Application status updated successfully.';
             } else {
+                AccessLog::log(
+                    'application_status_update_failed',
+                    'Failed updating application ID ' . $applicationId . ' to ' . $newStatus,
+                    Auth::user_id(),
+                    1
+                );
                 $_SESSION['error'] = 'Failed to update application status.';
             }
 

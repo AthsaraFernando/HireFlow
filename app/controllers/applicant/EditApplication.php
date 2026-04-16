@@ -168,6 +168,11 @@ class EditApplication extends Controller
 
         if (!empty($update_data)) {
             if ($applicationModel->updateApplication($application_id, $update_data)) {
+                AccessLog::log(
+                    'application_updated',
+                    'Applicant updated application ID ' . (int)$application_id . ' for job ID ' . (int)$application['job_id'],
+                    $user_id
+                );
                 $_SESSION['success'] = "Application updated successfully!";
             } else {
                 $_SESSION['error'] = "Failed to update application. Please try again.";

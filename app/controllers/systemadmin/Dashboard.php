@@ -25,10 +25,10 @@ class Dashboard extends Controller
         $applicants = $user->where(['role_id' => 4]);
         $data['applicants'] = is_array($applicants) ? count($applicants) : 0;
         
-        $data['recent_logins'] = $accessLog->getAllActivityWithUsers(15);
         $data["recent_registrations"] = $accessLog->getRecentRegistrationsCount();
         $data["pending_applications"] = $accessLog->getPendingApplicationsCount();
-
+        
+        $data['recent_logins'] = $accessLog->getAllActivityWithUsers(15);
 
         $data['roles'] = $role->findAll();
         $data['current_user'] = Auth::user();

@@ -56,6 +56,12 @@ class Categories extends Controller
 
             if ($categoryModel->validate($payload)) {
                 if ($categoryModel->insert($payload)) {
+                    $newCategory = $categoryModel->query("SELECT id FROM job_categories ORDER BY id DESC LIMIT 1");
+                    $newCategoryId = !empty($newCategory) ? (int)$newCategory[0]['id'] : 0;
+                    AccessLog::log(
+                        'job_category_created',
+                        'Created job category' . ($newCategoryId > 0 ? ' ID ' . $newCategoryId : '') . ': ' . $payload['name']
+                    );
                     $_SESSION['success_message'] = 'Category created successfully!';
                     redirect('hradmin/categories');
                 }
@@ -107,6 +113,10 @@ class Categories extends Controller
 
             if ($categoryModel->validate($payload, $id)) {
                 if ($categoryModel->update($id, $payload)) {
+                    AccessLog::log(
+                        'job_category_updated',
+                        'Updated job category ID ' . (int)$id . ' to name: ' . $payload['name']
+                    );
                     $_SESSION['success_message'] = 'Category updated successfully!';
                     redirect('hradmin/categories');
                 }
@@ -146,6 +156,10 @@ class Categories extends Controller
         }
 
         if ($categoryModel->delete($id)) {
+            AccessLog::log(
+                'job_category_deleted',
+                'Deleted job category ID ' . (int)$id . ': ' . ($category['name'] ?? 'unknown')
+            );
             $_SESSION['success_message'] = 'Category deleted successfully!';
         } else {
             $_SESSION['error_message'] = 'Failed to delete category.';

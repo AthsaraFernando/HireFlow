@@ -71,6 +71,12 @@ class Departments extends Controller
                 ];
 
                 if ($departmentModel->insert($insertData)) {
+                    $newDepartment = $departmentModel->query("SELECT id FROM departments ORDER BY id DESC LIMIT 1");
+                    $newDepartmentId = !empty($newDepartment) ? (int)$newDepartment[0]['id'] : 0;
+                    AccessLog::log(
+                        'department_created',
+                        'Created department' . ($newDepartmentId > 0 ? ' ID ' . $newDepartmentId : '') . ': ' . $name
+                    );
                     $_SESSION['success_message'] = 'Department created successfully!';
                     redirect('hradmin/departments');
                 }
@@ -140,6 +146,10 @@ class Departments extends Controller
                 ];
 
                 if ($departmentModel->update($id, $updateData)) {
+                    AccessLog::log(
+                        'department_updated',
+                        'Updated department ID ' . (int)$id . ' to name: ' . $name
+                    );
                     $_SESSION['success_message'] = 'Department updated successfully!';
                     redirect('hradmin/departments');
                 }
@@ -192,6 +202,10 @@ class Departments extends Controller
         }
 
         if ($departmentModel->delete($id)) {
+            AccessLog::log(
+                'department_deleted',
+                'Deleted department ID ' . (int)$id . ': ' . ($department['name'] ?? 'unknown')
+            );
             $_SESSION['success_message'] = 'Department deleted successfully!';
         } else {
             $_SESSION['error_message'] = 'Failed to delete department.';
