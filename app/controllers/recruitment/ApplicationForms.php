@@ -1,11 +1,7 @@
 <?php
 
-/**
- * ApplicationForms Controller
- * 
- * Manages application forms for recruitment managers
- * Replaces the old "Assigned Jobs" feature
- */
+// ApplicationForms Controller
+ 
 class ApplicationForms extends Controller
 {
     public function index()
@@ -85,9 +81,8 @@ class ApplicationForms extends Controller
         $this->view('recruitment/application-forms', $data);
     }
 
-    /**
-     * Show create form page
-     */
+
+    //Show create form page
     public function create($job_post_id = null)
     {
         Auth::requireRole(3);
@@ -124,9 +119,8 @@ class ApplicationForms extends Controller
         $this->view('recruitment/create-application-form', $data);
     }
 
-    /**
-     * Store new application form
-     */
+    
+    //Store new application form
     public function store()
     {
         Auth::requireRole(3);
@@ -171,7 +165,7 @@ class ApplicationForms extends Controller
             redirect('recruitment/applicationforms');
         }
 
-        // Create form (no need to store job details, will fetch from job_posts)
+        // Create form 
         $formData = [
             'job_post_id' => $job_post_id,
             'created_by' => $user_id,
@@ -206,9 +200,8 @@ class ApplicationForms extends Controller
         }
     }
 
-    /**
-     * Preview form
-     */
+    
+    //Preview form
     public function preview($form_id = null)
     {
         Auth::requireRole(3);
@@ -272,9 +265,8 @@ class ApplicationForms extends Controller
         $this->view('recruitment/preview-application-form', $data);
     }
 
-    /**
-     * Edit form
-     */
+    
+    //Edit form
     public function edit($form_id = null)
     {
         Auth::requireRole(3);
@@ -320,9 +312,8 @@ class ApplicationForms extends Controller
         $this->view('recruitment/edit-application-form', $data);
     }
 
-    /**
-     * Update form
-     */
+
+    //Update form
     public function update()
     {
         Auth::requireRole(3);
@@ -385,9 +376,8 @@ class ApplicationForms extends Controller
         redirect('recruitment/applicationforms/preview/' . $form_id);
     }
 
-    /**
-     * Publish form
-     */
+
+    //Publish form
     public function publish($form_id = null)
     {
         Auth::requireRole(3);
@@ -422,9 +412,8 @@ class ApplicationForms extends Controller
         }
     }
 
-    /**
-     * Delete form
-     */
+    
+    //Delete form
     public function delete($form_id = null)
     {
         Auth::requireRole(3);
@@ -459,9 +448,7 @@ class ApplicationForms extends Controller
         }
     }
 
-    /**
-     * Change form status
-     */
+    //Change form status
     public function changeStatus()
     {
         Auth::requireRole(3);
@@ -503,9 +490,8 @@ class ApplicationForms extends Controller
         redirect(getenv("HTTP_REFERER") ?? "recruitment/applicationforms");
     }
 
-    /**
-     * Toggle form status between active and inactive
-     */
+    
+    //Toggle form status between active and inactive
     public function toggleStatus($form_id = null)
     {
         Auth::requireRole(3);
@@ -542,9 +528,7 @@ class ApplicationForms extends Controller
         redirect('recruitment/applicationforms');
     }
 
-    /**
-     * Restore deleted form
-     */
+    //Restore deleted form
     public function restore($form_id = null)
     {
         Auth::requireRole(3);
@@ -579,9 +563,7 @@ class ApplicationForms extends Controller
         redirect('recruitment/applicationforms?show_deleted=1');
     }
 
-    /**
-     * Helper function to get category labels
-     */
+    //Helper function to get category labels
     private function getCategoryLabels()
     {
         return [

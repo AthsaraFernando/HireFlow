@@ -15,7 +15,6 @@
                 <li class="nav-item"><a href="<?= ROOT ?>/recruitment/shortlist-candidates" class="nav-link"><span class="nav-text">Shortlist</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/recruitment/interview-schedule" class="nav-link"><span class="nav-text">Interviews</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/recruitment/reports" class="nav-link active"><span class="nav-text">Reports</span></a></li>
-                <li class="nav-item"><a href="<?= ROOT ?>/recruitment/notifications" class="nav-link"><span class="nav-text">Notifications</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/recruitment/profile" class="nav-link"><span class="nav-text">My Profile</span></a></li>
             </ul>
         </nav>
@@ -225,6 +224,7 @@
                                                 <td style="padding:0.75rem; display:flex; gap:0.5rem;">
                                                     <a href="<?= ROOT ?>/recruitment/reports?tab=generate&mode=view&report_id=<?= (int) $report['id'] ?>" class="btn btn-outline">View</a>
                                                     <a href="<?= ROOT ?>/recruitment/reports?tab=generate&mode=edit&report_id=<?= (int) $report['id'] ?>" class="btn btn-primary">Edit</a>
+                                                    <a href="<?= ROOT ?>/recruitment/reports/download/<?= (int) $report['id'] ?>" class="btn btn-secondary">Download</a>
                                                     <form method="POST" action="<?= ROOT ?>/recruitment/reports/delete/<?= (int) $report['id'] ?>" onsubmit="return confirm('Delete this report?');">
                                                         <button type="submit" class="btn btn-danger">Delete</button>
                                                     </form>
