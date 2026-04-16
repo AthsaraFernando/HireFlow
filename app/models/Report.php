@@ -798,6 +798,108 @@ class Report
         return $this->tableSupportCache[$tableName];
     }
 
+    private function columnExists($tableName, $columnName)
+    {
+        $cacheKey = $tableName . '.' . $columnName;
+        if (array_key_exists($cacheKey, $this->tableSupportCache)) {
+            return $this->tableSupportCache[$cacheKey];
+        }
+
+        $query = "SELECT COUNT(*) as column_count
+                  FROM information_schema.columns
+                  WHERE table_schema = DATABASE()
+                  AND table_name = ?
+                  AND column_name = ?";
+
+        $result = $this->get_row($query, [$tableName, $columnName]);
+        $this->tableSupportCache[$cacheKey] = (int)($result['column_count'] ?? 0) > 0;
+
+        return $this->tableSupportCache[$cacheKey];
+    }
+
+    public function getApplicationSourceStats($filters = [])
+    {
+        $whereClauses = [];
+        $params = [];
+        $this->applyAnalyticsFilters($whereClauses, $params, $filters, [
+            'application_alias' => 'a',
+            'job_alias' => 'jp',
+            'date_column' => 'applied_at',
+            'default_days' => null,
+            'param_prefix' => 'source'
+        ]);
+
+        $sourceExpression = "'Company Website'";
+
+        $applicationSourceColumns = ['application_source', 'source', 'channel', 'applied_via'];
+        foreach ($applicationSourceColumns as $columnName) {
+            if ($this->columnExists('applications', $columnName)) {
+                $sourceExpression = "COALESCE(NULLIF(TRIM(a.{$columnName}), ''), 'Unknown')";
+                break;
+            }
+        }
+
+        if ($sourceExpression === "'Company Website'") {
+            $jobSourceColumns = ['source', 'application_source', 'channel'];
+            foreach ($jobSourceColumns as $columnName) {
+                if ($this->columnExists('job_posts', $columnName)) {
+                    $sourceExpression = "COALESCE(NULLIF(TRIM(jp.{$columnName}), ''), 'Unknown')";
+                    break;
+                }
+            }
+        }
+
+        $query = "SELECT
+                    {$sourceExpression} as source,
+                    COUNT(*) as applications,
+                    SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) as hires
+                  FROM applications a
+                  LEFT JOIN job_posts jp ON jp.id = a.job_id";
+
+        if (!empty($whereClauses)) {
+            $query .= ' WHERE ' . implode(' AND ', $whereClauses);
+        }
+
+        $query .= "
+                  GROUP BY source
+                  ORDER BY applications DESC, source ASC";
+
+        $rows = $this->query($query, $params);
+        if (!is_array($rows) || empty($rows)) {
+            return [];
+        }
+
+        $totalApplications = 0;
+        foreach ($rows as $row) {
+            $totalApplications += (int)($row['applications'] ?? 0);
+        }
+
+        if ($totalApplications <= 0) {
+            return [];
+        }
+
+        $normalized = [];
+        foreach ($rows as $row) {
+            $applications = (int)($row['applications'] ?? 0);
+            $hires = (int)($row['hires'] ?? 0);
+            $source = trim((string)($row['source'] ?? ''));
+
+            if ($source === '') {
+                $source = 'Unknown';
+            }
+
+            $normalized[] = [
+                'source' => $source,
+                'applications' => $applications,
+                'hires' => $hires,
+                'success_rate' => $applications > 0 ? round(($hires / $applications) * 100, 1) : 0,
+                'percent_total' => round(($applications / $totalApplications) * 100, 1),
+            ];
+        }
+
+        return $normalized;
+    }
+
     private function getConfiguredCostPerHire()
     {
         if (!$this->tableExists('system_settings')) {

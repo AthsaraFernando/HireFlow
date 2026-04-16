@@ -57,17 +57,8 @@ class Reports extends Controller
         $topPerformingJobs = $reportModel->getTopPerformingJobPosts(5, $filters) ?: [];
         $interviewerPerformance = $reportModel->getInterviewerPerformance(5, $filters) ?: [];
 
-        $totalApplications = (int)($dashboardMetrics['total_applications'] ?? 0);
-        $successfulHires = (int)($dashboardMetrics['successful_hires'] ?? 0);
         $successRate = $reportModel->getSuccessRate($filters);
-
-        $applicationSources = [[
-            'source' => 'Company Website',
-            'applications' => $totalApplications,
-            'hires' => $successfulHires,
-            'success_rate' => $totalApplications > 0 ? round(($successfulHires / $totalApplications) * 100, 1) : 0,
-            'percent_total' => $totalApplications > 0 ? 100.0 : 0,
-        ]];
+        $applicationSources = $reportModel->getApplicationSourceStats($filters) ?: [];
 
         return [
             'filters' => $filters,
