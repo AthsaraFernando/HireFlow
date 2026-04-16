@@ -7,6 +7,8 @@ class Application
     protected $allowedColumns = [
         'job_id',
         'applicant_id',
+        'form_id',
+        'form_data',
         'cover_letter',
         'resume_path',
         'status',
@@ -89,10 +91,24 @@ class Application
             return false;
         }
 
+        if (array_key_exists('form_data', $data) && is_array($data['form_data'])) {
+            $data['form_data'] = json_encode($data['form_data'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+
         if ($this->validate($data)) {
             $data['applied_at'] = date('Y-m-d H:i:s');
             AccessLog::log('application_submit', 'Apllication submission jobId: ' . $data['job_id'], Auth::user_id());
-            $this->insert($data);
+            $insert_id = $this->insert($data);
+            if (!$insert_id) {
+                return false;
+            }
+
+            $form_id = (int)($data['form_id'] ?? 0);
+            if ($form_id > 0) {
+                $applicationFormModel = new ApplicationForm();
+                $applicationFormModel->incrementSubmissionCount($form_id);
+            }
+
             return true;
         }
         return false;

@@ -1,19 +1,19 @@
 <?php $this->view('components/header') ?>
 
-<div class="main-container">
-    <div class="header-section">
-        <h1 class="page-title">Notifications</h1>
-        <p class="page-description">Stay updated with your recruitment activities</p>
-        <div class="quick-actions">
-            <a href="<?= ROOT ?>/recruitment/dashboard" class="btn btn-secondary">Back to Dashboard</a>
-            <button class="btn btn-outline" onclick="markAllAsRead()">Mark All as Read</button>
+<div>
+    <div>
+        <h1>Notifications</h1>
+        <p>Stay updated with your recruitment activities</p>
+        <div>
+            <a href="<?= ROOT ?>/recruitment/dashboard">Back to Dashboard</a>
+            <button onclick="markAllAsRead()">Mark All as Read</button>
         </div>
     </div>
 
-    <div class="notifications-list">
+    <div>
         <?php foreach($notifications as $notification): ?>
-        <div class="notification-item <?= $notification['read'] ? 'read' : 'unread' ?> <?= $notification['priority'] ?>">
-            <div class="notification-icon">
+        <div>
+            <div>
                 <?php 
                 switch($notification['type']) {
                     case 'new_application': echo '📋'; break;
@@ -23,16 +23,16 @@
                 }
                 ?>
             </div>
-            <div class="notification-content">
+            <div>
                 <h4><?= htmlspecialchars($notification['title']) ?></h4>
                 <p><?= htmlspecialchars($notification['message']) ?></p>
-                <span class="notification-time"><?= $notification['time'] ?></span>
+                <span><?= $notification['time'] ?></span>
             </div>
-            <div class="notification-actions">
+            <div>
                 <?php if (!$notification['read']): ?>
-                    <button class="btn btn-sm btn-outline" onclick="markAsRead(<?= $notification['id'] ?>)">Mark as Read</button>
+                    <button onclick="markAsRead(<?= $notification['id'] ?>)">Mark as Read</button>
                 <?php endif; ?>
-                <button class="btn btn-sm btn-danger" onclick="deleteNotification(<?= $notification['id'] ?>)">Delete</button>
+                <button onclick="deleteNotification(<?= $notification['id'] ?>)">Delete</button>
             </div>
         </div>
         <?php endforeach; ?>

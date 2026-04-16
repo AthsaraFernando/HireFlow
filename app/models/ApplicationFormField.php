@@ -1,11 +1,7 @@
 <?php
 
-/**
- * ApplicationFormField Model
- * 
- * Manages individual fields within application forms
- * Handles field creation, updates, and retrieval
- */
+//ApplicationFormField Model
+ 
 class ApplicationFormField
 {
     use Model;
@@ -25,10 +21,8 @@ class ApplicationFormField
         'help_text'
     ];
 
-    /**
-     * Get all available field definitions
-     * These are the fields that recruitment managers can choose from
-     */
+    //Get all available field definitions
+    //These are the fields that recruitment managers can choose from
     public static function getAvailableFields()
     {
         return [
@@ -97,7 +91,7 @@ class ApplicationFormField
                         'label' => 'Nationality',
                         'type' => 'text',
                         'required' => false,
-                        'placeholder' => 'e.g., Sri Lankan',
+                        'placeholder' => 'Ex : Sri Lankan',
                         'validation' => 'max:50'
                     ],
                     [
@@ -149,7 +143,7 @@ class ApplicationFormField
                         'label' => 'Degree / Field of Study',
                         'type' => 'text',
                         'required' => true,
-                        'placeholder' => 'e.g., BSc Computer Science',
+                        'placeholder' => 'Ex: BSc Computer Science',
                         'validation' => 'required|max:200'
                     ]
                 ]
@@ -163,7 +157,7 @@ class ApplicationFormField
                         'label' => 'Job Title',
                         'type' => 'text',
                         'required' => true,
-                        'placeholder' => 'e.g., Senior Software Engineer',
+                        'placeholder' => 'Ex: Senior Software Engineer',
                         'validation' => 'required|max:200'
                     ],
                     [
@@ -171,7 +165,7 @@ class ApplicationFormField
                         'label' => 'Company Name',
                         'type' => 'text',
                         'required' => true,
-                        'placeholder' => 'e.g., ABC Technologies',
+                        'placeholder' => 'Ex: ABC Technologies',
                         'validation' => 'required|max:200'
                     ],
                     [
@@ -230,7 +224,7 @@ class ApplicationFormField
                         'label' => 'Tools / Technologies',
                         'type' => 'textarea',
                         'required' => false,
-                        'placeholder' => 'e.g., Git, Docker, AWS, VS Code (comma separated)',
+                        'placeholder' => 'Ex: Git, Docker, AWS, VS Code (comma separated)',
                         'help_text' => 'Enter tools and technologies separated by commas',
                         'validation' => ''
                     ]
@@ -266,7 +260,7 @@ class ApplicationFormField
                         'label' => 'Expected Salary (Monthly)',
                         'type' => 'text',
                         'required' => true,
-                        'placeholder' => 'e.g., LKR 100,000 - 150,000',
+                        'placeholder' => 'Ex: LKR 100,000 - 150,000',
                         'help_text' => 'You can provide a range',
                         'validation' => 'required|max:100'
                     ]

@@ -115,13 +115,31 @@ class App
         } else {
 
             /**
-             * STEP 2: Special case - applicant
+             * STEP 2: Folder-based controllers (including applicant)
              */
-            if ($URL[0] === 'applicant') {
+            if (isset($URL[1])) {
 
+                $resolvedController = $this->resolveFolderController($URL[0], $URL[1]);
+
+                if ($resolvedController) {
+                    require $resolvedController['file'];
+                    $this->controller = $resolvedController['controller'];
+
+                    unset($URL[0]);
+                    unset($URL[1]);
+                } else {
+                    require "../app/controllers/_404.php";
+                    $this->controller = '_404';
+                }
+
+            } else {
+
+                /**
+                 * STEP 3: Default controller inside folder
+                 */
                 list($fileName, $controllerName) = $this->resolveControllerFile(
-                    "../app/controllers/applicant",
-                    'Applicant'
+                    "../app/controllers/" . $URL[0],
+                    ucfirst($URL[0])
                 );
 
                 if ($fileName) {
@@ -131,46 +149,6 @@ class App
                 } else {
                     require "../app/controllers/_404.php";
                     $this->controller = '_404';
-                }
-
-            } else {
-
-                /**
-                 * STEP 3: Folder-based controllers
-                 */
-                if (isset($URL[1])) {
-
-                    $resolvedController = $this->resolveFolderController($URL[0], $URL[1]);
-
-                    if ($resolvedController) {
-                        require $resolvedController['file'];
-                        $this->controller = $resolvedController['controller'];
-
-                        unset($URL[0]);
-                        unset($URL[1]);
-                    } else {
-                        require "../app/controllers/_404.php";
-                        $this->controller = '_404';
-                    }
-
-                } else {
-
-                    /**
-                     * STEP 4: Default controller inside folder
-                     */
-                    list($fileName, $controllerName) = $this->resolveControllerFile(
-                        "../app/controllers/" . $URL[0],
-                        ucfirst($URL[0])
-                    );
-
-                    if ($fileName) {
-                        require $fileName;
-                        $this->controller = $controllerName;
-                        unset($URL[0]);
-                    } else {
-                        require "../app/controllers/_404.php";
-                        $this->controller = '_404';
-                    }
                 }
             }
         }
@@ -199,7 +177,8 @@ class App
     {
         $publicPages = [
             'home', 'signin', 'signup', 'signout', '_404',
-            'passwordreset', 'password-reset', 'admin-setup'
+            'passwordreset', 'password-reset', 'admin-setup',
+            'terms', 'privacy'
         ];
 
         if (empty($URL[0]) || in_array(strtolower($URL[0]), $publicPages)) {

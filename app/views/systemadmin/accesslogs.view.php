@@ -421,7 +421,7 @@
     <div class="sidebar">
         <div class="sidebar-header">
             <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
-            
+
         </div>
 
         <nav class="sidebar-nav">
@@ -479,7 +479,7 @@
             </div>
 
             <div class="header-right">
-               
+
 
                 <div class="header-user">
                     <div class="user-info">
@@ -501,7 +501,7 @@
                     }
                     ?>
                     <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt="" class="profile_picture">
-                    
+
                 </div>
             </div>
         </header>
@@ -525,7 +525,7 @@
             <div class="page-controls">
                 <!-- Page Header -->
                 <div class="page-header">
-                   
+
                 </div>
 
                 <!-- Statistics Cards -->
@@ -542,7 +542,7 @@
                         <div class="metric-value"><?= number_format($failed_logins_today ?? 0) ?></div>
                         <div class="metric-label">Failed Attempts</div>
                     </div>
-                 
+
                 </div>
 
                 <div class="controls-header">
@@ -589,31 +589,55 @@
                             <option value="login">Login</option>
                             <option value="logout">Logout</option>
                             <option value="failed_login">Failed Login</option>
-                            <option value="password_change_request">Password Change Request</option>
+                            <option value="password_reset_request">Password Reset Request</option>
                             <option value="profile_update">Profile Update</option>
-                            <option value="password_change">Password Change</option>
+                            <option value="password_change">Password Reset</option>
                             <option value="registration">Registration</option>
                             <option value="user_updated">User Updated</option>
                             <option value="user_deleted">User Deleted</option>
                             <option value="user_status_changed">User Status Changed</option>
                             <option value="user_created">User Created</option>
                             <option value="application_submit">Application Submit</option>
-                            <option value="db_backup_create">Database Backup</option>
+                            <option value="db_backup_created">Database Backup</option>
                             <option value="db_restore">Database Restore</option>
                             <option value="db_backup_download">Database Backup Download</option>
                             <option value="db_backup_deleted">Database Backup Delete</option>
-                            <option value="password_reset_request">Password Reset Request</option>
-                            <option value="password_change">Password Change</option>
                             <option value="announcement_created">Announcement Create</option>
                             <option value="announcement_updated">Announcement Update</option>
                             <option value="announcement_deleted">Announcement Delete</option>
-
+                            <option value="application_status_updated">Application Status Updated</option>
+                            <option value="application_status_update_failed">Application Status Update Failed</option>
+                            <option value="interview_scheduled">Interview Scheduled</option>
+                            <option value="interview_rescheduled">Interview Rescheduled</option>
+                            <option value="interview_deleted">Interview Deleted</option>
+                            <option value="interview_feedback_submitted">Interview Feedback Submitted</option>
+                            <option value="interview_feedback_updated">Interview Feedback Updated</option>
+                            <option value="interview_feedback_deleted">Interview Feedback Deleted</option>
+                            <option value="application_form_created">Application Form Created</option>
+                            <option value="application_form_published">Application Form Published</option>
+                            <option value="application_form_deleted">Application Form Deleted</option>
+                            <option value="application_form_status_updated">Application Form Status Updated</option>
+                            <option value="application_form_restored">Application Form Restored</option>
+                            <option value="job_post_created">Job Post Created</option>
+                            <option value="job_post_updated">Job Post Updated</option>
+                            <option value="job_post_deleted">Job Post Deleted</option>
+                            <option value="job_category_created">Job Category Created</option>
+                            <option value="job_category_updated">Job Category Updated</option>
+                            <option value="job_category_deleted">Job Category Deleted</option>
+                            <option value="department_created">Department Created</option>
+                            <option value="department_updated">Department Updated</option>
+                            <option value="department_deleted">Department Deleted</option>
+                            <option value="application_updated">Application Updated</option>
+                            <option value="application_deleted">Application Deleted</option>
+                            <option value="saved_job_added">Saved Job Added</option>
+                            <option value="saved_job_note_updated">Saved Job Note Updated</option>
+                            <option value="saved_job_removed">Saved Job Removed</option>
                         </select>
                     </div>
                     <div class="filter-group">
                         <label>Filter by Flag:</label>
                         <select class="filter-select" id="flagFilter">
-                            <option value="">Unflagged</option>
+                            <option value="">All Flags</option>
                             <option value="unflagged">Unflagged</option>
                             <option value="flagged">Flagged</option>
                         </select>
@@ -788,7 +812,7 @@
                         }
 
                         // Action filter
-                        if (actionFilter && !action.includes(actionFilter.toLowerCase())) {
+                        if (actionFilter && action !== actionFilter.toLowerCase()) {
                             shouldShow = false;
                         }
 

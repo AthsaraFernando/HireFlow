@@ -34,7 +34,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                    <a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="nav-link">
                         <span class="nav-text">Saved Jobs</span>
                     </a>
                 </li>
@@ -176,13 +176,13 @@
                         <div class="job-actions">
                             <a href="<?= ROOT ?>/applicant/jobs/details/<?= $job['id'] ?>" class="btn btn-outline">View Details</a>
                             <?php if(!$job['is_saved']): ?>
-                                <form method="POST" action="<?= ROOT ?>/applicant/savedJobs/save" class="inline-action-form">
+                                <form method="POST" action="<?= ROOT ?>/applicant/jobs/savedJobs/save" class="inline-action-form">
                                     <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
                                     <input type="hidden" name="return_to" value="applicant/jobs">
                                     <button type="submit" class="btn btn-outline">Save Job</button>
                                 </form>
                             <?php else: ?>
-                                <a href="<?= ROOT ?>/applicant/savedJobs" class="btn btn-outline">Saved</a>
+                                <a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="btn btn-outline">Saved</a>
                             <?php endif; ?>
                             <?php if($job['form_available'] && !$job['has_applied']): ?>
                                 <a href="<?= ROOT ?>/applicant/applications/apply?job_id=<?= $job['id'] ?>" class="btn btn-primary">Apply Now</a>

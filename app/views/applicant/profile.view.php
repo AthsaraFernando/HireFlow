@@ -209,7 +209,7 @@
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/dashboard" class="nav-link"><span class="nav-text">Dashboard</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/jobs" class="nav-link"><span class="nav-text">Browse Jobs</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/applications" class="nav-link"><span class="nav-text">My Applications</span></a></li>
-                <li class="nav-item"><a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link"><span class="nav-text">Saved Jobs</span></a></li>
+                <li class="nav-item"><a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="nav-link"><span class="nav-text">Saved Jobs</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/interviews" class="nav-link"><span class="nav-text">Interview Schedule</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/interviews/feedback" class="nav-link"><span class="nav-text">Interview Feedback</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/profile" class="nav-link active"><span class="nav-text">My Profile</span></a></li>
@@ -385,7 +385,7 @@
                                     type="submit"
                                     id="deleteProfileButton"
                                     class="btn btn-danger btn-large"
-                                    formaction="<?= ROOT ?>/applicant/deleteProfile"
+                                    formaction="<?= ROOT ?>/applicant/profile/delete"
                                     formmethod="POST"
                                 >Delete My Profile</button>
                             </div>

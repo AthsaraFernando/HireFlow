@@ -171,6 +171,10 @@ class JobPosts extends Controller
                 $result = $jobPost->update($id, $updateData);
                 
                 if ($result !== false) {
+                    AccessLog::log(
+                        'job_post_updated',
+                        'Updated job post ID ' . (int)$id . ': ' . ($updateData['title'] ?? 'Untitled')
+                    );
                     $_SESSION['success_message'] = 'Job post updated successfully!';
                     redirect('hradmin/job-posts');
                 } else {
@@ -242,6 +246,10 @@ class JobPosts extends Controller
         $result = $jobPost->delete($id);
         
         if ($result !== false) {
+            AccessLog::log(
+                'job_post_deleted',
+                'Deleted job post ID ' . (int)$id . ': ' . ($job['title'] ?? 'Untitled')
+            );
             $_SESSION['success_message'] = 'Job post deleted successfully!';
         } else {
             $_SESSION['error_message'] = 'Failed to delete job post. Please try again.';
