@@ -185,6 +185,11 @@ class ApplicationForms extends Controller
             $form_id = $applicationForm->insert($formData);
 
             if ($form_id) {
+                AccessLog::log(
+                    'application_form_created',
+                    'Created application form ID ' . $form_id . ' for job post ID ' . $job_post_id
+                );
+
                 // Save selected fields
                 if ($applicationFormField->saveFormFields($form_id, $selected_fields)) {
                     // Update field count
@@ -414,6 +419,10 @@ class ApplicationForms extends Controller
 
         // Publish the form
         if ($applicationForm->publishForm($form_id)) {
+            AccessLog::log(
+                'application_form_published',
+                'Published application form ID ' . $form_id
+            );
             $_SESSION['success'] = "Application form published successfully and is now live for applicants";
             redirect('recruitment/applicationforms/preview/' . $form_id);
         } else {
@@ -451,6 +460,10 @@ class ApplicationForms extends Controller
 
         // Soft delete: Mark form as deleted and set status to inactive
         if ($applicationForm->softDelete($form_id)) {
+            AccessLog::log(
+                'application_form_deleted',
+                'Soft-deleted application form ID ' . $form_id
+            );
             $_SESSION['success'] = "Application form has been deleted successfully";
             redirect('recruitment/applicationforms');
         } else {
@@ -495,6 +508,10 @@ class ApplicationForms extends Controller
 
         // Update status
         if ($applicationForm->updateStatus($form_id, $status)) {
+            AccessLog::log(
+                'application_form_status_updated',
+                'Updated application form ID ' . $form_id . ' status to ' . $status
+            );
             $_SESSION['success'] = "Form status updated successfully";
         } else {
             $_SESSION['error'] = "Failed to update form status";
@@ -534,6 +551,10 @@ class ApplicationForms extends Controller
         $newStatus = $form['status'] === 'active' ? 'inactive' : 'active';
         
         if ($applicationForm->updateStatus($form_id, $newStatus)) {
+            AccessLog::log(
+                'application_form_status_updated',
+                'Toggled application form ID ' . $form_id . ' status to ' . $newStatus
+            );
             $_SESSION['success'] = "Form status changed to " . $newStatus;
         } else {
             $_SESSION['error'] = "Failed to update form status";
@@ -571,6 +592,10 @@ class ApplicationForms extends Controller
 
         // Restore form
         if ($applicationForm->restoreForm($form_id)) {
+            AccessLog::log(
+                'application_form_restored',
+                'Restored application form ID ' . $form_id
+            );
             $_SESSION['success'] = "Form restored successfully";
         } else {
             $_SESSION['error'] = "Failed to restore form";

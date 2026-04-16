@@ -33,6 +33,11 @@ class DeleteApplication extends Controller
         $this->deleteResumeFile($application['resume_path'] ?? '');
 
         if ($applicationModel->deleteApplication($application_id)) {
+            AccessLog::log(
+                'application_deleted',
+                'Applicant deleted application ID ' . (int)$application_id . ' for job ID ' . (int)$application['job_id'],
+                $user_id
+            );
             $_SESSION['success'] = "Application deleted successfully!";
         } else {
             $_SESSION['error'] = "Failed to delete application. Please try again.";

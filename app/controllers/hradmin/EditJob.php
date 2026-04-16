@@ -126,6 +126,11 @@ class EditJob extends Controller
                 ];
                 
                 if ($jobPost->update($id, $updateData)) {
+                    AccessLog::log(
+                        'job_post_updated',
+                        'Updated job post ID ' . (int)$id . ': ' . ($updateData['title'] ?? 'Untitled')
+                    );
+
                     if ($isModalRequest) {
                         header('Content-Type: application/json');
                         echo json_encode([

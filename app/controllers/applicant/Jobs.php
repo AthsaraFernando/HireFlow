@@ -217,6 +217,11 @@ class Jobs extends Controller
                 if ($job_id <= 0) {
                     $_SESSION['error'] = 'Invalid job selected.';
                 } elseif ($savedJobModel->saveJob($user_id, $job_id, $note)) {
+                    AccessLog::log(
+                        'saved_job_added',
+                        'Applicant saved job ID ' . (int)$job_id,
+                        $user_id
+                    );
                     $_SESSION['success'] = 'Job saved successfully.';
                 } else {
                     $_SESSION['error'] = 'Unable to save this job right now.';
@@ -242,6 +247,11 @@ class Jobs extends Controller
                 }
 
                 if ($savedJobModel->updateNote($saved_job_id, $user_id, $note)) {
+                    AccessLog::log(
+                        'saved_job_note_updated',
+                        'Applicant updated note for saved job ID ' . (int)$saved_job_id,
+                        $user_id
+                    );
                     $_SESSION['success'] = 'Saved job note updated.';
                 } else {
                     $_SESSION['error'] = 'Failed to update note. Please try again.';
@@ -261,6 +271,11 @@ class Jobs extends Controller
                 }
 
                 if ($savedJobModel->removeSavedJob($saved_job_id, $user_id)) {
+                    AccessLog::log(
+                        'saved_job_removed',
+                        'Applicant removed saved job ID ' . (int)$saved_job_id,
+                        $user_id
+                    );
                     $_SESSION['success'] = 'Saved job removed.';
                 } else {
                     $_SESSION['error'] = 'Unable to remove saved job.';
