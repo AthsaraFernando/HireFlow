@@ -107,6 +107,11 @@ class ConductInterview extends Controller
             exit;
         }
 
+        AccessLog::log(
+            'interview_feedback_submitted',
+            'Submitted feedback for interview ID ' . $interview_id . ' with recommendation: ' . ($payload['recommendation'] ?? 'N/A')
+        );
+
         $recommendation = $payload['recommendation'] ?? '';
         if (in_array($recommendation, ['Hire', 'Reject'], true)) {
             $jobTitle = $interview['job_title'] ?? 'your application';
@@ -155,6 +160,11 @@ class ConductInterview extends Controller
 
                 if (!$applicationUpdated) {
                     $warnings[] = 'Application status was not updated.';
+                } else {
+                    AccessLog::log(
+                        'application_status_updated',
+                        'Set application ID ' . (int)$interview['application_id'] . ' to ' . $nextApplicationStatus . ' after interview ID ' . (int)$interview_id
+                    );
                 }
             }
         } catch (Exception $e) {

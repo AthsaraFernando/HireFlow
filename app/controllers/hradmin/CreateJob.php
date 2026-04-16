@@ -103,6 +103,10 @@ class CreateJob extends Controller
                 $insertId = $jobPost->insert($jobData);
                 
                 if ($insertId) {
+                    AccessLog::log(
+                        'job_post_created',
+                        'Created job post ID ' . (int)$insertId . ': ' . ($jobData['title'] ?? 'Untitled')
+                    );
                     $_SESSION['success_message'] = 'Job posted successfully!';
                     redirect('hradmin/job-posts');
                 } else {

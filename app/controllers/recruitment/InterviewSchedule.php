@@ -122,6 +122,11 @@ class InterviewSchedule extends Controller
                     $result = $interview->createInterview($interviewData);
                     
                     if ($result) {
+                        AccessLog::log(
+                            'interview_scheduled',
+                            'Scheduled interview for application ID ' . $application_id . ' on ' . $scheduled_date . ' ' . $scheduled_time
+                        );
+
                         // Update application status to 'Interview Scheduled'
                         $application = new Application();
                         $statusUpdated = $application->update($application_id, ['status' => 'Interview Scheduled']);
@@ -240,6 +245,11 @@ class InterviewSchedule extends Controller
                 $result = $interview->updateInterview($id, $updateData);
                 
                 if ($result) {
+                    AccessLog::log(
+                        'interview_rescheduled',
+                        'Rescheduled interview ID ' . $id . ' to ' . $scheduled_date . ' ' . $scheduled_time
+                    );
+
                     $interviewDetails = $interview->getInterviewById($id);
                     $applicationDetails = $interviewDetails ? (new Application())->getApplicationById((int)$interviewDetails['application_id']) : null;
                     $jobTitle = $applicationDetails['job_title'] ?? 'your application';
@@ -292,6 +302,11 @@ class InterviewSchedule extends Controller
                     $result = $interview->deleteInterview($id);
                     
                     if ($result) {
+                        AccessLog::log(
+                            'interview_deleted',
+                            'Deleted interview ID ' . $id . ' for application ID ' . $interviewData['application_id']
+                        );
+
                         // Update application status back to 'Shortlisted'
                         $application = new Application();
                         $application->update($interviewData['application_id'], ['status' => 'Shortlisted']);

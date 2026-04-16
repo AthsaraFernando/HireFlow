@@ -98,7 +98,17 @@ class Application
         if ($this->validate($data)) {
             $data['applied_at'] = date('Y-m-d H:i:s');
             AccessLog::log('application_submit', 'Apllication submission jobId: ' . $data['job_id'], Auth::user_id());
-            $this->insert($data);
+            $insert_id = $this->insert($data);
+            if (!$insert_id) {
+                return false;
+            }
+
+            $form_id = (int)($data['form_id'] ?? 0);
+            if ($form_id > 0) {
+                $applicationFormModel = new ApplicationForm();
+                $applicationFormModel->incrementSubmissionCount($form_id);
+            }
+
             return true;
         }
         return false;
