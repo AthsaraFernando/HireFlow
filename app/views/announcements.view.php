@@ -273,4 +273,4 @@ $dashboardUrl = $dashboardMap[Auth::user_role()] ?? 'home';
     <?php endif; ?>
 </main>
 
-<?php  $this->view('components/footer'); ?>
+<?php  // $this->view('components/footer'); ?>
