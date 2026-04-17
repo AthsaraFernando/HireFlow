@@ -166,7 +166,7 @@
                         </div>
                         <div class="info-grid-item">
                             <span class="info-label">Application Deadline</span>
-                            <span class="info-value"><?= $job['deadline'] ? date('M d, Y', strtotime($job['deadline'])) : 'Not specified' ?></span>
+                            <span class="info-value"><?= !empty($job['deadline']) ? date('M d, Y', strtotime($job['deadline'])) : 'Not mentioned' ?></span>
                         </div>
                     </div>
                 </div>
@@ -221,7 +221,7 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">Application Deadline:</span>
-                            <span class="info-value"><?= date('M d, Y', strtotime($job['deadline'])) ?></span>
+                            <span class="info-value"><?= !empty($job['deadline']) ? date('M d, Y', strtotime($job['deadline'])) : 'Not mentioned' ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Job Type:</span>
