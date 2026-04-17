@@ -1,11 +1,7 @@
 <?php
 
-/**
- * ApplicationForms Controller
- * 
- * Manages application forms for recruitment managers
- * Replaces the old "Assigned Jobs" feature
- */
+// ApplicationForms Controller
+ 
 class ApplicationForms extends Controller
 {
     public function index()
@@ -85,9 +81,8 @@ class ApplicationForms extends Controller
         $this->view('recruitment/application-forms', $data);
     }
 
-    /**
-     * Show create form page
-     */
+
+    //Show create form page
     public function create($job_post_id = null)
     {
         Auth::requireRole(3);
@@ -124,9 +119,8 @@ class ApplicationForms extends Controller
         $this->view('recruitment/create-application-form', $data);
     }
 
-    /**
-     * Store new application form
-     */
+    
+    //Store new application form
     public function store()
     {
         Auth::requireRole(3);
@@ -171,7 +165,7 @@ class ApplicationForms extends Controller
             redirect('recruitment/applicationforms');
         }
 
-        // Create form (no need to store job details, will fetch from job_posts)
+        // Create form 
         $formData = [
             'job_post_id' => $job_post_id,
             'created_by' => $user_id,
@@ -185,6 +179,11 @@ class ApplicationForms extends Controller
             $form_id = $applicationForm->insert($formData);
 
             if ($form_id) {
+                AccessLog::log(
+                    'application_form_created',
+                    'Created application form ID ' . $form_id . ' for job post ID ' . $job_post_id
+                );
+
                 // Save selected fields
                 if ($applicationFormField->saveFormFields($form_id, $selected_fields)) {
                     // Update field count
@@ -206,9 +205,8 @@ class ApplicationForms extends Controller
         }
     }
 
-    /**
-     * Preview form
-     */
+    
+    //Preview form
     public function preview($form_id = null)
     {
         Auth::requireRole(3);
@@ -272,9 +270,8 @@ class ApplicationForms extends Controller
         $this->view('recruitment/preview-application-form', $data);
     }
 
-    /**
-     * Edit form
-     */
+    
+    //Edit form
     public function edit($form_id = null)
     {
         Auth::requireRole(3);
@@ -320,9 +317,8 @@ class ApplicationForms extends Controller
         $this->view('recruitment/edit-application-form', $data);
     }
 
-    /**
-     * Update form
-     */
+
+    //Update form
     public function update()
     {
         Auth::requireRole(3);
@@ -385,9 +381,8 @@ class ApplicationForms extends Controller
         redirect('recruitment/applicationforms/preview/' . $form_id);
     }
 
-    /**
-     * Publish form
-     */
+
+    //Publish form
     public function publish($form_id = null)
     {
         Auth::requireRole(3);
@@ -414,6 +409,10 @@ class ApplicationForms extends Controller
 
         // Publish the form
         if ($applicationForm->publishForm($form_id)) {
+            AccessLog::log(
+                'application_form_published',
+                'Published application form ID ' . $form_id
+            );
             $_SESSION['success'] = "Application form published successfully and is now live for applicants";
             redirect('recruitment/applicationforms/preview/' . $form_id);
         } else {
@@ -422,9 +421,8 @@ class ApplicationForms extends Controller
         }
     }
 
-    /**
-     * Delete form
-     */
+    
+    //Delete form
     public function delete($form_id = null)
     {
         Auth::requireRole(3);
@@ -451,6 +449,10 @@ class ApplicationForms extends Controller
 
         // Soft delete: Mark form as deleted and set status to inactive
         if ($applicationForm->softDelete($form_id)) {
+            AccessLog::log(
+                'application_form_deleted',
+                'Soft-deleted application form ID ' . $form_id
+            );
             $_SESSION['success'] = "Application form has been deleted successfully";
             redirect('recruitment/applicationforms');
         } else {
@@ -459,9 +461,7 @@ class ApplicationForms extends Controller
         }
     }
 
-    /**
-     * Change form status
-     */
+    //Change form status
     public function changeStatus()
     {
         Auth::requireRole(3);
@@ -495,6 +495,10 @@ class ApplicationForms extends Controller
 
         // Update status
         if ($applicationForm->updateStatus($form_id, $status)) {
+            AccessLog::log(
+                'application_form_status_updated',
+                'Updated application form ID ' . $form_id . ' status to ' . $status
+            );
             $_SESSION['success'] = "Form status updated successfully";
         } else {
             $_SESSION['error'] = "Failed to update form status";
@@ -503,9 +507,8 @@ class ApplicationForms extends Controller
         redirect(getenv("HTTP_REFERER") ?? "recruitment/applicationforms");
     }
 
-    /**
-     * Toggle form status between active and inactive
-     */
+    
+    //Toggle form status between active and inactive
     public function toggleStatus($form_id = null)
     {
         Auth::requireRole(3);
@@ -534,6 +537,10 @@ class ApplicationForms extends Controller
         $newStatus = $form['status'] === 'active' ? 'inactive' : 'active';
         
         if ($applicationForm->updateStatus($form_id, $newStatus)) {
+            AccessLog::log(
+                'application_form_status_updated',
+                'Toggled application form ID ' . $form_id . ' status to ' . $newStatus
+            );
             $_SESSION['success'] = "Form status changed to " . $newStatus;
         } else {
             $_SESSION['error'] = "Failed to update form status";
@@ -542,9 +549,7 @@ class ApplicationForms extends Controller
         redirect('recruitment/applicationforms');
     }
 
-    /**
-     * Restore deleted form
-     */
+    //Restore deleted form
     public function restore($form_id = null)
     {
         Auth::requireRole(3);
@@ -571,6 +576,10 @@ class ApplicationForms extends Controller
 
         // Restore form
         if ($applicationForm->restoreForm($form_id)) {
+            AccessLog::log(
+                'application_form_restored',
+                'Restored application form ID ' . $form_id
+            );
             $_SESSION['success'] = "Form restored successfully";
         } else {
             $_SESSION['error'] = "Failed to restore form";
@@ -579,9 +588,7 @@ class ApplicationForms extends Controller
         redirect('recruitment/applicationforms?show_deleted=1');
     }
 
-    /**
-     * Helper function to get category labels
-     */
+    //Helper function to get category labels
     private function getCategoryLabels()
     {
         return [

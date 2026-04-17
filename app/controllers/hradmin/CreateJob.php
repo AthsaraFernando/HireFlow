@@ -67,6 +67,21 @@ class CreateJob extends Controller
                 if (empty($validCategory)) {
                     $data['errors'][] = 'Please select a valid job title from categories.';
                 }
+
+                $applicationDeadline = trim($_POST['application_deadline'] ?? '');
+                if ($applicationDeadline !== '') {
+                    $deadlineDate = DateTime::createFromFormat('Y-m-d', $applicationDeadline);
+                    $isValidDate = $deadlineDate && $deadlineDate->format('Y-m-d') === $applicationDeadline;
+
+                    if (!$isValidDate) {
+                        $data['errors'][] = 'Application deadline must be a valid date.';
+                    } else {
+                        $today = new DateTime('today');
+                        if ($deadlineDate < $today) {
+                            $data['errors'][] = 'Application deadline cannot be a past date.';
+                        }
+                    }
+                }
             }
 
             if (empty($data['errors'])) {
@@ -103,6 +118,10 @@ class CreateJob extends Controller
                 $insertId = $jobPost->insert($jobData);
                 
                 if ($insertId) {
+                    AccessLog::log(
+                        'job_post_created',
+                        'Created job post ID ' . (int)$insertId . ': ' . ($jobData['title'] ?? 'Untitled')
+                    );
                     $_SESSION['success_message'] = 'Job posted successfully!';
                     redirect('hradmin/job-posts');
                 } else {

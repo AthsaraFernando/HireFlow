@@ -98,6 +98,36 @@ class ShortlistCandidates extends Controller
             exit;
         }
 
+        AccessLog::log(
+            'interview_feedback_updated',
+            'Updated feedback ID ' . (int)$id . ' for interview ID ' . (int)$feedback['interview_id'] . ' with recommendation: ' . ($payload['recommendation'] ?? 'N/A')
+        );
+
+        $interviewModel = new Interview();
+        $applicationModel = new Application();
+        $interviewData = $interviewModel->getInterviewById((int) $feedback['interview_id']);
+
+        if ($interviewData && !empty($interviewData['application_id'])) {
+            $nextApplicationStatus = null;
+
+            if ($payload['recommendation'] === 'Hire') {
+                $nextApplicationStatus = 'Offered';
+            } elseif ($payload['recommendation'] === 'Reject') {
+                $nextApplicationStatus = 'Rejected';
+            }
+
+            if ($nextApplicationStatus !== null) {
+                $applicationModel->update((int) $interviewData['application_id'], [
+                    'status' => $nextApplicationStatus
+                ]);
+
+                AccessLog::log(
+                    'application_status_updated',
+                    'Set application ID ' . (int)$interviewData['application_id'] . ' to ' . $nextApplicationStatus . ' from shortlist feedback'
+                );
+            }
+        }
+
         $totalPoints = (int) $payload['technical_skills']
             + (int) $payload['problem_solving']
             + (int) $payload['communication']
@@ -139,6 +169,11 @@ class ShortlistCandidates extends Controller
             echo json_encode(['success' => false, 'message' => 'Failed to delete feedback.']);
             exit;
         }
+
+        AccessLog::log(
+            'interview_feedback_deleted',
+            'Soft-deleted feedback ID ' . (int)$id
+        );
 
         echo json_encode(['success' => true, 'message' => 'Feedback removed successfully.']);
         exit;

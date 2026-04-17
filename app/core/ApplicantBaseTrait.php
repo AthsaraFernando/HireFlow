@@ -281,8 +281,17 @@ trait ApplicantBaseTrait
      */
     protected function publicPath($relative = '')
     {
-        $project_root = dirname(__DIR__, 3);
+        // app/core -> project root (HireFlow)
+        $project_root = dirname(__DIR__, 2);
         $public_root = rtrim($project_root . '/public', '/');
+
+        // Fallback for setups where web root points directly to /public
+        if (!is_dir($public_root) && !empty($_SERVER['DOCUMENT_ROOT'])) {
+            $doc_root = rtrim((string)$_SERVER['DOCUMENT_ROOT'], '/');
+            if (is_dir($doc_root)) {
+                $public_root = $doc_root;
+            }
+        }
 
         if ($relative === '' || $relative === null) {
             return $public_root;

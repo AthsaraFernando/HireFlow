@@ -1077,7 +1077,7 @@
 }
 
 .duration::before {
-    content: '⏱️';
+    content: 'Duration : ';
     font-size: 0.8rem;
 }
 

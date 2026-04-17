@@ -47,6 +47,8 @@ class Profile extends Controller
                         // Update session data
                         $updatedUser = $user->first(['id' => Auth::user_id()]);
                         $_SESSION['USER'] = $updatedUser;
+
+                        AccessLog::log('profile_update', 'Recruitment Manager profile updated');
                         
                         $data['success'] = "Profile updated successfully!";
                     } else {

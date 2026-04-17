@@ -40,13 +40,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/notifications" class="nav-link">
-                        <span class="nav-text">Notifications</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/recruitment/profile" class="nav-link">
-                        <span class="nav-text">Profile</span>
+                        <span class="nav-text">My Profile</span>
                     </a>
                 </li>
             </ul>
@@ -73,9 +68,8 @@
                         <span class="user-name"><?= esc($_SESSION['USER']['full_name'] ?? 'Recruitment Manager') ?></span>
                         <span class="user-role">Recruitment Manager</span>
                     </div>
-                    <div class="user-avatar"></div>
-                        </div>
-                    </div>
+                </div>
+            </div>
         </header>
 
         <div class="dashboard-content">
