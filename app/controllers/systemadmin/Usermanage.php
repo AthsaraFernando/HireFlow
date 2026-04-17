@@ -9,17 +9,35 @@ class Usermanage extends Controller
         $data = [];
         $user = new User();
         $role = new Role();
+        $action = $_POST['action'] ?? '';
 
         $canManageUsers = Auth::hasRole(1);
         $data['can_manage_users'] = $canManageUsers;
 
+        $ajaxActions = ['create', 'update', 'delete', 'toggle_status', 'fetch'];
+        $isAjaxAction = in_array($action, $ajaxActions, true);
+
+        $respondJsonError = function ($message) {
+            header('Content-Type: application/json');
+            echo json_encode([
+                'success' => false,
+                'message' => $message,
+            ]);
+            exit;
+        };
+
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             if (!$canManageUsers) {
+                if ($isAjaxAction) {
+                    $respondJsonError('Insufficient privileges to perform this action.');
+                }
                 $data['errors']['general'] = "Insufficient privileges to perform this action.";
             } elseif (!isset($_POST['csrf_token']) || !Auth::verifyCSRFToken($_POST['csrf_token'])) {
                 // Skip CSRF check for fetch action (read-only)
-                $action = $_POST['action'] ?? '';
                 if ($action !== 'fetch') {
+                    if ($isAjaxAction) {
+                        $respondJsonError('Invalid request. Please refresh the page and try again.');
+                    }
                     $data['errors']['general'] = "Invalid request. Please try again.";
                 }
             }

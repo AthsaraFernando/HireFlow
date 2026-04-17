@@ -109,9 +109,6 @@ if (!function_exists('old_value')) {
                                     Create Applicant Account
                                 </a>
                             </p>
-                            <p class="text-muted small mt-2">
-                                <strong>Staff Access:</strong> HR Admin & Recruitment Manager accounts are created by System Admin.
-                            </p>
                         </div>
                     </form>
                     

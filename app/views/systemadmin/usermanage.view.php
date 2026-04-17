@@ -705,6 +705,8 @@
             </div>
 
             <script>
+                const userManageEndpoint = '<?= ROOT ?>/systemadmin/usermanage';
+
                 // Sidebar toggle functionality
                 document.getElementById('sidebarToggle').addEventListener('click', function () {
                     document.querySelector('.sidebar').classList.toggle('collapsed');
@@ -771,7 +773,7 @@
                     formData.append('action', 'fetch');
                     formData.append('user_id', userId);
 
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
@@ -856,7 +858,7 @@
                     }
 
 
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
@@ -904,7 +906,7 @@
                     }
 
                     // Create user via AJAX
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
@@ -955,7 +957,7 @@
                     formData.append('action', 'fetch');
                     formData.append('user_id', userId);
 
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
@@ -1021,7 +1023,7 @@
                         formData.append('user_id', userId);
                         formData.append('csrf_token', '<?= $csrf_token ?>');
 
-                        fetch('/HireFlow/public/systemadmin/usermanage', {
+                        fetch(userManageEndpoint, {
                             method: 'POST',
                             body: formData
                         })
@@ -1057,7 +1059,7 @@
                     formData.append('status', newStatus);
                     formData.append('csrf_token', '<?= $csrf_token ?>');
 
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
