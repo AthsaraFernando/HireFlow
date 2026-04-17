@@ -579,9 +579,12 @@
                                                     <i class="icon-eye"></i>
                                                 </button>
                                                 <?php if (($can_manage_users ?? false) && $user['id'] != Auth::user_id()): ?>
-                                                    <button class="btn-icon" onclick="editUser(<?= $user['id'] ?>)" title="Edit">
-                                                        <i class="icon-edit"></i>
-                                                    </button>
+                                                    <?php $isApplicantUser = (($user['role_id'] ?? null) == 4) || (strtolower(trim($user['role_name'] ?? '')) === 'applicant'); ?>
+                                                    <?php if (!$isApplicantUser): ?>
+                                                        <button class="btn-icon" onclick="editUser(<?= $user['id'] ?>)" title="Edit">
+                                                            <i class="icon-edit"></i>
+                                                        </button>
+                                                    <?php endif; ?>
                                                     <button class="btn-icon danger" onclick="toggleUserStatus(<?= $user['id'] ?>)"
                                                         title="<?= $user['status'] === 'active' ? 'Suspend' : 'Activate' ?>">
                                                         <i class="icon-<?= $user['status'] === 'active' ? 'pause' : 'play' ?>"></i>
