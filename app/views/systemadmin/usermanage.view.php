@@ -1205,4 +1205,4 @@
         </div>
     </div>
 
-    <?php $this->view('components/footer') ?>
+    <?php  // $this->view('components/footer') ?>
