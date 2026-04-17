@@ -197,7 +197,7 @@
                                         <th>ID</th>
                                         <th>Backup name</th>
                                         <th>Size</th>
-                                        <th>Status</th>
+                                        <!-- <th>Status</th> -->
                                         <th>Created</th>
                                         <th>Restored</th>
                                         <th style="text-align: center;">Actions</th>
@@ -209,7 +209,7 @@
                                             <td><?= htmlspecialchars($log['id']) ?></td>
                                             <td><?= htmlspecialchars($log['backup_name']) ?></td>
                                             <td><?= htmlspecialchars(round($log['file_size'] / (1024 * 1024), 2)) ?> MB</td>
-                                            <td><?= htmlspecialchars($log['status']) ?></td>
+                                            <!-- <td><?= htmlspecialchars($log['status']) ?></td> -->
                                             <td><?= htmlspecialchars($log['created_at']) ?></td>
                                             <td><?= !empty($log['restored_at']) ? htmlspecialchars($log['restored_at']) : 'N/A' ?>
                                             </td>
