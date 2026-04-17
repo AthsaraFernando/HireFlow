@@ -395,8 +395,8 @@ class Report
         }
         
         $query = "SELECT 
-                    CONCAT('Week ', WEEK(a.applied_at, 1)) as period,
-                    YEARWEEK(a.applied_at, 1) as year_week,
+                CONCAT('Week ', WEEK(MIN(a.applied_at), 1)) as period,
+                YEARWEEK(MIN(a.applied_at), 1) as year_week,
                     COUNT(*) as total_applications,
                     SUM(CASE WHEN a.status IN ('Under Review', 'Shortlisted') THEN 1 ELSE 0 END) as screenings,
                     SUM(CASE WHEN a.status = 'Interview Scheduled' THEN 1 ELSE 0 END) as interviews,
@@ -439,9 +439,9 @@ class Report
             $whereClauses[] = "a.applied_at >= DATE_SUB(NOW(), INTERVAL {$months} MONTH)";
         }
         
-        $query = "SELECT 
-                    DATE_FORMAT(a.applied_at, '%Y-%m') as month,
-                    DATE_FORMAT(a.applied_at, '%b %Y') as month_name,
+                $query = "SELECT 
+                                        DATE_FORMAT(a.applied_at, '%Y-%m') as month,
+                                        DATE_FORMAT(MIN(a.applied_at), '%b %Y') as month_name,
                     COUNT(*) as total_applications,
                     SUM(CASE WHEN a.status = 'Hired' THEN 1 ELSE 0 END) as hires
                   FROM applications a
