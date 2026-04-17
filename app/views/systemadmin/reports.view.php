@@ -525,14 +525,14 @@
                 </div>
 
 
-                <div class="text-center mt-4">
+                <!-- <div class="text-center mt-4">
                     <a href="<?= ROOT ?>/systemadmin/dashboard" class="btn btn-outline-secondary">
                         ← Back to Dashboard
                     </a>
-                </div>
+                </div> -->
             </div>
 
-            <?php $this->view('components/footer') ?>
+            <?php  // $this->view('components/footer') ?>
 
             <script src="<?= ROOT ?>/assets/js/main.js"></script>
             <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
