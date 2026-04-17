@@ -289,4 +289,22 @@ class ApplicationForm
         
         return $this->query($query, ['form_id' => $form_id]);
     }
+
+    /**
+     * Increment submission count for a form.
+     */
+    public function incrementSubmissionCount($form_id)
+    {
+        $form_id = (int)$form_id;
+        if ($form_id <= 0) {
+            return false;
+        }
+
+        $query = "UPDATE {$this->table}
+                  SET submission_count = COALESCE(submission_count, 0) + 1,
+                      updated_at = CURRENT_TIMESTAMP
+                  WHERE id = :form_id";
+
+        return $this->query($query, ['form_id' => $form_id]);
+    }
 }

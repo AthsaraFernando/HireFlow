@@ -104,7 +104,7 @@ class User
             }
 
             // Verify password
-            if (password_verify($data['password'], $row['password']) || $data['password'] === $row['password']) {
+            if (password_verify($data['password'], $row['password'])) {
                 // Check role if provided
                 if (isset($data['role_id'])) {
                     $posted_role_id = (int) $data['role_id'];

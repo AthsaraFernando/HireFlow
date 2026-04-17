@@ -11,6 +11,13 @@ class JobPosts extends Controller
         $data['errors'] = [];
         $data['success'] = '';
         $data['page_title'] = 'Job Posts Management';
+
+        $filters = [
+            'q' => trim((string)($_GET['q'] ?? '')),
+            'status' => trim((string)($_GET['status'] ?? '')),
+            'department' => trim((string)($_GET['department'] ?? '')),
+            'type' => trim((string)($_GET['type'] ?? '')),
+        ];
         
         // Check for success message from redirect
         if (!empty($_SESSION['success_message'])) {
@@ -31,12 +38,15 @@ class JobPosts extends Controller
         $departmentModel = new Department();
         $departments = $departmentModel->findAll();
         $deptMap = [];
+        $departmentOptions = [];
         foreach ($departments as $dept) {
             $deptMap[$dept['id']] = $dept['name'];
+            $departmentOptions[] = $dept['name'];
         }
         
         // Format data for the view
         $data['job_posts'] = [];
+        $typeOptions = [];
         if ($jobs) {
             foreach ($jobs as $job) {
                 // Get department name from map if department_id exists
@@ -47,19 +57,52 @@ class JobPosts extends Controller
                     $deptName = $job['department'];
                 }
                 
-                $data['job_posts'][] = [
+                $formattedJob = [
                     'id' => $job['id'],
                     'title' => $job['title'],
                     'department' => $deptName,
                     'location' => $job['location'],
                     'type' => $job['employment_type'],
                     'status' => $job['status'],
-                    'applications' => $job['applications_count'] ?? 0,
+                    'applications' => (int)($job['live_applications_count'] ?? 0),
                     'created_date' => date('Y-m-d', strtotime($job['created_at'])),
                     'deadline' => $job['deadline']
                 ];
+
+                if (!empty($formattedJob['type'])) {
+                    $typeOptions[] = $formattedJob['type'];
+                }
+
+                $searchText = strtolower(implode(' ', [
+                    (string)($formattedJob['title'] ?? ''),
+                    (string)($formattedJob['department'] ?? ''),
+                    (string)($formattedJob['location'] ?? ''),
+                    (string)($formattedJob['type'] ?? ''),
+                ]));
+
+                if ($filters['q'] !== '' && strpos($searchText, strtolower($filters['q'])) === false) {
+                    continue;
+                }
+
+                if ($filters['status'] !== '' && strtolower((string)$formattedJob['status']) !== strtolower($filters['status'])) {
+                    continue;
+                }
+
+                if ($filters['department'] !== '' && strtolower((string)$formattedJob['department']) !== strtolower($filters['department'])) {
+                    continue;
+                }
+
+                if ($filters['type'] !== '' && strtolower((string)$formattedJob['type']) !== strtolower($filters['type'])) {
+                    continue;
+                }
+
+                $data['job_posts'][] = $formattedJob;
             }
         }
+
+        $data['filters'] = $filters;
+        $data['department_options'] = array_values(array_unique(array_filter($departmentOptions)));
+        $data['type_options'] = array_values(array_unique(array_filter($typeOptions)));
         
         $this->view('hradmin/job-posts', $data);
     }
@@ -128,6 +171,10 @@ class JobPosts extends Controller
                 $result = $jobPost->update($id, $updateData);
                 
                 if ($result !== false) {
+                    AccessLog::log(
+                        'job_post_updated',
+                        'Updated job post ID ' . (int)$id . ': ' . ($updateData['title'] ?? 'Untitled')
+                    );
                     $_SESSION['success_message'] = 'Job post updated successfully!';
                     redirect('hradmin/job-posts');
                 } else {
@@ -199,6 +246,10 @@ class JobPosts extends Controller
         $result = $jobPost->delete($id);
         
         if ($result !== false) {
+            AccessLog::log(
+                'job_post_deleted',
+                'Deleted job post ID ' . (int)$id . ': ' . ($job['title'] ?? 'Untitled')
+            );
             $_SESSION['success_message'] = 'Job post deleted successfully!';
         } else {
             $_SESSION['error_message'] = 'Failed to delete job post. Please try again.';

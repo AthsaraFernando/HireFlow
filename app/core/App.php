@@ -4,131 +4,195 @@ class App
 {
     private $controller = 'Home';
     private $method = 'index';
+
     private function splitURL()
     {
         $URL = $_GET['url'] ?? 'home';
         $URL = explode("/", trim($URL, "/"));
         return $URL;
     }
-    private function convertUrlToClassName($url) {
-        // Convert hyphenated URL segments to PascalCase class names
-        // e.g., "job-posts" -> "JobPosts", "create-job" -> "CreateJob"
+
+    private function convertUrlToClassName($url)
+    {
         return str_replace(' ', '', ucwords(str_replace('-', ' ', $url)));
     }
-    
+
+    private function normalizeControllerToken($value)
+    {
+        return strtolower(preg_replace('/[^a-z0-9]/i', '', (string)$value));
+    }
+
+    /**
+     * Robust root-level controller resolver (case-insensitive fallback)
+     */
+    private function resolveControllerFile($directory, $expectedClassName)
+    {
+        $directory = rtrim($directory, '/');
+        $exactFile = $directory . '/' . $expectedClassName . '.php';
+
+        if (file_exists($exactFile)) {
+            return [$exactFile, $expectedClassName];
+        }
+
+        if (!is_dir($directory)) {
+            return [null, null];
+        }
+
+        foreach (scandir($directory) as $file) {
+            if ($file === '.' || $file === '..') {
+                continue;
+            }
+
+            if (strtolower(pathinfo($file, PATHINFO_EXTENSION)) !== 'php') {
+                continue;
+            }
+
+            $stem = pathinfo($file, PATHINFO_FILENAME);
+            if (strtolower($stem) === strtolower($expectedClassName)) {
+                return [$directory . '/' . $file, $stem];
+            }
+        }
+
+        return [null, null];
+    }
+
+    /**
+     * Flexible folder controller resolver
+     */
+    private function resolveFolderController($folder, $segment)
+    {
+        $controllerDir = "../app/controllers/" . $folder;
+
+        if (!is_dir($controllerDir)) {
+            return null;
+        }
+
+        $controllerName = $this->convertUrlToClassName($segment);
+        $directPath = $controllerDir . "/" . $controllerName . ".php";
+
+        if (file_exists($directPath)) {
+            return [
+                'controller' => $controllerName,
+                'file' => $directPath,
+            ];
+        }
+
+        $targetToken = $this->normalizeControllerToken($segment);
+
+        foreach (glob($controllerDir . "/*.php") as $candidatePath) {
+            $candidateController = pathinfo($candidatePath, PATHINFO_FILENAME);
+
+            if ($this->normalizeControllerToken($candidateController) === $targetToken) {
+                return [
+                    'controller' => $candidateController,
+                    'file' => $candidatePath,
+                ];
+            }
+        }
+
+        return null;
+    }
+
     public function loadController()
     {
         $URL = $this->splitURL();
-        
+
         // Global authentication check
         $this->checkGlobalAuth($URL);
-        
-        // show($URL);
-        
-        // First check for direct controller files (e.g., Home.php, Signin.php)
-        $fileName = "../app/controllers/" . ucfirst($URL[0]) . ".php";
-        if (file_exists($fileName)) {
+
+        /**
+         * STEP 1: Root-level controllers (robust)
+         */
+        list($fileName, $controllerName) = $this->resolveControllerFile(
+            "../app/controllers",
+            ucfirst($URL[0])
+        );
+
+        if ($fileName) {
             require $fileName;
-            $this->controller = ucfirst($URL[0]);
+            $this->controller = $controllerName;
             unset($URL[0]);
         } else {
-            // Check for folder-based controllers (e.g., systemadmin/Dashboard.php, applicant/Applicant.php)
-            
-            // Special handling for applicant routes - all go to main Applicant controller
-            if ($URL[0] === 'applicant') {
-                $fileName = "../app/controllers/applicant/Applicant.php";
-                if (file_exists($fileName)) {
-                    require $fileName;
-                    $this->controller = 'Applicant';
-                    unset($URL[0]); // Remove 'applicant' from URL array
+
+            /**
+             * STEP 2: Folder-based controllers (including applicant)
+             */
+            if (isset($URL[1])) {
+
+                $resolvedController = $this->resolveFolderController($URL[0], $URL[1]);
+
+                if ($resolvedController) {
+                    require $resolvedController['file'];
+                    $this->controller = $resolvedController['controller'];
+
+                    unset($URL[0]);
+                    unset($URL[1]);
                 } else {
-                    $fileName = "../app/controllers/_404.php";
-                    require $fileName;
+                    require "../app/controllers/_404.php";
                     $this->controller = '_404';
                 }
+
             } else {
-                // For systemadmin and other folder-based controllers
-                if (isset($URL[1])) {
-                    $controllerName = $this->convertUrlToClassName($URL[1]);
-                    $fileName = "../app/controllers/" . $URL[0] . "/" . $controllerName . ".php";
-                    if (file_exists($fileName)) {
-                        require $fileName;
-                        $this->controller = $controllerName;
-                        unset($URL[0]); // Remove folder name from URL
-                        unset($URL[1]); // Remove controller name from URL
-                    } else {
-                        $fileName = "../app/controllers/_404.php";
-                        require $fileName;
-                        $this->controller = '_404';
-                    }
+
+                /**
+                 * STEP 3: Default controller inside folder
+                 */
+                list($fileName, $controllerName) = $this->resolveControllerFile(
+                    "../app/controllers/" . $URL[0],
+                    ucfirst($URL[0])
+                );
+
+                if ($fileName) {
+                    require $fileName;
+                    $this->controller = $controllerName;
+                    unset($URL[0]);
                 } else {
-                    // If no second segment, try the main controller for that folder
-                    $folderControllerName = ucfirst($URL[0]);
-                    $fileName = "../app/controllers/" . $URL[0] . "/" . $folderControllerName . ".php";
-                    if (file_exists($fileName)) {
-                        require $fileName;
-                        $this->controller = $folderControllerName;
-                        unset($URL[0]);
-                    } else {
-                        $fileName = "../app/controllers/_404.php";
-                        require $fileName;
-                        $this->controller = '_404';
-                    }
+                    require "../app/controllers/_404.php";
+                    $this->controller = '_404';
                 }
             }
         }
 
         $controller = new $this->controller;
-        
-        // Selecting the controller's method based on the URL
-        // After removing folder and controller segments, check for method
-        $remainingURL = array_values($URL); // Re-index array
+
+        /**
+         * METHOD RESOLUTION
+         */
+        $remainingURL = array_values($URL);
+
         if (!empty($remainingURL[0])) {
             if (method_exists($controller, $remainingURL[0])) {
                 $this->method = $remainingURL[0];
                 unset($remainingURL[0]);
             }
         }
-        
-        call_user_func_array([$controller, $this->method], array_values($remainingURL));
 
+        call_user_func_array([$controller, $this->method], array_values($remainingURL));
     }
-    
+
     /**
-     * Global authentication check for protected areas
+     * Global authentication check
      */
     private function checkGlobalAuth($URL)
     {
-        // Define public pages that don't require authentication
         $publicPages = [
-            'home', 'signin', 'signup', 'signout', '_404','passwordreset',
-            'password-reset', 'admin-setup'
+            'home', 'signin', 'signup', 'signout', '_404',
+            'passwordreset', 'password-reset', 'admin-setup',
+            'terms', 'privacy'
         ];
-        
-        // Check if accessing a public page
+
         if (empty($URL[0]) || in_array(strtolower($URL[0]), $publicPages)) {
-            return; // Allow access to public pages
+            return;
         }
-        
-        // Check for special public files (robots.txt, favicon.ico, etc.)
+
         if (isset($URL[0]) && preg_match('/\.(txt|ico|png|jpg|jpeg|gif|css|js)$/i', $URL[0])) {
-            return; // Allow access to static files
+            return;
         }
-        
-        // All other pages require authentication
+
         if (!Auth::logged_in()) {
-            // Store the requested URL for redirect after login
             $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'] ?? '';
             redirect('signin?required=1');
             exit();
         }
-        
-        // Additional role-based checks can be added here
-        // For now, basic login is sufficient as controllers handle specific role checks
     }
 }
-
-
-
-
-

@@ -209,7 +209,7 @@
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/dashboard" class="nav-link"><span class="nav-text">Dashboard</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/jobs" class="nav-link"><span class="nav-text">Browse Jobs</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/applications" class="nav-link"><span class="nav-text">My Applications</span></a></li>
-                <li class="nav-item"><a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link"><span class="nav-text">Saved Jobs</span></a></li>
+                <li class="nav-item"><a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="nav-link"><span class="nav-text">Saved Jobs</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/interviews" class="nav-link"><span class="nav-text">Interview Schedule</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/interviews/feedback" class="nav-link"><span class="nav-text">Interview Feedback</span></a></li>
                 <li class="nav-item"><a href="<?= ROOT ?>/applicant/profile" class="nav-link active"><span class="nav-text">My Profile</span></a></li>
@@ -228,6 +228,7 @@
                 <p class="page-subtitle">Manage your personal and account information</p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name"><?= esc($user['name'] ?? 'Applicant') ?></span>
                     <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'A', 0, 2)) ?></div>
@@ -384,7 +385,7 @@
                                     type="submit"
                                     id="deleteProfileButton"
                                     class="btn btn-danger btn-large"
-                                    formaction="<?= ROOT ?>/applicant/deleteProfile"
+                                    formaction="<?= ROOT ?>/applicant/profile/delete"
                                     formmethod="POST"
                                 >Delete My Profile</button>
                             </div>

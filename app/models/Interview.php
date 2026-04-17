@@ -47,6 +47,7 @@ class Interview
     public function getUserInterviews($user_id)
     {
         $query = "SELECT i.*, 
+                         a.id as application_id,
                          a.job_id,
                          jp.title as job_title, 
                          jp.department,
@@ -64,6 +65,7 @@ class Interview
     public function getUpcomingInterviews($user_id)
     {
         $query = "SELECT i.*, 
+                         a.id as application_id,
                          a.job_id,
                          jp.title as job_title, 
                          jp.department,
@@ -74,7 +76,7 @@ class Interview
                   LEFT JOIN users u ON i.interviewer_id = u.id
                   WHERE a.applicant_id = ?
                   AND i.scheduled_date >= CURDATE()
-                  AND i.status = 'Scheduled'
+                  AND LOWER(i.status) IN ('pending', 'scheduled', 'rescheduled')
                   ORDER BY i.scheduled_date ASC, i.scheduled_time ASC
                   LIMIT 5";
 
@@ -84,8 +86,8 @@ class Interview
     public function getInterviewCount($user_id)
     {
         $query = "SELECT COUNT(*) as total_interviews,
-                         SUM(CASE WHEN i.status = 'Scheduled' AND i.scheduled_date >= CURDATE() THEN 1 ELSE 0 END) as upcoming_interviews,
-                         SUM(CASE WHEN i.status = 'Completed' THEN 1 ELSE 0 END) as completed_interviews
+                         SUM(CASE WHEN LOWER(i.status) IN ('pending', 'scheduled', 'rescheduled') AND i.scheduled_date >= CURDATE() THEN 1 ELSE 0 END) as upcoming_interviews,
+                         SUM(CASE WHEN LOWER(i.status) = 'completed' THEN 1 ELSE 0 END) as completed_interviews
                   FROM interviews i 
                   JOIN applications a ON i.application_id = a.id
                   WHERE a.applicant_id = ?";
@@ -121,7 +123,7 @@ class Interview
                   JOIN job_posts jp ON a.job_id = jp.id
                   LEFT JOIN users interviewer ON i.interviewer_id = interviewer.id
                   LEFT JOIN roles r ON interviewer.role_id = r.id
-                  ORDER BY i.scheduled_date DESC, i.scheduled_time DESC";
+                  ORDER BY i.created_at DESC, i.scheduled_date DESC, i.scheduled_time DESC";
 
         return $this->query($query);
     }
@@ -167,9 +169,9 @@ class Interview
             $data['interview_type'] = 'Video';
         }
 
-        // Call parent insert and explicitly return true if successful
-        $this->insert($data);
-        return true; // Override the false return from Model trait
+        // Return real insert result so callers can detect DB failures.
+        $insertId = $this->insert($data);
+        return $insertId !== false;
     }
 
     /**
@@ -178,9 +180,8 @@ class Interview
      */
     public function updateInterview($id, $data)
     {
-        // Call parent update and explicitly return true if successful
-        $this->update($id, $data);
-        return true; // Override the false return from Model trait
+        // Return real update result so callers can detect DB failures.
+        return $this->update($id, $data);
     }
 
     /**
@@ -191,8 +192,7 @@ class Interview
     {
         // Use direct query instead of the buggy Model trait delete
         $query = "DELETE FROM {$this->table} WHERE id = :id";
-        $this->query($query, ['id' => $id]);
-        return true;
+        return $this->query($query, ['id' => $id]);
     }
 
     /**
@@ -233,18 +233,11 @@ class Interview
 
     public function getInterviewStats()
     {
-        $query = "SELECT
-                    scheduled_date,
-                        COUNT(*) AS scheduledCount
-                    FROM
-                        interviews
-                    WHERE
-                        status = 'Scheduled'
-                    GROUP BY
-                        scheduled_date
-                    ORDER BY
-                        scheduled_date ASC";
-
+        $query = "SELECT scheduled_date,COUNT(*) AS scheduledCount
+                  FROM interviews
+                  WHERE status = 'Scheduled'
+                  GROUP BY scheduled_date
+                  ORDER BY scheduled_date ASC";
         $result = $this->query($query);
         return $result ? $result : 0;
     }

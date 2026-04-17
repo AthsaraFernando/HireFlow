@@ -44,27 +44,49 @@ class ViewJob extends Controller
         // Get application statistics
         $application = new Application();
         $allApplications = $application->where(['job_id' => $id], []);
-        $job['total_applications'] = count($allApplications);
+        $job['applications_count'] = count($allApplications);
+        $job['total_applications'] = $job['applications_count'];
         
         // Count new applications (Applied status)
         $job['new_applications'] = 0;
         $job['interviews_scheduled'] = 0;
         $job['offers_made'] = 0;
+        $job['shortlisted_count'] = 0;
+        $job['interviewed_count'] = 0;
         
         foreach ($allApplications as $app) {
-            if ($app['status'] === 'Applied' || $app['status'] === 'Under Review') {
+            $status = strtolower(trim((string)($app['status'] ?? '')));
+
+            if ($status === 'applied' || $status === 'under review') {
                 $job['new_applications']++;
-            } elseif ($app['status'] === 'Interview Scheduled') {
+            }
+
+            if ($status === 'interview scheduled') {
                 $job['interviews_scheduled']++;
-            } elseif ($app['status'] === 'Offer Made') {
+            }
+
+            if ($status === 'offer made') {
                 $job['offers_made']++;
             }
+
+            if ($status === 'shortlisted') {
+                $job['shortlisted_count']++;
+            }
+
+            if ($status === 'interview scheduled' || $status === 'interview completed' || $status === 'interviewed') {
+                $job['interviewed_count']++;
+            }
         }
+
+        $currentViews = (isset($job['views_count']) && is_numeric($job['views_count'])) ? (int)$job['views_count'] : 0;
+        $job['views_count'] = max($currentViews, (int)$job['applications_count']);
         
         // Map database fields to view expectations
         $job['summary'] = $job['description'];
         $job['type'] = $job['employment_type'];
         $job['created_date'] = $job['created_at'] ?? date('Y-m-d');
+        $job['posted_date'] = !empty($job['created_at']) ? date('M d, Y', strtotime($job['created_at'])) : date('M d, Y');
+        $job['application_deadline'] = $job['deadline'] ?? null;
         
         $data['job'] = $job;
         

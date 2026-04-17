@@ -164,6 +164,11 @@
     color: #6b7280;
 }
 
+.action-static.btn-secondary,
+.action-static.btn-disabled {
+    color: #fff;
+}
+
 .btn-danger {
     background: #dc2626;
     border: 1px solid #b91c1c;
@@ -194,6 +199,10 @@
 .empty-state p {
     margin: 0 0 16px 0;
     color: #64748b;
+}
+
+.empty-state .btn-primary {
+    color: #fff;
 }
 
 @media (max-width: 768px) {

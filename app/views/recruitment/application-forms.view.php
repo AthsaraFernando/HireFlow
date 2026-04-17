@@ -35,23 +35,13 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/candidate-evaluation" class="nav-link">
-                        <span class="nav-text">Evaluations</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/recruitment/reports" class="nav-link">
                         <span class="nav-text">Reports</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/notifications" class="nav-link">
-                        <span class="nav-text">Notifications</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/recruitment/profile" class="nav-link">
-                        <span class="nav-text">Profile</span>
+                        <span class="nav-text">My Profile</span>
                     </a>
                 </li>
             </ul>
@@ -78,9 +68,8 @@
                         <span class="user-name"><?= esc($_SESSION['USER']['full_name'] ?? 'Recruitment Manager') ?></span>
                         <span class="user-role">Recruitment Manager</span>
                     </div>
-                    <div class="user-avatar"></div>
-                        </div>
-                    </div>
+                </div>
+            </div>
         </header>
 
         <div class="dashboard-content">
@@ -194,11 +183,27 @@
             <?php else: ?>
                 <div class="jobs-grid">
                     <?php foreach ($available_jobs as $job): ?>
+                        <?php
+                            $jobTitle = trim((string)($job['title'] ?? ''));
+                            $employmentTypeRaw = trim((string)($job['employment_type'] ?? ''));
+                            $locationText = trim((string)($job['location'] ?? ''));
+                            $departmentText = trim((string)($job['department'] ?? ''));
+                            $salaryText = trim((string)($job['salary_range'] ?? ''));
+                            $descriptionText = trim(strip_tags((string)($job['description'] ?? '')));
+
+                            $employmentType = $employmentTypeRaw !== '' ? $employmentTypeRaw : 'Not specified';
+                            $employmentBadgeClass = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $employmentTypeRaw !== '' ? $employmentTypeRaw : 'not-specified'));
+                            $jobTitle = $jobTitle !== '' ? $jobTitle : 'Untitled job post';
+                            $locationText = $locationText !== '' ? $locationText : 'Location not specified';
+                            $departmentText = $departmentText !== '' ? $departmentText : 'Department not specified';
+                            $salaryText = $salaryText !== '' ? $salaryText : 'Salary not specified';
+                            $descriptionPreview = $descriptionText !== '' ? mb_substr($descriptionText, 0, 150) : 'No job description available for this post yet.';
+                        ?>
                         <div class="job-card">
                             <div class="job-card-header">
-                                <h3 class="job-title"><?= esc($job['title']) ?></h3>
-                                <span class="badge badge-<?= strtolower($job['employment_type']) ?>">
-                                    <?= esc($job['employment_type']) ?>
+                                <h3 class="job-title\"><?= esc($jobTitle) ?></h3>
+                                <span class="badge badge-<?= esc($employmentBadgeClass) ?>">
+                                    <?= esc($employmentType) ?>
                                 </span>
                             </div>
                             
@@ -208,7 +213,7 @@
                                         <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                         <circle cx="12" cy="10" r="3"></circle>
                                     </svg>
-                                    <span><?= esc($job['location']) ?></span>
+                                    <span><?= esc($locationText) ?></span>
                                 </div>
                                 
                                 <div class="detail-item">
@@ -216,18 +221,16 @@
                                         <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                                         <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                                     </svg>
-                                    <span><?= esc($job['department']) ?></span>
+                                    <span><?= esc($departmentText) ?></span>
                                 </div>
                                 
-                                <?php if (!empty($job['salary_range'])): ?>
                                 <div class="detail-item">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <line x1="12" y1="1" x2="12" y2="23"></line>
                                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                                     </svg>
-                                    <span><?= esc($job['salary_range']) ?></span>
+                                    <span><?= esc($salaryText) ?></span>
                                 </div>
-                                <?php endif; ?>
                                 
                                 <?php if (!empty($job['deadline'])): ?>
                                 <div class="detail-item">
@@ -242,11 +245,10 @@
                                 <?php endif; ?>
                             </div>
                             
-                            <?php if (!empty($job['description'])): ?>
                             <div class="job-description">
-                                <?= substr(strip_tags($job['description']), 0, 150) ?>...
+                                <?= esc($descriptionPreview) ?>
+                                <?= mb_strlen($descriptionText) > 150 ? '...' : '' ?>
                             </div>
-                            <?php endif; ?>
                             
                             <div class="job-card-footer">
                                 <span class="job-meta">Posted: <?= date('M d, Y', strtotime($job['created_at'])) ?></span>

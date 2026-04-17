@@ -1,4 +1,4 @@
-<?php $this->view('components/header') ?>
+<?php $this->view('components/header', ['page_title' => $page_title ?? 'System Admin']) ?>
 
 <style>
     .page-header {
@@ -304,13 +304,124 @@
             grid-template-columns: 1fr;
         }
     }
+
+    .profile_picture {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        margin-left: 20px;
+    }
+
+    .user-agent {
+        max-width: 200px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .log-detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .detail-item.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .detail-item label {
+        font-weight: 600;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+    }
+
+    .detail-item span,
+    .detail-item div {
+        color: var(--text-primary);
+        word-break: break-all;
+    }
+
+    .action-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+
+    .action-badge.login {
+        background: #e3f2fd;
+        color: #1976d2;
+    }
+
+    .action-badge.logout {
+        background: #f3e5f5;
+        color: #7b1fa2;
+    }
+
+    .action-badge.failed-login {
+        background: #ffebee;
+        color: #d32f2f;
+    }
+
+    .action-badge.data-access {
+        background: #e8f5e8;
+        color: #388e3c;
+    }
+
+    .action-badge.profile-update {
+        background: #fff3e0;
+        color: #f57c00;
+    }
+
+    .action-badge.admin-action {
+        background: #fce4ec;
+        color: #c2185b;
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .filter-input,
+    .filter-select {
+        padding: 0.5rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 0.875rem;
+    }
+
+    .search-section {
+        margin: 1rem 0;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .search-input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+    }
 </style>
 
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
             <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
-            <p class="brand-subtitle">System Admin</p>
+
         </div>
 
         <nav class="sidebar-nav">
@@ -341,6 +452,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/announcements" class="nav-link">
+                        <span class="nav-text">Announcements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -363,9 +479,7 @@
             </div>
 
             <div class="header-right">
-                <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div>
+
 
                 <div class="header-user">
                     <div class="user-info">
@@ -373,8 +487,21 @@
                             <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
                         <span class="user-role">System Administrator</span>
                     </div>
-                    <div class="user-avatar">
-                    </div>
+                    <?php
+                    $defaultProfileImage = 'default-avatar.jpg';
+                    $profileImage = $defaultProfileImage;
+
+                    if (!empty($_SESSION['USER']['profile_picture'])) {
+                        $basePath = dirname(dirname(dirname(__DIR__)));
+                        $profileImageFile = $basePath . '/public/assets/images/profiles/' . $_SESSION['USER']['profile_picture'];
+
+                        if (file_exists($profileImageFile)) {
+                            $profileImage = $_SESSION['USER']['profile_picture'];
+                        }
+                    }
+                    ?>
+                    <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt="" class="profile_picture">
+
                 </div>
             </div>
         </header>
@@ -398,15 +525,14 @@
             <div class="page-controls">
                 <!-- Page Header -->
                 <div class="page-header">
-                    <h1 class="page-title">Access Logs</h1>
-                    <p class="page-description">Monitor and track all system access activities</p>
+
                 </div>
 
                 <!-- Statistics Cards -->
                 <div class="controls-stats">
                     <div class="metric-card">
                         <div class="metric-value"><?= number_format($total_logs ?? 0) ?></div>
-                        <div class="metric-label">Total Logins Today</div>
+                        <div class="metric-label">Total Logs</div>
                     </div>
                     <div class="metric-card">
                         <div class="metric-value"><?= number_format($unique_users_today ?? 0) ?></div>
@@ -416,10 +542,7 @@
                         <div class="metric-value"><?= number_format($failed_logins_today ?? 0) ?></div>
                         <div class="metric-label">Failed Attempts</div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-value"><?= count($blocked_ips ?? []) ?></div>
-                        <div class="metric-label">Suspicious Activities</div>
-                    </div>
+
                 </div>
 
                 <div class="controls-header">
@@ -466,27 +589,55 @@
                             <option value="login">Login</option>
                             <option value="logout">Logout</option>
                             <option value="failed_login">Failed Login</option>
-                            <option value="password_change_request">Password Change Request</option>
+                            <option value="password_reset_request">Password Reset Request</option>
                             <option value="profile_update">Profile Update</option>
-                            <option value="password_change">Password Change</option>
+                            <option value="password_change">Password Reset</option>
                             <option value="registration">Registration</option>
                             <option value="user_updated">User Updated</option>
                             <option value="user_deleted">User Deleted</option>
                             <option value="user_status_changed">User Status Changed</option>
                             <option value="user_created">User Created</option>
                             <option value="application_submit">Application Submit</option>
-                            <option value="db_backup">Database Backup</option>
+                            <option value="db_backup_created">Database Backup</option>
                             <option value="db_restore">Database Restore</option>
                             <option value="db_backup_download">Database Backup Download</option>
-                            <option value="password_reset_request">Password Reset Request</option>
-                            <option value="password_change">Password Change</option>
-
+                            <option value="db_backup_deleted">Database Backup Delete</option>
+                            <option value="announcement_created">Announcement Create</option>
+                            <option value="announcement_updated">Announcement Update</option>
+                            <option value="announcement_deleted">Announcement Delete</option>
+                            <option value="application_status_updated">Application Status Updated</option>
+                            <option value="application_status_update_failed">Application Status Update Failed</option>
+                            <option value="interview_scheduled">Interview Scheduled</option>
+                            <option value="interview_rescheduled">Interview Rescheduled</option>
+                            <option value="interview_deleted">Interview Deleted</option>
+                            <option value="interview_feedback_submitted">Interview Feedback Submitted</option>
+                            <option value="interview_feedback_updated">Interview Feedback Updated</option>
+                            <option value="interview_feedback_deleted">Interview Feedback Deleted</option>
+                            <option value="application_form_created">Application Form Created</option>
+                            <option value="application_form_published">Application Form Published</option>
+                            <option value="application_form_deleted">Application Form Deleted</option>
+                            <option value="application_form_status_updated">Application Form Status Updated</option>
+                            <option value="application_form_restored">Application Form Restored</option>
+                            <option value="job_post_created">Job Post Created</option>
+                            <option value="job_post_updated">Job Post Updated</option>
+                            <option value="job_post_deleted">Job Post Deleted</option>
+                            <option value="job_category_created">Job Category Created</option>
+                            <option value="job_category_updated">Job Category Updated</option>
+                            <option value="job_category_deleted">Job Category Deleted</option>
+                            <option value="department_created">Department Created</option>
+                            <option value="department_updated">Department Updated</option>
+                            <option value="department_deleted">Department Deleted</option>
+                            <option value="application_updated">Application Updated</option>
+                            <option value="application_deleted">Application Deleted</option>
+                            <option value="saved_job_added">Saved Job Added</option>
+                            <option value="saved_job_note_updated">Saved Job Note Updated</option>
+                            <option value="saved_job_removed">Saved Job Removed</option>
                         </select>
                     </div>
                     <div class="filter-group">
                         <label>Filter by Flag:</label>
                         <select class="filter-select" id="flagFilter">
-                            <option value="">Unflagged</option>
+                            <option value="">All Flags</option>
                             <option value="unflagged">Unflagged</option>
                             <option value="flagged">Flagged</option>
                         </select>
@@ -661,7 +812,7 @@
                         }
 
                         // Action filter
-                        if (actionFilter && !action.includes(actionFilter.toLowerCase())) {
+                        if (actionFilter && action !== actionFilter.toLowerCase()) {
                             shouldShow = false;
                         }
 
@@ -774,6 +925,9 @@
                 }
 
                 function exportLogs() {
+                    if (!confirm("Do you want to export the filtered logs?")) {
+                        return;
+                    }
                     // Get all visible table rows (filtered rows)
                     const tableRows = document.querySelectorAll('.data-table tbody tr');
                     const visibleRows = Array.from(tableRows).filter(row => {
@@ -840,15 +994,6 @@
                     }
                 }
 
-                // Real-time log updates (simulated)
-                setInterval(function () {
-                    const badge = document.querySelector('.metric-card .metric-value');
-                    if (badge) {
-                        const currentValue = parseInt(badge.textContent.replace(',', ''));
-                        badge.textContent = (currentValue + Math.floor(Math.random() * 3)).toLocaleString();
-                    }
-                }, 30000); // Update every 30 seconds
-
                 // Toast notification function
                 function showToast(message, type) {
                     const toast = document.createElement('div');
@@ -861,110 +1006,6 @@
                     }, 3000);
                 }
             </script>
-
-            <style>
-                .user-agent {
-                    max-width: 200px;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-
-                .log-detail-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 1rem;
-                }
-
-                .detail-item {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.25rem;
-                }
-
-                .detail-item.full-width {
-                    grid-column: 1 / -1;
-                }
-
-                .detail-item label {
-                    font-weight: 600;
-                    color: var(--text-secondary);
-                    font-size: 0.875rem;
-                }
-
-                .detail-item span,
-                .detail-item div {
-                    color: var(--text-primary);
-                    word-break: break-all;
-                }
-
-                .action-badge {
-                    padding: 0.25rem 0.5rem;
-                    border-radius: 4px;
-                    font-size: 0.75rem;
-                    font-weight: 500;
-                    text-transform: uppercase;
-                }
-
-                .action-badge.login {
-                    background: #e3f2fd;
-                    color: #1976d2;
-                }
-
-                .action-badge.logout {
-                    background: #f3e5f5;
-                    color: #7b1fa2;
-                }
-
-                .action-badge.failed-login {
-                    background: #ffebee;
-                    color: #d32f2f;
-                }
-
-                .action-badge.data-access {
-                    background: #e8f5e8;
-                    color: #388e3c;
-                }
-
-                .action-badge.profile-update {
-                    background: #fff3e0;
-                    color: #f57c00;
-                }
-
-                .action-badge.admin-action {
-                    background: #fce4ec;
-                    color: #c2185b;
-                }
-
-                .filter-group {
-                    display: flex;
-                    gap: 1rem;
-                    align-items: center;
-                    flex-wrap: wrap;
-                }
-
-                .filter-input,
-                .filter-select {
-                    padding: 0.5rem;
-                    border: 1px solid var(--border-color);
-                    border-radius: 4px;
-                    font-size: 0.875rem;
-                }
-
-                .search-section {
-                    margin: 1rem 0;
-                    display: flex;
-                    gap: 1rem;
-                    align-items: center;
-                }
-
-                .search-input {
-                    flex: 1;
-                    padding: 0.75rem;
-                    border: 1px solid var(--border-color);
-                    border-radius: 4px;
-                }
-            </style>
 
             <script>
                 // Sidebar toggle functionality
@@ -996,5 +1037,6 @@
 
         </div>
     </div>
+</body>
 
-    <?php $this->view('components/footer') ?>
+<?php //$this->view('components/footer') ?>

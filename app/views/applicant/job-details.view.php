@@ -34,7 +34,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                    <a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="nav-link">
                         <span class="nav-text">Saved Jobs</span>
                     </a>
                 </li>
@@ -74,6 +74,7 @@
                 <p class="page-subtitle"><?= $job['company'] ?> • <?= $job['location'] ?></p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name">John Smith</span>
                     <div class="user-avatar">JS</div>
@@ -117,13 +118,13 @@
                             <span class="salary-value"><?= $job['salary'] ?></span>
                         </div>
                         <?php if(!$job['is_saved']): ?>
-                            <form method="POST" action="<?= ROOT ?>/applicant/savedJobs/save" class="details-save-form">
+                            <form method="POST" action="<?= ROOT ?>/applicant/jobs/savedJobs/save" class="details-save-form">
                                 <input type="hidden" name="job_id" value="<?= (int)$job['id'] ?>">
                                 <input type="hidden" name="return_to" value="applicant/jobs/details/<?= (int)$job['id'] ?>">
                                 <button type="submit" class="btn btn-outline btn-large">Save Job</button>
                             </form>
                         <?php else: ?>
-                            <a href="<?= ROOT ?>/applicant/savedJobs" class="btn btn-outline btn-large">Saved Job</a>
+                            <a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="btn btn-outline btn-large">Saved Job</a>
                         <?php endif; ?>
                         <?php if($job['has_applied']): ?>
                             <div class="btn btn-secondary btn-large" style="cursor: default; text-align: center;">
@@ -165,7 +166,7 @@
                         </div>
                         <div class="info-grid-item">
                             <span class="info-label">Application Deadline</span>
-                            <span class="info-value"><?= $job['deadline'] ? date('M d, Y', strtotime($job['deadline'])) : 'Not specified' ?></span>
+                            <span class="info-value"><?= !empty($job['deadline']) ? date('M d, Y', strtotime($job['deadline'])) : 'Not mentioned' ?></span>
                         </div>
                     </div>
                 </div>
@@ -188,18 +189,6 @@
                     </ul>
                 </div>
 
-                <!-- Benefits -->
-                <div class="content-card">
-                    <h3 class="section-title">Benefits & Perks</h3>
-                    <div class="benefits-grid">
-                        <?php foreach($job['benefits'] as $benefit): ?>
-                            <div class="benefit-item">
-                                <span class="benefit-icon">✅</span>
-                                <span><?= $benefit ?></span>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
             </div>
 
             <!-- Sidebar -->
@@ -232,7 +221,7 @@
                         </div>
                         <div class="info-item">
                             <span class="info-label">Application Deadline:</span>
-                            <span class="info-value"><?= date('M d, Y', strtotime($job['deadline'])) ?></span>
+                            <span class="info-value"><?= !empty($job['deadline']) ? date('M d, Y', strtotime($job['deadline'])) : 'Not mentioned' ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Job Type:</span>

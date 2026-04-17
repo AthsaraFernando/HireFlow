@@ -1,4 +1,4 @@
-<?php $this->view('components/header') ?>
+<?php $this->view('components/header',['page_title' => $page_title ?? 'System Admin']) ?>
 
 <style>
     /* Page Controls Styling - Full Width */
@@ -315,13 +315,22 @@
             grid-template-columns: 1fr;
         }
     }
+
+    .profile_picture {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        margin-left: 20px;
+    }
 </style>
 
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
             <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
-            <p class="brand-subtitle">System Admin</p>
+        
         </div>
 
         <nav class="sidebar-nav">
@@ -352,6 +361,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/announcements" class="nav-link">
+                        <span class="nav-text">Announcements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -374,9 +388,7 @@
             </div>
 
             <div class="header-right">
-                <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div>
+                
 
                 <div class="header-user">
                     <div class="user-info">
@@ -384,8 +396,21 @@
                             <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
                         <span class="user-role">System Administrator</span>
                     </div>
-                    <div class="user-avatar">
-                    </div>
+                    <?php
+                    $defaultProfileImage = 'default-avatar.jpg';
+                    $profileImage = $defaultProfileImage;
+
+                    if (!empty($_SESSION['USER']['profile_picture'])) {
+                        $basePath = dirname(dirname(dirname(__DIR__)));
+                        $profileImageFile = $basePath . '/public/assets/images/profiles/' . $_SESSION['USER']['profile_picture'];
+
+                        if (file_exists($profileImageFile)) {
+                            $profileImage = $_SESSION['USER']['profile_picture'];
+                        }
+                    }
+                    ?>
+                    <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt="" class="profile_picture">
+                    
                 </div>
             </div>
         </header>
@@ -407,8 +432,7 @@
 
             <div class="page-controls">
                 <div class="page-header">
-                    <h1 class="page-title">User Management</h1>
-                    <p class="page-description">Manage system users, roles, and permissions</p>
+                 
                 </div>
 
                 <div class="controls-stats">
@@ -445,14 +469,14 @@
                         <div class="search-container">
                             <input type="text" placeholder="Search users..." class="search-input" id="userSearch">
                             <button class="search-btn" onclick="filterUsers()">
-                                <!-- <i class="icon-search"></i> -->Search
+                                Search
                             </button>
                         </div>
                     </div>
                     <div class="controls-right">
                         <?php if ($can_manage_users ?? false): ?>
                             <button class="btn btn-primary" onclick="openUserModal('add')">
-                                <!-- <i class="icon-plus"></i> -->
+                                
                                 Add Staff User
                             </button>
                             <button class="btn btn-secondary" onclick="exportUsers()">
@@ -489,7 +513,7 @@
                 <?php if ($can_manage_users ?? false): ?>
                     <div class="info-note">
                         <p class="text-muted">
-                            <!-- <i class="icon-info"></i> -->
+                            
                             <strong>Note:</strong> Applicants self-register through the public portal. Only create HR Admin
                             and Recruitment Manager accounts here.
                         </p>
@@ -533,11 +557,10 @@
                                         <td>USR-<?= str_pad($user['id'], 3, '0', STR_PAD_LEFT) ?></td>
                                         <td>
                                             <div class="user-info">
-                                                <!-- <div class="user-avatar"><?= $initials ?></div> -->
+                                            
                                                 <div>
                                                     <div class="user-name"><?= htmlspecialchars($user['full_name']) ?></div>
-                                                    <!-- <div class="user-meta">
-                                                    </div> -->
+                                                 
                                                 </div>
                                             </div>
                                         </td>
@@ -682,6 +705,8 @@
             </div>
 
             <script>
+                const userManageEndpoint = '<?= ROOT ?>/systemadmin/usermanage';
+
                 // Sidebar toggle functionality
                 document.getElementById('sidebarToggle').addEventListener('click', function () {
                     document.querySelector('.sidebar').classList.toggle('collapsed');
@@ -729,8 +754,8 @@
                         button.textContent = 'Create Staff Account';
                         button.onclick = saveUser;
                     } else if (action === 'edit') {
-                        document.querySelector('input[name="password"]').setAttribute('disabled',true);
-                        document.querySelector('input[name="confirmPassword"]').setAttribute('disabled',true);
+                        document.querySelector('input[name="password"]').setAttribute('disabled', true);
+                        document.querySelector('input[name="confirmPassword"]').setAttribute('disabled', true);
                         title.textContent = 'Edit User';
                         button.textContent = 'Update User';
                         modal.setAttribute('data-user-id', userId);
@@ -748,7 +773,7 @@
                     formData.append('action', 'fetch');
                     formData.append('user_id', userId);
 
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
@@ -833,7 +858,7 @@
                     }
 
 
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
@@ -881,7 +906,7 @@
                     }
 
                     // Create user via AJAX
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
@@ -895,7 +920,26 @@
                                 }, 1000);
                             } else {
                                 console.log(data.message)
-                                showToast(data.message || 'Failed to create user', 'error');
+                                if (data.errors) {
+                                    if (data.errors.firstName) {
+                                        showToast(data.errors.firstName, 'error');
+                                    }
+                                    else if (data.errors.lastName) {
+                                        showToast(data.errors.lastName, 'error');
+                                    }
+                                    else if (data.errors.email) {
+                                        showToast(data.errors.email, 'error');
+                                    }
+                                    else if (data.errors.role) {
+                                        showToast(data.errors.role, 'error');
+                                    }
+                                    else {
+                                        showToast(data.errors.password, 'error');
+                                    }
+                                }
+                                else {
+                                    showToast(data.message || 'Failed to create user', 'error');
+                                }
                             }
                         })
                         .catch(error => {
@@ -913,7 +957,7 @@
                     formData.append('action', 'fetch');
                     formData.append('user_id', userId);
 
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
@@ -979,7 +1023,7 @@
                         formData.append('user_id', userId);
                         formData.append('csrf_token', '<?= $csrf_token ?>');
 
-                        fetch('/HireFlow/public/systemadmin/usermanage', {
+                        fetch(userManageEndpoint, {
                             method: 'POST',
                             body: formData
                         })
@@ -1015,7 +1059,7 @@
                     formData.append('status', newStatus);
                     formData.append('csrf_token', '<?= $csrf_token ?>');
 
-                    fetch('/HireFlow/public/systemadmin/usermanage', {
+                    fetch(userManageEndpoint, {
                         method: 'POST',
                         body: formData
                     })
@@ -1035,6 +1079,9 @@
                 }
 
                 function exportUsers() {
+                    if (!confirm("Do you want to export the filtered users?")) {
+                        return;
+                    }
                     const tableRows = document.querySelectorAll('.data-table tbody tr');
                     const visibleRows = Array.from(tableRows).filter(row => {
                         return row.style.display !== 'none' && !row.querySelector('td[colspan]');
@@ -1160,4 +1207,4 @@
         </div>
     </div>
 
-    <?php $this->view('components/footer') ?>
+    <?php  // $this->view('components/footer') ?>

@@ -34,7 +34,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/applicant/savedJobs" class="nav-link">
+                    <a href="<?= ROOT ?>/applicant/jobs/savedJobs" class="nav-link">
                         <span class="nav-text">Saved Jobs</span>
                     </a>
                 </li>
@@ -69,6 +69,7 @@
                 <p class="page-subtitle">Track your job applications and their status</p>
             </div>
             <div class="header-right">
+                <?php include __DIR__ . '/components/notification-bell.view.php'; ?>
                 <div class="user-info">
                     <span class="user-name"><?= $user['name'] ?? 'User' ?></span>
                     <div class="user-avatar"><?= strtoupper(substr($user['name'] ?? 'U', 0, 2)) ?></div>

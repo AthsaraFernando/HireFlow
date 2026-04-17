@@ -11,6 +11,11 @@
   cursor: pointer;
 }
 
+a.btn,
+a.btn:visited {
+  text-decoration: none;
+}
+
 .btn:disabled {
   opacity: 0.6;
   pointer-events: none;
@@ -22,6 +27,12 @@
   color: var(--primary-foreground);
   border-color: var(--primary);
 }
+a.btn-primary,
+a.btn-primary:visited,
+a.btn-primary:hover,
+a.btn-primary:active {
+  color: var(--primary-foreground);
+}
 .btn-primary:hover {
   background-color: oklch(0.56 0.25 292.717);
 }
@@ -31,6 +42,12 @@
   color: var(--secondary-foreground);
   border-color: var(--secondary);
 }
+a.btn-secondary,
+a.btn-secondary:visited,
+a.btn-secondary:hover,
+a.btn-secondary:active {
+  color: var(--secondary-foreground);
+}
 .btn-secondary:hover {
   background-color: oklch(0.94 0.001 286.375);
 }
@@ -39,6 +56,12 @@
   background-color: var(--destructive);
   color: var(--primary-foreground);
   border-color: var(--destructive);
+}
+a.btn-destructive,
+a.btn-destructive:visited,
+a.btn-destructive:hover,
+a.btn-destructive:active {
+  color: var(--primary-foreground);
 }
 .btn-destructive:hover {
   background-color: oklch(0.53 0.25 27.325);

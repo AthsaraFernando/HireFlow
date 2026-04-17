@@ -46,6 +46,12 @@ class Signin extends Controller
 
             // Validate login
             if ($user->signInValidate($_POST, $user)) {
+                if (!empty($_POST['remember_me'])) {
+                    Auth::setRememberMeCookie($_SESSION['USER_ID'] ?? null);
+                } else {
+                    Auth::clearRememberMeCookie();
+                }
+
                 // Log successful login
                 AccessLog::log('login', 'User logged in successfully');
                 

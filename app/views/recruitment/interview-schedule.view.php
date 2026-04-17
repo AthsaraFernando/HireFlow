@@ -35,18 +35,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/candidate-evaluation" class="nav-link">
-                        <span class="nav-text">Evaluations</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/recruitment/reports" class="nav-link">
                         <span class="nav-text">Reports</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/notifications" class="nav-link">
-                        <span class="nav-text">Notifications</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -73,17 +63,11 @@
             </div>
 
             <div class="header-right">
-                <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div>
-
                 <div class="header-user">
                     <div class="user-info">
                         <span class="user-name">
                             <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
                         <span class="user-role">Recruitment Manager</span>
-                    </div>
-                    <div class="user-avatar">
                     </div>
                 </div>
             </div>
@@ -125,8 +109,10 @@
                     </div>
                     <span class="status-badge <?= strtolower($interview['status']) ?>"><?= ucfirst($interview['status']) ?></span>
                     <div class="interview-actions">
-                        <a href="<?= ROOT ?>/recruitment/conduct-interview/<?= $interview['id'] ?>" class="btn btn-primary">Join Interview</a>
-                        <button class="btn btn-outline" onclick="rescheduleInterview(<?= $interview['id'] ?>)">Reschedule</button>
+                        <?php if (strtolower($interview['status']) !== 'completed'): ?>
+                            <a href="<?= ROOT ?>/recruitment/conduct-interview/<?= $interview['id'] ?>" class="btn btn-primary">Join Interview</a>
+                            <button class="btn btn-outline" onclick="rescheduleInterview(<?= $interview['id'] ?>)">Reschedule</button>
+                        <?php endif; ?>
                         <button class="btn btn-danger" onclick="deleteInterview(<?= $interview['id'] ?>)">Delete</button>
                     </div>
                 </div>

@@ -86,7 +86,7 @@ if (!function_exists('old_value')) {
 
                         <div class="form-group mb-4">
                             <label class="checkbox-label">
-                                <input type="checkbox" name="remember_me" class="form-checkbox">
+                                <input type="checkbox" name="remember_me" class="form-checkbox" <?= isset($_POST['remember_me']) ? 'checked' : '' ?>>
                                 <span class="checkbox-text">Remember me</span>
                             </label>
                         </div>
@@ -108,9 +108,6 @@ if (!function_exists('old_value')) {
                                 <a href="<?= ROOT ?>/signup" class="link link-primary">
                                     Create Applicant Account
                                 </a>
-                            </p>
-                            <p class="text-muted small mt-2">
-                                <strong>Staff Access:</strong> HR Admin & Recruitment Manager accounts are created by System Admin.
                             </p>
                         </div>
                     </form>

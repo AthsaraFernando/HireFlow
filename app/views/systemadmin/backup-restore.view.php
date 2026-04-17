@@ -17,13 +17,50 @@
     <link rel="stylesheet" href="<?= ROOT ?>/assets/css/systemadmin/system-admin.css">
 
     <link rel="icon" type="image/x-icon" href="<?= ROOT ?>/assets/images/logo.png">
+
+    <style>
+        .profile_picture {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            margin-left: 20px;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .chart-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            font-style: italic;
+        }
+    </style>
 </head>
 
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
             <h2 class="brand-title">Hire<span class="dark">Flow</span></h2>
-            <p class="brand-subtitle">System Admin</p>
         </div>
 
         <nav class="sidebar-nav">
@@ -54,6 +91,11 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="<?= ROOT ?>/announcements" class="nav-link">
+                        <span class="nav-text">Announcements</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="<?= ROOT ?>/systemadmin/profile" class="nav-link">
                         <span class="nav-text">My Profile</span>
                     </a>
@@ -71,14 +113,12 @@
         <header class="top-header">
             <div class="header-left">
                 <button class="sidebar-toggle" id="sidebarToggle">
-                    < </button>
-                        <h1 class="page-title">Backup & Restore</h1>
+                </button>
+                <h1 class="page-title">Backup & Restore</h1>
             </div>
 
             <div class="header-right">
-                <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div>
+
 
                 <div class="header-user">
                     <div class="user-info">
@@ -86,8 +126,21 @@
                             <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
                         <span class="user-role">System Administrator</span>
                     </div>
-                    <div class="user-avatar">
-                    </div>
+                    <?php
+                    $defaultProfileImage = 'default-avatar.jpg';
+                    $profileImage = $defaultProfileImage;
+
+                    if (!empty($_SESSION['USER']['profile_picture'])) {
+                        $basePath = dirname(dirname(dirname(__DIR__)));
+                        $profileImageFile = $basePath . '/public/assets/images/profiles/' . $_SESSION['USER']['profile_picture'];
+
+                        if (file_exists($profileImageFile)) {
+                            $profileImage = $_SESSION['USER']['profile_picture'];
+                        }
+                    }
+                    ?>
+                    <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt="" class="profile_picture">
+                    
                 </div>
             </div>
         </header>
@@ -102,22 +155,49 @@
             <?php endif; ?>
 
             <div class="dashboard-sections">
+                <div class="dashboard-section" style="display: flex; flex-direction: row; gap: 10px;">
+                    <div class="reports-section">
+                        <h2 class="section-title">Monthly Backup Frequency</h2>
+                        <div class="export-buttons">
+
+                           
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <canvas id="myChart1" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reports-section">
+                        <h2 class="section-title">Monthly Restore Frequency</h2>
+                        <div class="export-buttons">
+
+                           
+                        </div>
+                        <div class="chart-container">
+                            <div class="chart-placeholder">
+                                <canvas id="myChart2" width="400" height="200"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="dashboard-section">
                     <div class="section-header">
                         <h2 class="section-title">Backups and Restores</h2>
                     </div>
-                    <!-- <div class="activity-list"> -->
+                
                     <?php if (!empty($logs)): ?>
-                        <?php //  logger($recent_logins) ?>
+                        
                         <div class="table-container">
                             <table class="data-table activity-table">
                                 <thead>
                                     <tr>
                                         <th>ID</th>
                                         <th>Backup name</th>
-                                        <th>File path</th>
                                         <th>Size</th>
-                                        <th>Status</th>
+                                        <!-- <th>Status</th> -->
                                         <th>Created</th>
                                         <th>Restored</th>
                                         <th style="text-align: center;">Actions</th>
@@ -128,10 +208,8 @@
                                         <tr>
                                             <td><?= htmlspecialchars($log['id']) ?></td>
                                             <td><?= htmlspecialchars($log['backup_name']) ?></td>
-                                            <td><?= htmlspecialchars(strstr(str_replace('\\', '/', $log['file_path']), 'systemadmin/')) ?>
-                                            </td>
                                             <td><?= htmlspecialchars(round($log['file_size'] / (1024 * 1024), 2)) ?> MB</td>
-                                            <td><?= htmlspecialchars($log['status']) ?></td>
+                                            <!-- <td><?= htmlspecialchars($log['status']) ?></td> -->
                                             <td><?= htmlspecialchars($log['created_at']) ?></td>
                                             <td><?= !empty($log['restored_at']) ? htmlspecialchars($log['restored_at']) : 'N/A' ?>
                                             </td>
@@ -142,6 +220,8 @@
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-secondary"
                                                     onclick="downloadBackup(<?= $log['id'] ?>)">Download</button>
+                                                <button type="button" class="btn btn-sm btn-danger"
+                                                    onclick="deleteBackup(<?= $log['id'] ?>)">Delete</button>
                                             </td>
 
                                         </tr>
@@ -179,12 +259,87 @@
 
             </div>
         </div>
-        < </div>
+    </div>
 
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        const whiteBackgroundPlugin = {
+            id: 'custom_canvas_background_color',
+            beforeDraw: (chart) => {
+                const ctx = chart.ctx;
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-over';
+                ctx.fillStyle = '#f8f9fa';
+                ctx.fillRect(0, 0, chart.width, chart.height);
+                ctx.restore();
+            }
+        };
+        Chart.register(whiteBackgroundPlugin);
+        Chart.defaults.devicePixelRatio = 3;
+
+
+        let userChart1;
+        function backupFrequencyChart() {
+            const stats = <?= json_encode($data['monthly_backup_frequencies']) ?>;
+            const labels = stats.map(row => row.instance);
+            const count = stats.map(row => row.monthly_backup_count);
+
+            const ctx = document.getElementById('myChart1').getContext('2d');
+
+            userChart1 = new Chart(ctx, {   
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Number of backups', data: count, borderWidth: 2 },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+        backupFrequencyChart()
+
+        let userChart2;
+        function restoreFrequencyChart() {
+            const stats = <?= json_encode($data['monthly_restore_frequencies']) ?>;
+            const labels = stats.map(row => row.instance);
+            const count = stats.map(row => row.monthly_restore_count);
+
+            const ctx = document.getElementById('myChart2').getContext('2d');
+
+            userChart2 = new Chart(ctx, {  
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Number of restores', data: count, borderWidth: 2 },
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { precision: 0 }
+                        }
+                    }
+                }
+            });
+        }
+        restoreFrequencyChart()
+
+
         const csrfToken = '<?= $data['csrf_token'] ?>';
 
         function createBackup() {
@@ -223,7 +378,7 @@
         }
 
 
-        function restoreBackup(id, button) { // Add restoration feature if required only
+        function restoreBackup(id, button) {
 
             if (!confirm("Do you want to restore a backup now?")) {
                 return;
@@ -263,7 +418,43 @@
 
         }
 
+
+        function deleteBackup(id) {
+            if (!confirm("Do you want to delete the backup?")) {
+                return;
+            }
+
+            const formData = new FormData(document.createElement('form'));
+            formData.set('csrf_token', csrfToken);
+            formData.set('action', 'delete');
+            formData.set('backup_id', id);
+
+            fetch('/HireFlow/public/systemadmin/backuprestore', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, 'success');
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1000);
+                    } else {
+                        showToast(data.message || 'Deletion failed', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('An error occurred while deleting the database backup', 'error');
+                });
+        }
+
         function downloadBackup(id) {
+            if (!confirm("Do you want to download the backup?")) {
+                return;
+            }
+
             const form = document.createElement('form');
             form.method = 'POST';
             form.action = '/HireFlow/public/systemadmin/backuprestore';
@@ -304,22 +495,17 @@
         document.querySelector('.sidebar-toggle').addEventListener('click', function (e) {
             if (e.target.textContent.trim() === ">") {
                 e.target.textContent = "<";
-            } else {
-                e.target.textContent = ">";
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const currentPath = window.location.pathname;
-            const navLinks = document.querySelectorAll('.nav-link');
-
-            navLinks.forEach(link => {
-                if (link.getAttribute('href').includes(currentPath)) {
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
-                }
+            } else { e.target.textContent = ">"; }
+        }); document.addEventListener('DOMContentLoaded',
+            function () {
+                const currentPath = window.location.pathname; const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach(link => {
+                    if (link.getAttribute('href').includes(currentPath)) {
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        link.classList.add('active');
+                    }
+                });
             });
-        });
 
         function showToast(message, type) {
             const toast = document.createElement('div');

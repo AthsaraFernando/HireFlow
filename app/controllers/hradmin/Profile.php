@@ -27,7 +27,7 @@ class Profile extends Controller
                     if (!password_verify($_POST['current_password'], $userData['password'])) {
                         $data['errors'][] = "Current password is incorrect";
                     } else {
-                        $updateData['password'] = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+                        $updateData['password'] = $_POST['new_password'];
                     }
                 }
 
@@ -36,6 +36,8 @@ class Profile extends Controller
                         // Update session data
                         $updatedUser = $user->first(['id' => Auth::user_id()], []);
                         $_SESSION['USER'] = $updatedUser;
+
+                        AccessLog::log('profile_update', 'HR Admin profile updated');
                         
                         $data['success'] = "Profile updated successfully!";
                     } else {
@@ -93,6 +95,6 @@ class Profile extends Controller
             return $errors;
         }
         
-        return true;
+        return [];
     }
 }

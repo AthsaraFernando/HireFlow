@@ -7,6 +7,8 @@ class Application
     protected $allowedColumns = [
         'job_id',
         'applicant_id',
+        'form_id',
+        'form_data',
         'cover_letter',
         'resume_path',
         'status',
@@ -38,7 +40,7 @@ class Application
 
     public function getApplicationsWithDetails()
     {
-        $query = "SELECT a.*, jp.title as job_title, u.full_name, u.email
+        $query = "SELECT a.*, jp.title as job_title, u.full_name, u.email, u.phone
                   FROM applications a 
                   LEFT JOIN job_posts jp ON a.job_id = jp.id 
                   LEFT JOIN users u ON a.applicant_id = u.id 
@@ -89,10 +91,24 @@ class Application
             return false;
         }
 
+        if (array_key_exists('form_data', $data) && is_array($data['form_data'])) {
+            $data['form_data'] = json_encode($data['form_data'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+
         if ($this->validate($data)) {
             $data['applied_at'] = date('Y-m-d H:i:s');
             AccessLog::log('application_submit', 'Apllication submission jobId: ' . $data['job_id'], Auth::user_id());
-            $this->insert($data);
+            $insert_id = $this->insert($data);
+            if (!$insert_id) {
+                return false;
+            }
+
+            $form_id = (int)($data['form_id'] ?? 0);
+            if ($form_id > 0) {
+                $applicationFormModel = new ApplicationForm();
+                $applicationFormModel->incrementSubmissionCount($form_id);
+            }
+
             return true;
         }
         return false;
@@ -177,6 +193,14 @@ class Application
                   FROM applications a
                   JOIN job_posts jp ON a.job_id = jp.id
                   GROUP BY jp.title";
-        return $this->query(query: $query) ?: [];
+        return $this->query($query) ?: [];
+    }
+
+    public function applicationStatusCounts()
+    {
+        $query = "SELECT status,COUNT(*) AS counts
+                  FROM applications
+                  GROUP BY status";
+        return $this->query($query) ?: [];
     }
 }

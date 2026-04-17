@@ -35,18 +35,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/candidate-evaluation" class="nav-link">
-                        <span class="nav-text">Evaluations</span>
-                    </a>
-                </li>
-                <li class="nav-item">
                     <a href="<?= ROOT ?>/recruitment/reports" class="nav-link">
                         <span class="nav-text">Reports</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="<?= ROOT ?>/recruitment/notifications" class="nav-link">
-                        <span class="nav-text">Notifications</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -73,17 +63,11 @@
             </div>
 
             <div class="header-right">
-                <div class="header-notifications">
-                    <button class="notification-btn"></button>
-                </div>
-
                 <div class="header-user">
                     <div class="user-info">
                         <span class="user-name">
                             <?= $_SESSION['USER']['full_name'] ?? '' ?></span>
                         <span class="user-role">Recruitment Manager</span>
-                    </div>
-                    <div class="user-avatar">
                     </div>
                 </div>
             </div>
@@ -91,11 +75,6 @@
 
         <div class="dashboard-content">
             <div class="main-container">
-                <div class="header-section">
-                    <h1 class="page-title">My Profile</h1>
-                    <p class="page-description">Manage your personal information and account settings</p>
-                </div>
-
                 <?php if(!empty($errors)): ?>
                     <div class="alert alert-error">
                         <?php foreach($errors as $error): ?>
@@ -110,129 +89,356 @@
                     </div>
                 <?php endif; ?>
 
-                <div class="profile-container">
-                    <div class="profile-main">
-                        <!-- Profile Header -->
-                        <div class="profile-header">
-                            <div class="profile-avatar">
-                                <div class="avatar-image">
-                                    <?= substr($_SESSION['USER']['full_name'] ?? 'RM', 0, 2) ?>
-                                </div>
-                                <button class="avatar-change-btn">Change Photo</button>
+                <div class="profile-content">
+                    <form method="POST" action="<?= ROOT ?>/recruitment/profile" class="profile-form"
+                        enctype="multipart/form-data">
+
+                        <?php
+                        $defaultProfileImage = 'default-avatar.jpg';
+                        $profileImage = $defaultProfileImage;
+
+                        if (!empty($_SESSION['USER']['profile_picture'])) {
+                            $basePath = dirname(dirname(dirname(__DIR__)));
+                            $profileImageFile = $basePath . '/public/assets/images/profiles/' . $_SESSION['USER']['profile_picture'];
+
+                            if (file_exists($profileImageFile)) {
+                                $profileImage = $_SESSION['USER']['profile_picture'];
+                            }
+                        }
+                        ?>
+                        <div class="profile-header-card">
+                            <img src="<?= ROOT ?>/assets/images/profiles/<?= $profileImage ?>" alt=""
+                                class="profile_picture">
+                            <div class="form-group">
+                                <label for="profile_picture" class="form-label"></label>
+                                <input hidden type="file" id="profile_picture" name="profile_picture" class="form-input"
+                                    accept="image/*">
                             </div>
-                            <div class="profile-info">
-                                <h2 class="profile-name"><?= $_SESSION['USER']['full_name'] ?? 'Recruitment Manager' ?></h2>
+                            <div class="profile-header-info">
+                                <h1 class="profile-name"><?= $_SESSION['USER']['full_name'] ?? 'Recruitment Manager' ?></h1>
                                 <p class="profile-role">Recruitment Manager</p>
                                 <p class="profile-email"><?= $_SESSION['USER']['email'] ?? '' ?></p>
+                                <div class="profile-stats">
+                                    <div class="stat-item">
+                                        <strong>User ID:</strong> <?= $_SESSION['USER']['id'] ?? 'RM001' ?>
+                                    </div>
+                                    <div class="stat-item">
+                                        <strong>Status:</strong> <span class="status-active">Active</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <strong>Last Login:</strong> <?= date('M j, Y g:i A') ?>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-primary btn-large" onclick="downloadData()">
+                                    Download Data
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Profile Form -->
-                        <form method="POST" action="<?= ROOT ?>/recruitment/profile" class="profile-form">
+                        <div class="profile-form-container">
                             <div class="form-section">
-                                <h3 class="section-title">Personal Information</h3>
+                                <div class="section-header">
+                                    <h3 class="section-title">Personal Information</h3>
+                                    <p class="section-description">Update your personal details and contact information</p>
+                                </div>
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label for="full_name" class="form-label">Full Name</label>
-                                        <input type="text" id="full_name" name="full_name" class="form-input" 
-                                               value="<?= $_SESSION['USER']['full_name'] ?? '' ?>" required>
+                                        <input type="text" id="full_name" name="full_name" class="form-input"
+                                            value="<?= $_SESSION['USER']['full_name'] ?? '' ?>" required>
                                     </div>
-                                    
+
                                     <div class="form-group">
                                         <label for="email" class="form-label">Email Address</label>
-                                        <input type="email" id="email" name="email" class="form-input" 
-                                               value="<?= $_SESSION['USER']['email'] ?? '' ?>" required>
+                                        <input type="email" id="email" name="email" class="form-input"
+                                            value="<?= $_SESSION['USER']['email'] ?? '' ?>" required>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="phone" class="form-label">Phone Number</label>
-                                        <input type="tel" id="phone" name="phone" class="form-input" 
-                                               value="<?= $_SESSION['USER']['phone'] ?? '' ?>">
+                                        <input type="tel" id="phone" name="phone" class="form-input"
+                                            value="<?= $_SESSION['USER']['phone'] ?? '' ?>">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="address" class="form-label">Address</label>
+                                        <input type="text" id="address" name="address" class="form-input"
+                                            value="<?= $_SESSION['USER']['address'] ?? '' ?>">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="department" class="form-label">Department</label>
-                                        <input type="text" id="department" name="department" class="form-input" 
-                                               value="Recruitment" readonly>
+                                        <input type="text" id="department" name="department" class="form-input"
+                                            value="Recruitment" readonly>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="role" class="form-label">Role</label>
+                                        <input type="text" id="role" name="role" class="form-input"
+                                            value="Recruitment Manager" readonly>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-section">
-                                <h3 class="section-title">Security Settings</h3>
+                                <div class="section-header">
+                                    <h3 class="section-title">Security Settings</h3>
+                                    <p class="section-description">Change your password and security preferences</p>
+                                </div>
                                 <div class="form-grid">
                                     <div class="form-group">
                                         <label for="current_password" class="form-label">Current Password</label>
-                                        <input type="password" id="current_password" name="current_password" class="form-input">
-                                        <small class="form-hint">Leave blank to keep current password</small>
+                                        <input type="password" id="current_password" name="current_password"
+                                            class="form-input">
+                                        <small class="form-hint">Required only when changing password</small>
                                     </div>
-                                    
+
                                     <div class="form-group">
                                         <label for="new_password" class="form-label">New Password</label>
                                         <input type="password" id="new_password" name="new_password" class="form-input">
-                                        <small class="form-hint">Minimum 8 characters with uppercase, lowercase, number and special character</small>
+                                        <small class="form-hint">Leave blank to keep current password</small>
                                     </div>
 
                                     <div class="form-group">
                                         <label for="confirm_password" class="form-label">Confirm New Password</label>
-                                        <input type="password" id="confirm_password" name="confirm_password" class="form-input">
+                                        <input type="password" id="confirm_password" name="confirm_password"
+                                            class="form-input">
                                     </div>
+                                </div>
+                                <div class="password-requirements">
+                                    <h4>Password Requirements:</h4>
+                                    <ul>
+                                        <li>At least 8 characters long</li>
+                                        <li>Contains uppercase and lowercase letters</li>
+                                        <li>Contains at least one number</li>
+                                        <li>Contains at least one special character (@$!%*?&)</li>
+                                    </ul>
                                 </div>
                             </div>
 
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">Update Profile</button>
-                                <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Profile Sidebar -->
-                    <div class="profile-sidebar">
-                        <div class="sidebar-card">
-                            <h4 class="card-title">Account Information</h4>
-                            <div class="info-list">
-                                <div class="info-item">
-                                    <span class="info-label">User ID</span>
-                                    <span class="info-value"><?= $_SESSION['USER']['id'] ?? 'RM001' ?></span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Role</span>
-                                    <span class="info-value">Recruitment Manager</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Status</span>
-                                    <span class="status-badge status-active">Active</span>
-                                </div>
-                                <div class="info-item">
-                                    <span class="info-label">Last Login</span>
-                                    <span class="info-value"><?= date('M j, Y g:i A') ?></span>
-                                </div>
+                                <button type="submit" class="btn btn-primary btn-large">Update Profile</button>
+                                <button type="button" class="btn btn-secondary btn-large" onclick="resetForm()">Reset Changes</button>
                             </div>
                         </div>
-
-                        <div class="sidebar-card">
-                            <h4 class="card-title">Quick Actions</h4>
-                            <div class="action-list">
-                                <a href="<?= ROOT ?>/recruitment/applications" class="action-link">
-                                    <i class="icon-applications"></i>Review Applications
-                                </a>
-                                <a href="<?= ROOT ?>/recruitment/shortlist-candidates" class="action-link">
-                                    <i class="icon-users"></i>Manage Shortlist
-                                </a>
-                                <a href="<?= ROOT ?>/recruitment/interview-schedule" class="action-link">
-                                    <i class="icon-calendar"></i>Schedule Interviews
-                                </a>
-                                <a href="<?= ROOT ?>/recruitment/reports" class="action-link">
-                                    <i class="icon-reports"></i>View Reports
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+
+<style>
+    .profile-content {
+        padding: 0;
+    }
+
+    .profile-header-card {
+        background: linear-gradient(135deg, #4e31aa 0%, #3b2693 100%);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        box-shadow: 0 8px 25px rgba(78, 49, 170, 0.2);
+    }
+
+    .profile-header-card .profile_picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        margin-left: 20px;
+    }
+
+    .profile-header-info {
+        flex: 1;
+    }
+
+    .profile-header-info button {
+        margin-top: 20px;
+    }
+
+    .profile-name {
+        font-size: 2rem;
+        margin: 0 0 8px 0;
+        font-weight: 700;
+    }
+
+    .profile-role {
+        font-size: 1.2rem;
+        margin: 0 0 8px 0;
+        opacity: 0.9;
+    }
+
+    .profile-email {
+        font-size: 1rem;
+        margin: 0 0 20px 0;
+        opacity: 0.8;
+    }
+
+    .profile-stats {
+        display: flex;
+        gap: 30px;
+    }
+
+    .stat-item {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    .status-active {
+        color: #4ade80;
+        font-weight: 600;
+    }
+
+    .profile-form-container {
+        background: white;
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-section {
+        margin-bottom: 40px;
+    }
+
+    .form-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .section-header {
+        margin-bottom: 25px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #f1f5f9;
+    }
+
+    .section-title {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin: 0 0 8px 0;
+    }
+
+    .section-description {
+        color: #64748b;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+
+    .form-input {
+        padding: 12px 16px;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: #4e31aa;
+        box-shadow: 0 0 0 3px rgba(78, 49, 170, 0.1);
+    }
+
+    .form-input:read-only {
+        background-color: #f8fafc;
+        color: #64748b;
+    }
+
+    .form-hint {
+        font-size: 0.8rem;
+        color: #64748b;
+        margin-top: 5px;
+    }
+
+    .password-requirements {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+    }
+
+    .password-requirements h4 {
+        margin: 0 0 12px 0;
+        font-size: 0.9rem;
+        color: #374151;
+    }
+
+    .password-requirements ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .password-requirements li {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin-bottom: 5px;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        padding-top: 30px;
+        border-top: 2px solid #f1f5f9;
+    }
+
+    .btn-large {
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .profile_picture_header {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(255, 255, 255, 0.3);
+        margin-left: 20px;
+    }
+
+    @media (max-width: 768px) {
+        .profile-header-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .profile-stats {
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
 
 <script>
 function resetForm() {
@@ -264,6 +470,24 @@ document.querySelector('.profile-form').addEventListener('submit', function(e) {
         return false;
     }
 });
+
+function uploadPhoto() {
+    const imageInput = document.querySelector('.profile_picture');
+    imageInput.addEventListener('click', function() {
+        document.getElementById('profile_picture').click();
+    });
+}
+uploadPhoto();
+
+function downloadData() {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '<?= ROOT ?>/recruitment/profile/downloadData';
+    form.style.display = 'none';
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+}
 
 // Sidebar toggle functionality
 document.getElementById('sidebarToggle').addEventListener('click', function () {
