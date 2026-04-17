@@ -239,7 +239,7 @@ class Interview
                   GROUP BY scheduled_date
                   ORDER BY scheduled_date ASC";
         $result = $this->query($query);
-        return $result ? $result : 0;
+        return $result ?: [];
     }
 }
 ?>
