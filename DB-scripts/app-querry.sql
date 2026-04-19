@@ -7,6 +7,13 @@ SET is_required = 0,
   validation_rules = 'max:200'
 WHERE field_name = 'job_title';
 
+-- nullable version 
+
+UPDATE application_form_fields
+SET is_required = 0,
+    validation_rules = 'nullable|max:200'
+WHERE field_name = 'job_title';
+
  MODEL OLD (app/models/ApplicationFormField.php)
 [
   'name' => 'job_title',
@@ -504,20 +511,6 @@ JOIN job_posts jp ON jp.id = a.job_id
 ORDER BY a.applied_at DESC;
 
 
--- 9) Pagination example (page size 10, page 1)
-SELECT id, full_name, email, created_at
-FROM users
-WHERE role_id = 4
-ORDER BY created_at DESC
-LIMIT 10 OFFSET 0;
-
-
--- 10) Pagination example (page size 10, page 2)
-SELECT id, full_name, email, created_at
-FROM users
-WHERE role_id = 4
-ORDER BY created_at DESC
-LIMIT 10 OFFSET 10;
 
 
 -- 11) Display only selected form fields (from JSON form_data)
@@ -851,4 +844,127 @@ ORDER BY jp.title ASC
 ORDER BY LOWER(jp.title) ASC
 
 -- saved jobs order ui check jobpost.php model, order by L182
+
+-- saved jobs new field note 2 note2
+
+ALTER TABLE saved_jobs
+ADD COLUMN note2 TEXT NULL AFTER note;
+
+--add in savedjob.php model
+/*
+<?php
+protected $allowedColumns = [
+    'applicant_id',
+    'job_id',
+    'note',
+    'note2',
+    'saved_at',
+    'updated_at'
+];
+*/
+
+/*
+<?php
+public function saveJob($applicant_id, $job_id, $note = '', $note2 = '')
+{
+    $existing = $this->getSavedJobByApplicantAndJob($applicant_id, $job_id);
+    $payload = [
+        'note' => $note,
+        'note2' => $note2,
+        'updated_at' => date('Y-m-d H:i:s')
+    ];
+    ...
+}
+*/
+
+/*
+<?php
+public function updateNote($saved_job_id, $applicant_id, $note, $note2 = '')
+{
+    $query = "UPDATE {$this->table}
+              SET note = :note, note2 = :note2, updated_at = :updated_at
+              WHERE id = :id AND applicant_id = :applicant_id";
+
+    return $this->query($query, [
+        'note' => $note,
+        'note2' => $note2,
+        'updated_at' => date('Y-m-d H:i:s'),
+        'id' => $saved_job_id,
+        'applicant_id' => $applicant_id
+    ]);
+}
+*/
+
+
+-- in jobs.php controller
+/*
+<?php
+$note2 = trim($_POST['note2'] ?? '');
+...
+$savedJobModel->updateNote($saved_job_id, $user_id, $note, $note2);
+*/
+
+/*
+<?php
+'note2' => $saved_job['note2'] ?? '',
+*/
+
+-- add in saved-jobs.view.php
+for textarea
+/*
+<?php
+<label for="note2_<?= (int)$saved_job['id'] ?>">My Note 2</label>
+<textarea id="note2_<?= (int)$saved_job['id'] ?>" name="note2" rows="3"><?= htmlspecialchars($saved_job['note2'] ?? '') ?></textarea>
+*/
+for dropdown
+/*
+<label for="note2_<?= (int)$saved_job['id'] ?>">Note 2 Type</label>
+<select id="note2_<?= (int)$saved_job['id'] ?>" name="note2">
+    <option value="">-- Select --</option>
+    <option value="Interested" <?= (($saved_job['note2'] ?? '') === 'Interested') ? 'selected' : '' ?>>Interested</option>
+    <option value="Maybe Later" <?= (($saved_job['note2'] ?? '') === 'Maybe Later') ? 'selected' : '' ?>>Maybe Later</option>
+    <option value="Not Suitable" <?= (($saved_job['note2'] ?? '') === 'Not Suitable') ? 'selected' : '' ?>>Not Suitable</option>
+</select>
+*/
+for check box
+/*
+<input type="hidden" name="note2" value="No">
+<label for="note2_<?= (int)$saved_job['id'] ?>">
+    <input
+        type="checkbox"
+        id="note2_<?= (int)$saved_job['id'] ?>"
+        name="note2"
+        value="Yes"
+        <?= (($saved_job['note2'] ?? '') === 'Yes') ? 'checked' : '' ?>
+    >
+    Mark as High Priority
+</label>
+*/
+
+
+-- phone validation regex in model/user.php
+
+if (!empty($data['phone']) && !preg_match('/^07\d{8}$/', $data['phone'])) {
+    $this->errors['phone'] = "Please enter a valid phone number (07XXXXXXXX - 10 digits)";
+}
+
+-- fetch display in recruiter view application 
+
+data comes from apllications.php (a.form_data)
+pass to view applications.view.php , (form_data)
+in the view
+this line -> modalContent.innerHTML = renderJsonHtml(parsedData); pass data
+this line for output formatting renders html  -> function renderField(label, value, fullWidth) 
+this function decide which keys exist - renderObjectSection
+
+-- add below code  just after
+  keys.forEach(function(key) {
+                  const value = obj[key];
+
+-- add code (below above code in applications.vew.php recruiter) after L415
+                     if (key === 'first_name') {
+                sectionHtml += renderField('country', renderPrimitive(value), false);
+                return;}
+
+
 
