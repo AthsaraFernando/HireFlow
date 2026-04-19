@@ -182,6 +182,7 @@
                                                 <?php
                                                     $options = json_decode($field['field_options'] ?? '[]', true);
                                                     if (is_array($options)):
+                                                        
                                                         foreach ($options as $option):
                                                 ?>
                                                     <option value="<?= esc($option) ?>" <?= ($prefillValue === $option) ? 'selected' : '' ?>><?= esc($option) ?></option>
